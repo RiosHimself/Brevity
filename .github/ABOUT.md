@@ -22,10 +22,10 @@ A one-file HTML email builder that works inside Gmail's limits. Blocks, circular
 
 ## Website field
 
-Point it at your GitHub Pages deployment:
+Point it at the GitHub Pages deployment:
 
 ```
-https://<user>.github.io/brevity/
+https://rioshimself.github.io/Brevity/
 ```
 
 ## Topics

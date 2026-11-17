@@ -4,6 +4,10 @@ All notable changes to this project are recorded here. Dates are the day the cha
 
 ## [Unreleased]
 
+### Added
+- Install as an app from the hosted copy: an Install button in the top bar on Chrome, Edge and Android, and Add to Home Screen on iPhone and iPad. Installed, Brevity opens in its own window and works offline. Opened from disk, nothing changes
+- App icon and favicon, from the mark in the top bar
+
 ### Fixed
 - Country flags showed as two letters on Windows, which has no flag emoji. Where a computer cannot draw flags, Brevity now uses a bundled flag font in the picker, the canvas and the subject line, and emoji sent as pictures carry real flags to every reader
 

@@ -4,7 +4,7 @@ Thanks for looking. A few ground rules keep this project usable.
 
 ## The constraints
 
-1. **One file, no build step.** `index.html` must open and run straight from disk. No bundler, no package manager, no transpiler. If a change needs tooling to run, it does not belong here.
+1. **One file, no build step.** `index.html` must open and run straight from disk. No bundler, no package manager, no transpiler. If a change needs tooling to run, it does not belong here. The only other files are `manifest.webmanifest`, `sw.js` and `icons/`, which let the hosted copy install as an app; `index.html` must never depend on them. If you add a file the app loads, list it in `APP` in `sw.js` and bump `VERSION`.
 2. **No runtime dependencies** beyond the Google Fonts link for the interface and the handwriting styles. No frameworks, no CDN libraries.
 3. **The email output is the product.** Anything rendered into a message must use tables, inline styles and web-safe fonts. No `<style>` block, no flexbox, no grid, no `border-radius` that matters, no external image URLs.
 4. **One renderer.** `rb()` produces both the canvas and the export. Resist adding a separate export path; they drift apart within a release.

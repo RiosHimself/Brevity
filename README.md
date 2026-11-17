@@ -6,6 +6,8 @@ A browser-based builder for HTML emails that survive Gmail. Compose with blocks,
 
 It is one HTML file. No build step, no dependencies to install, no server, no account. Open it and start writing.
 
+**Try it:** [rioshimself.github.io/Brevity](https://rioshimself.github.io/Brevity/)
+
 ---
 
 ## Why it exists
@@ -84,9 +86,20 @@ To send:
 
 Any static host works. For GitHub Pages: push this repository, then under **Settings → Pages** choose **Deploy from a branch**, branch `main`, folder `/ (root)`. The app will be live at `https://<user>.github.io/<repo>/`.
 
+### Installing it as an app
+
+The hosted copy can be installed, so it opens in its own window and works without a connection. Drafts stay in the same place either way.
+
+- **Chrome or Edge on a computer:** select **Install** in Brevity's top bar, or the install icon at the right of the address bar.
+- **Android:** **Install** in the top bar, or the browser menu, then **Install app**.
+- **iPhone and iPad:** in Safari, **Share**, then **Add to Home Screen**.
+- **Firefox on a computer** does not install web apps; use it in a tab.
+
+This needs `manifest.webmanifest`, `sw.js` and the `icons/` folder beside `index.html`. Opened from disk, none of it is used and the app works as before.
+
 ## Privacy
 
-Nothing leaves the browser. There is no server, no analytics and no network request except the webfonts loaded from Google Fonts for the interface and the handwriting styles. Drafts, photos and saved layouts live in your own browser's IndexedDB; clearing site data deletes them.
+Nothing leaves the browser. There is no server, no analytics and no network request except the webfonts loaded from Google Fonts for the interface and the handwriting styles. An installed copy keeps the page, its icons and those fonts in the browser's cache so it opens offline; nothing else is stored or sent. Drafts, photos and saved layouts live in your own browser's IndexedDB; clearing site data deletes them.
 
 ## Limitations worth knowing
 
