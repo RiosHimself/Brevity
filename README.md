@@ -22,10 +22,14 @@ Brevity works inside those limits instead of around them:
 ## Features
 
 **Composing**
-- Fourteen block types: header, heading, text, round photo, photo row, photo with text, signature, wide photo, button, quote, callout, divider, spacer, footer
-- Edit text directly on the canvas, with bold, italic, underline and links
+- Eighteen block types: header, heading, text, two columns, round photo, photo row, photo with text, wide photo, event, table, button, link row, quote, callout, signature, divider, spacer, footer
+- **Event** blocks show a date badge with Add to calendar links for Google Calendar and Outlook
+- **Tables** for menus and schedules: paste cells straight from a spreadsheet
+- **Two columns** sit side by side on a computer and stack on a phone
+- Edit text directly on the canvas, with bold, italic, underline, strikethrough, links, bulleted and numbered lists, and text colour and highlight that follow the palette
 - Drag blocks to reorder, or use the keyboard (`Alt+↑` / `Alt+↓`, `Ctrl+D` to duplicate, `Delete` to remove)
 - Undo and redo across everything, including palette changes and photo moves
+- Emoji from the Unicode list, browsed by category from a dropdown or searched by name, in any skin tone, dropped in at the cursor
 
 **Photos**
 - Drop files anywhere, paste from the clipboard, or pick them
@@ -48,14 +52,19 @@ Brevity works inside those limits instead of around them:
 - Twenty-one starters, split into general use and school use, written as working drafts rather than lorem ipsum
 - Save your own email as a reusable layout, photos included
 - Reset back to the original of whichever layout you started from
+- Save any single block as a reusable section, such as a school footer
 
 **Before you send**
-- A checklist for the expensive mistakes: no subject line, placeholder photos, missing alt text, unsigned signature blocks, buttons with no link
+- A checklist for the expensive mistakes: no subject line, placeholder photos, missing alt text, unsigned signature blocks, buttons with no link, past event dates, heavy photos, hard-to-read colours, links that say "click here" and very long paragraphs
+- A dark mode preview of how Gmail's phone apps may recolour the email
+- Photo quality: Sharp, or Smaller at about half the weight
 - A size meter against Gmail's 102 KB clipping threshold
-- Copy for Gmail, copy raw HTML, download an `.html` file, or copy a plain-text version
+- Optionally send emoji as small pictures, so flags and the newest emoji look right on older phones and on Windows
+- Copy for Gmail, copy raw HTML, download an `.html` file, copy a plain-text version, or print and save as PDF
 
 **Quality of life**
-- Autosave to IndexedDB, so a reload does not lose the draft
+- Several drafts at once, autosaved to IndexedDB, so a reload loses nothing
+- Save an email as a `.brevity` file, photos included, to move it between computers or share it with a colleague
 - Phone-width preview
 - Light and dark interface, following the system setting
 - Works on a phone, with panels switched by a bottom tab bar
@@ -85,11 +94,13 @@ Nothing leaves the browser. There is no server, no analytics and no network requ
 - **Outlook on Windows** uses the Word rendering engine and will square off some rounded corners. Circular photos survive because they are baked images.
 - **No mail merge, no sending.** Brevity composes; your mail client sends.
 - **Dark mode in mail clients** may recolour parts of the message. Test if your recipients are likely to read in dark mode.
-- **Saved layouts are per browser.** They do not sync between devices.
+- **Drafts, saved layouts and sections are per browser.** They do not sync between devices; save a `.brevity` file to move an email.
+- **Add to calendar** covers Google Calendar and Outlook. Apple Calendar needs an `.ics` file, which an email body cannot carry; Apple Mail offers to add dates it finds in the text.
+- **Emoji are drawn by the recipient's device** unless you send them as pictures. Pictures are made with your own device's emoji font, so an emoji your device cannot draw (dimmed in the picker; on Windows that includes flags) stays as text. The subject line is always text.
 
 ## How the code is organised
 
-One file, around 1,400 lines, commented throughout.
+One file, around 2,100 lines, commented throughout.
 
 | Part | What it does |
 | --- | --- |
@@ -98,7 +109,9 @@ One file, around 1,400 lines, commented throughout.
 | `bake()` | Draws a photo into a canvas with its crop, frame and circle, and returns a data URI. |
 | `theme()` | Resolves the active palette, user overrides included, and derives readable text colours. |
 | `STARTS` | Starter layouts, each a function returning a complete document. |
-| `checks()` | The pre-send checklist. |
+| `checks()` | The pre-send checklist; `readability()` adds the contrast, link wording and paragraph rules. |
+| `saveNow()`, `openDraft()` | Drafts in IndexedDB, one key per email. |
+| `openBrevity()`, `sanDoc()` | Opening a `.brevity` file, checking every field before anything is rendered. |
 | `buildEmail()` | Wraps the blocks in the outer table structure Gmail expects. |
 
 The DOM is always a rendering of `doc` and is rebuilt wholesale on change, which removes a class of bugs where the model and the view disagree.

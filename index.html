@@ -85,6 +85,20 @@ main{display:grid;grid-template-columns:clamp(260px,24vw,304px) minmax(0,1fr) 29
 .palette button{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:9px;text-align:left;font-weight:500;min-height:42px}
 .palette button:hover{border-color:var(--accent);background:var(--accent-soft)}
 .palette svg{width:22px;height:22px;flex:none;color:var(--accent)}
+.emoji-pick{display:grid;gap:6px}
+/* Named for screen readers, hidden on screen; the placeholder and the
+   dropdown's own text already say what these are. */
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.emoji-pick select,.emoji-pick input{width:100%;min-width:0;border:1px solid var(--line);background:var(--field);border-radius:8px;padding:8px 10px}
+.emoji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(36px,1fr));gap:2px;max-height:236px;overflow-x:hidden;overflow-y:auto;border:1px solid var(--line);border-radius:10px;padding:4px;background:var(--field)}
+.emoji-grid button{min-width:0;height:38px;border:0;background:none;border-radius:7px;padding:0;font:22px/1 "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;cursor:pointer}
+.emoji-grid button:hover,.emoji-grid button:focus-visible{background:var(--accent-soft)}
+.emoji-grid .hint{grid-column:1 / -1;margin:6px}
+.emoji-grid button.cant{opacity:.3}
+.tones{display:flex;gap:4px}
+.tones button{flex:1;min-width:0;height:30px;border:1px solid var(--line);background:var(--field);border-radius:8px;padding:0;display:grid;place-items:center;cursor:pointer}
+.tones i{width:16px;height:16px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.tones button[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .starts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
 .starts button{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:10px;text-align:left}
 .starts button:hover{border-color:var(--accent);background:var(--accent-soft)}
@@ -137,6 +151,19 @@ main{display:grid;grid-template-columns:clamp(260px,24vw,304px) minmax(0,1fr) 29
 .check input{width:16px;height:16px;accent-color:var(--accent)}
 input[type=color]{width:38px;height:32px;padding:2px;border:1px solid var(--line);border-radius:7px;background:var(--field)}
 .rt button{font-weight:700;min-width:34px;justify-content:center}
+.field input[type=date],.field input[type=time],.linkitem input,.linkitem select{width:100%;min-width:0;border:1px solid var(--line);background:var(--field);border-radius:8px;padding:7px 9px}
+.field.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.field.two label{display:grid;gap:4px;font-weight:500;font-size:13px}
+.linkitem{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);display:grid;gap:6px}.linkitem .row{flex-wrap:nowrap}.linkitem select{flex:1}
+.field .lab+.paint{margin-top:0}
+.paint{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.paint .sw-b{width:30px;height:30px;border:1px solid var(--line);background:var(--field);border-radius:8px;padding:0;display:grid;place-items:center;cursor:pointer}
+.paint .sw-b:hover{border-color:var(--accent)}
+.paint .sw-b i{width:16px;height:16px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.paint .sw-b.none i{background:linear-gradient(135deg,transparent 45%,var(--red) 45%,var(--red) 55%,transparent 55%),var(--panel)}
+.paint input[type=color]{width:30px;height:30px}
+/* Lists on the canvas match the inline styles the export gives them. */
+#canvas [data-rich] ul,#canvas [data-rich] ol{margin:6px 0;padding:0 0 0 24px}
+#canvas [data-rich] li{margin:0 0 4px}
 
 /* stage */
 .stage{overflow:auto;min-height:0;background:var(--stage);padding:20px 16px 60px;position:relative}
@@ -192,6 +219,20 @@ dialog::backdrop{background:rgba(12,16,20,.5);backdrop-filter:blur(3px)}
 .meter i.w{background:var(--warn)}
 .steps{margin:0;padding-left:20px;color:var(--muted)}
 .steps li{margin:3px 0}
+.drafts{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:6px;max-height:min(52vh,420px);overflow-y:auto}
+.drafts li{min-width:0;display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:10px;padding:9px 10px}
+.drafts li.cur{border-color:var(--accent);background:var(--accent-soft)}
+.drafts li>div:first-child{min-width:0}.drafts b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.drafts span{color:var(--muted);font-size:12px}
+.drafts .row{flex-wrap:nowrap}.drafts .btn{padding:4px 9px;min-height:30px;font-size:13px}
+.btn.danger{background:var(--red);border-color:var(--red);color:#fff}
+.secs .item button[data-sec]{display:flex;align-items:center;gap:8px;font-weight:500}.secs svg{width:20px;height:20px;flex:none;color:var(--accent)}
+.secs{grid-template-columns:minmax(0,1fr)}.secsave{margin-top:22px;border-top:1px solid var(--line);padding-top:14px}.secsave input{flex:1;min-width:0;border:1px solid var(--line);background:var(--field);border-radius:8px;padding:8px 10px}
+@media (max-width:920px){.wide-t{display:none}}
+@media (max-width:560px){.drafts li{flex-wrap:wrap}.drafts li>div:first-child{width:100%}.drafts .row{flex-wrap:wrap}}
+body.darkprev #canvas{filter:invert(1) hue-rotate(180deg)}
+body.darkprev #canvas img{filter:invert(1) hue-rotate(180deg)}
+.darknote{margin:0;padding:8px 12px;font-size:13px;color:var(--ink);background:var(--accent-soft);border-bottom:1px solid var(--line)}
+#darkPrev[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
 #manual{display:none;margin-top:12px;border:1px solid var(--line);border-radius:8px;max-height:220px;overflow:auto;background:#fff}
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#14161B;color:#fff;padding:11px 17px;border-radius:11px;box-shadow:0 10px 30px rgba(10,14,20,.3);font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;max-width:calc(100vw - 32px)}
 #toast.on{opacity:1}
@@ -219,12 +260,14 @@ dialog::backdrop{background:rgba(12,16,20,.5);backdrop-filter:blur(3px)}
     Brevity
     <em>Less clutter. Better newsletters.</em>
   </div>
+  <button class="btn" id="openDrafts" title="Your emails, and saving or opening files"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M2 4.5V12a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H8L6.5 3.5H3a1 1 0 0 0-1 1z"/></svg><span class="wide-t">Drafts</span></button>
   <button class="btn icon" id="undo" aria-label="Undo" title="Undo (Ctrl+Z)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3 2 6l3 3"/><path d="M2 6h7a4 4 0 0 1 0 8H6"/></svg></button>
   <button class="btn icon" id="redo" aria-label="Redo" title="Redo (Ctrl+Shift+Z)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m11 3 3 3-3 3"/><path d="M14 6H7a4 4 0 0 0 0 8h3"/></svg></button>
   <div class="seg wide" role="group" aria-label="Preview width">
     <button data-device="desktop" aria-pressed="true">Desktop</button>
     <button data-device="phone" aria-pressed="false">Phone</button>
   </div>
+  <button class="btn icon" id="darkPrev" aria-pressed="false" aria-label="Dark mode preview" title="Preview roughly how Gmail’s phone apps recolour this email in dark mode"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 9.6A5.6 5.6 0 0 1 6.4 2.5a5.6 5.6 0 1 0 7.1 7.1z"/></svg></button>
   <button class="btn" id="openExport">Check and export <span class="badge" id="badge" hidden></span></button>
   <button class="btn primary" id="copyGmail">Copy for Gmail</button>
 </header>
@@ -239,6 +282,17 @@ dialog::backdrop{background:rgba(12,16,20,.5);backdrop-filter:blur(3px)}
       <h2>Blocks</h2>
       <div class="palette" id="palette"></div>
       <p class="hint">Click to add below the selected block, or drag into place.</p>
+      <div id="sectionsWrap" hidden><h2>Your sections</h2><div class="starts secs" id="sections"></div></div>
+      <h2>Emoji</h2>
+      <div class="emoji-pick">
+        <label class="sr" for="emojiCat">Emoji category</label>
+        <select id="emojiCat"></select>
+        <label class="sr" for="emojiFind">Search emoji</label>
+        <input id="emojiFind" type="search" placeholder="Search, e.g. heart" autocomplete="off">
+        <div class="tones" id="emojiTone" role="group" aria-label="Skin tone"></div>
+        <div class="emoji-grid" id="emojiGrid" role="group" aria-label="Emoji"></div>
+      </div>
+      <p class="hint">Click into any text in the email, or the subject line, then pick an emoji to put it there.</p>
       <h2>Start from a layout</h2>
       <div class="starts" id="starts"></div>
       <div class="saverow">
@@ -256,6 +310,7 @@ dialog::backdrop{background:rgba(12,16,20,.5);backdrop-filter:blur(3px)}
         <label><span>Subject</span><input id="subject" type="text" placeholder="What is this email about?"></label>
         <label><span>Preview text</span><input id="preheader" type="text" placeholder="The line shown after the subject in the inbox"></label>
       </div>
+      <p class="darknote" id="darkNote" hidden>Dark mode preview: roughly how Gmail’s iPhone and Android apps recolour emails. Your email itself is unchanged. Gmail on a computer leaves it as it is.</p>
       <div id="canvas"></div>
     </div>
   </section>
@@ -277,6 +332,13 @@ dialog::backdrop{background:rgba(12,16,20,.5);backdrop-filter:blur(3px)}
   </div>
 </dialog>
 
+<dialog id="draftsDlg" aria-labelledby="drTitle">
+  <div class="dlg">
+    <h2 id="drTitle">Your emails</h2>
+    <div id="drBody"></div>
+  </div>
+</dialog>
+
 <dialog id="signDlg" aria-labelledby="sgTitle">
   <div class="dlg">
     <h2 id="sgTitle">Sign here</h2>
@@ -295,6 +357,7 @@ dialog::backdrop{background:rgba(12,16,20,.5);backdrop-filter:blur(3px)}
 </dialog>
 
 <input type="file" id="file" accept="image/*" multiple hidden>
+<input type="file" id="openFile" accept=".brevity,application/json" hidden>
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -379,11 +442,39 @@ const THEMES={
 function theme(){
   const t=THEMES[doc.theme]||THEMES.harbor, accent=doc.accent||t.accent, accent2=doc.accent2||t.accent2||accent, roomy=doc.density!=='cozy';
   return Object.assign({},t,{accent,accent2,bg:doc.bg||t.bg,on:lum(accent)>.4?'#111111':'#FFFFFF',tint:mix(accent2,t.card,.9),line:mix(t.text,t.card,.86),
-    cardR:doc.corners==='square'?0:14,btnR:{square:0,round:8,pill:999}[doc.buttons]||999,pad:roomy?40:28,vp:roomy?14:10});
+    cardR:doc.corners==='square'?0:14,btnR:({square:0,round:8,pill:999})[doc.buttons]??999,  // ?? not ||: square is 0, and 0 is falsy
+    pad:roomy?40:28,vp:roomy?14:10});
 }
 
+/* Word colours. The swatches store a name, not a colour ("accent", "yellow"),
+   and the name is resolved against the palette each time the email is drawn,
+   so changing the palette recolours coloured words with it. Highlights are a
+   28% tint of their colour over the card, which keeps them light behind dark
+   text and dark behind light text, so dark palettes stay readable. Red and
+   green get lighter versions on dark cards for the same reason. A custom
+   colour is stored as its #hex and left alone. */
+const isDark=T=>lum(T.card)<.4;
+const WORD_FG={accent:['Main colour',T=>T.accent],accent2:['Second colour',T=>T.accent2],muted:['Soft grey',T=>T.muted],
+  red:['Red',T=>isDark(T)?'#FF8A80':'#C0392B'],green:['Green',T=>isDark(T)?'#7CD992':'#1E8449']};
+const WORD_BG={yellow:['Yellow','#FFD400'],accent:['Main colour',T=>T.accent],accent2:['Second colour',T=>T.accent2],green:['Green','#3CCB6E'],pink:['Pink','#FF6FA8']};
+function wordColor(kind,v,T){
+  if(/^#[0-9a-f]{6}$/i.test(v))return v;
+  const d=(kind==='fg'?WORD_FG:WORD_BG)[v];if(!d)return '';
+  const c=typeof d[1]==='function'?d[1](T):d[1];
+  return kind==='fg'?c:mix(c,T.card,.72);
+}
+const okWord=(kind,v)=>/^#[0-9a-f]{6}$/i.test(v)||Object.prototype.hasOwnProperty.call(kind==='fg'?WORD_FG:WORD_BG,v);
+// "rgb(1, 2, 3)" or "#abc" -> "#010203"; transparent -> ''
+function toHex(c){c=String(c||'').trim();if(!c)return '';
+  let m=/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)$/.exec(c);
+  if(m){if(m[4]!=null&&+m[4]===0)return '';return '#'+[m[1],m[2],m[3]].map(x=>(+x).toString(16).padStart(2,'0')).join('');}
+  m=/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(c);if(m){const h=m[1].length===3?m[1].replace(/./g,'$&$&'):m[1];return '#'+h.toLowerCase();}
+  return '';}
+
 /* ---------- state ---------- */
-let doc={subject:'',preheader:'',theme:'harbor',accent:null,accent2:null,bg:null,corners:'round',buttons:'pill',density:'roomy',blocks:[]};
+const freshDoc=()=>({subject:'',preheader:'',theme:'harbor',accent:null,accent2:null,bg:null,corners:'round',buttons:'pill',density:'roomy',emojiPics:false,photoQuality:'sharp',blocks:[]});
+let doc=freshDoc();
+let drafts=[],draftId=null,sections=[];
 let sel={id:null,sub:''};
 const images={};            // id -> {src, el}
 const imgOpts=new Map();    // "blockId/path" -> bake options
@@ -393,6 +484,9 @@ const P0=()=>({img:null,zoom:1,ox:0,oy:0,alt:''});
 /* make() returns a new block of the given type with sensible defaults.
    Every photo-bearing field starts from P0(): img id, zoom, and ox/oy, which
    are the -1..1 pan offsets used when the photo is dragged inside its frame. */
+// Today plus n days as YYYY-MM-DD in local time, and this computer's time zone name.
+function isoDay(n){const d=new Date();d.setDate(d.getDate()+(n||0));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function localTZ(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'';}catch(e){return '';}}
 function make(type){
   const b={id:uid('b'),type};
   const d={
@@ -409,11 +503,15 @@ function make(type){
     callout:{title:'Worth knowing',html:'Dates, reminders, or the one thing readers should not miss.'},
     divider:{style:'line'},
     spacer:{h:24},
-    footer:{html:'You’re receiving this because you asked to hear from us.',align:'center'}
+    footer:{html:'You’re receiving this because you asked to hear from us.',align:'center'},
+    event:{title:'Spring showcase',date:isoDay(7),start:'18:00',end:'19:30',allDay:false,place:'School hall',notes:'Doors open 15 minutes early. Families welcome.',cal:true,tz:localTZ()},
+    table:{rows:[['Day','What’s on'],['Monday','Library visit'],['Wednesday','Swimming, bring a towel'],['Friday','Spelling test']],head:true,stripes:true},
+    columns:Object.assign({layout:'text',t1:'First thing',h1:'A short paragraph about one topic.',t2:'Second thing',h2:'A short paragraph about another.'},{pic:P0()}),
+    links:{style:'labels',items:[{kind:'web',url:'',label:'Website'},{kind:'email',url:'',label:'Email us'},{kind:'phone',url:'',label:'Call us'}]}
   }[type];
   return Object.assign(b,JSON.parse(JSON.stringify(d)));
 }
-const LABEL={header:'Header',heading:'Heading',text:'Text',photo:'Round photo',people:'Photo row',profile:'Photo and text',signature:'Signature',banner:'Wide photo',button:'Button',quote:'Quote',callout:'Callout',divider:'Divider',spacer:'Space',footer:'Footer'};
+const LABEL={header:'Header',heading:'Heading',text:'Text',columns:'Two columns',photo:'Round photo',people:'Photo row',profile:'Photo and text',banner:'Wide photo',event:'Event',table:'Table',button:'Button',links:'Link row',quote:'Quote',callout:'Callout',signature:'Signature',divider:'Divider',spacer:'Space',footer:'Footer'};
 const ICON={
   header:'<rect x="3" y="4" width="18" height="7" rx="1.5" fill="currentColor"/><path d="M5 15h14M5 19h9"/>',
   heading:'<path d="M6 5v14M18 5v14M6 12h12" stroke-width="2.4"/>',
@@ -428,8 +526,22 @@ const ICON={
   callout:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 10h10M7 14h6"/>',
   divider:'<path d="M3 12h18"/>',
   spacer:'<path d="M12 4v16M8 8l4-4 4 4M8 16l4 4 4-4"/>',
-  footer:'<path d="M5 6h14" opacity=".35"/><path d="M5 15h14M8 19h8"/>'
+  footer:'<path d="M5 6h14" opacity=".35"/><path d="M5 15h14M8 19h8"/>',
+  event:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/><rect x="8" y="13" width="3" height="3" fill="currentColor" stroke="none"/>',
+  table:'<rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 10h18M3 14.5h18M10 5v14"/>',
+  columns:'<rect x="3" y="5" width="8" height="14" rx="1.5"/><rect x="13" y="5" width="8" height="14" rx="1.5"/>',
+  links:'<circle cx="5.5" cy="12" r="2.6"/><circle cx="12" cy="12" r="2.6"/><circle cx="18.5" cy="12" r="2.6"/>'
 };
+/* Link row icons: simple generic glyphs on a 24-unit grid, drawn as strokes.
+   No company logos, only what a link is for. */
+const LINK_KINDS={web:['Website','M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0M3.5 12h17M12 3c3.2 3.4 3.2 14.6 0 18M12 3c-3.2 3.4-3.2 14.6 0 18','https://'],
+  email:['Email','M3.5 6.5h17v11h-17zM4 7l8 6 8-6','name@example.org'],
+  phone:['Phone','M7 3.5h3l1.6 4.4-2.2 1.4a10.5 10.5 0 0 0 5.3 5.3l1.4-2.2 4.4 1.6v3a2 2 0 0 1-2 2A15.5 15.5 0 0 1 5 5.5a2 2 0 0 1 2-2','Phone number'],
+  map:['Map','M12 20.5s-6.5-5.6-6.5-10.6a6.5 6.5 0 0 1 13 0c0 5-6.5 10.6-6.5 10.6zM12 7.4a2.3 2.3 0 1 0 0 4.6a2.3 2.3 0 1 0 0-4.6','https:// link to a map'],
+  calendar:['Calendar','M4.5 6h15v13.5h-15zM4.5 10h15M8.5 3.5v4M15.5 3.5v4','https:// link to a calendar'],
+  video:['Video','M3.5 7h11v10h-11zM14.5 10.5l6-3v9l-6-3','https:// link to a video'],
+  doc:['Document','M6.5 3.5h7.5l4 4v13h-11.5zM14 3.5v4h4M9.5 12h5M9.5 15.5h5','https:// link to a form or file'],
+  chat:['Message','M4 5h16v10.5H9.5L4 19.5z','https:// or a messaging link']};
 const ico=t=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[t]+'</svg>';
 
 /* ---------- starter layouts ---------- */
@@ -623,9 +735,13 @@ const cache=new Map();
    Rendered at 2x for retina. Circles export as PNG (they need transparent
    corners); rectangles export as JPEG unless o.png asks otherwise. */
 function bake(h,o,T,live){
-  const key=[h.img||'ph',h.zoom,h.ox,h.oy,o.shape,o.w,o.h,o.frame,o.radius,T.accent,T.card,T.accent2,o.mono,T.on,o.mono!=null?T.hf:'',o.fill,o.png].join('|');
+  /* Photo quality: "sharp" draws at 2x for high-resolution screens; "light"
+     draws at 1.25x with stronger JPEG compression, roughly halving the weight
+     of photo-heavy emails at a small cost in crispness on phones. */
+  const light=doc.photoQuality==='light';
+  const key=[h.img||'ph',h.zoom,h.ox,h.oy,o.shape,o.w,o.h,o.frame,o.radius,T.accent,T.card,T.accent2,o.mono,T.on,o.mono!=null?T.hf:'',o.fill,o.png,light].join('|');
   if(!live&&cache.has(key))return cache.get(key);
-  const s=2,W=Math.round(o.w*s),H=Math.round(o.h*s),c=document.createElement('canvas');c.width=W;c.height=H;
+  const s=light?1.25:2,W=Math.round(o.w*s),H=Math.round(o.h*s),c=document.createElement('canvas');c.width=W;c.height=H;
   const g=c.getContext('2d'),im=h.img&&images[h.img]&&images[h.img].el;
   const draw=(x,y,w,hh)=>{
     if(im){const k=Math.max(w/im.naturalWidth,hh/im.naturalHeight)*(h.zoom||1),dw=im.naturalWidth*k,dh=im.naturalHeight*k;
@@ -648,7 +764,7 @@ function bake(h,o,T,live){
     const r=(o.radius||0)*s;if(o.fill!==null){g.fillStyle=o.fill||T.card;g.fillRect(0,0,W,H);}g.save();g.beginPath();
     if(r&&g.roundRect)g.roundRect(0,0,W,H,r);else g.rect(0,0,W,H);
     g.clip();draw(0,0,W,H);g.restore();
-    out=o.png?c.toDataURL('image/png'):c.toDataURL('image/jpeg',.88);
+    out=o.png?c.toDataURL('image/png'):c.toDataURL('image/jpeg',light?.74:.88);
   }
   if(!live){if(cache.size>300)cache.clear();cache.set(key,out);}
   return out;
@@ -667,7 +783,8 @@ function picOpts(b,T){
   if(b.type==='photo')return{shape:'circle',w:{s:96,m:140,l:200,xl:280}[b.size]||200,h:{s:96,m:140,l:200,xl:280}[b.size]||200,frame:b.frame};
   if(b.type==='people'){const n={2:140,3:120,4:96}[b.items.length]||96;return{shape:'circle',w:n,h:n,frame:b.frame};}
   if(b.type==='profile')return{shape:'circle',w:96,h:96,frame:b.frame};
-  const w=b.bleed?600:600-T.pad*2;return{shape:'rect',w,h:Math.round(w/parseFloat(b.ratio||2)),radius:(!b.bleed&&b.rounded)?14:0,fluid:true};
+  if(b.type==='columns'){const w=Math.floor((600-T.pad*2)/2)-12;return{shape:'rect',w,h:Math.round(w*.75),radius:T.cardR?10:0,fluid:true};}
+  const w=b.bleed?600:600-T.pad*2;return{shape:'rect',w,h:Math.round(w/parseFloat(b.ratio||2)),radius:(!b.bleed&&b.rounded&&T.cardR)?14:0,fluid:true};  // square page corners square every box
 }
 /* pic() = picOpts + bake + the <img> tag, sized in both attributes and CSS
    because some clients ignore one or the other. */
@@ -682,24 +799,46 @@ function pic(b,path,T,ed){
 /* ---------- rich text ---------- */
 /* clean() whitelists the HTML that contenteditable produces. Browsers emit
    <div>, <span style=...> and pasted markup; email needs a tiny, predictable
-   subset. Anything not b/i/u/a/br is flattened to its text. */
-function clean(node){
+   subset: b, i, u, s, a, br, ul/ol/li, and <span data-fg data-bg> for word
+   colours. Anything else is flattened to its text.
+   Colours: the browser writes them as inline styles, on a span it adds or on
+   an element that was already there. A colour that still matches its stored
+   name keeps the name; one the browser changed becomes a #hex; one equal to
+   the field's own colour is dropped, which is how "Default" removes colour. */
+function clean(node,ctx){
+  if(!ctx){const T=theme();ctx={T,base:toHex(getComputedStyle(node).color)};}
   let out='';
   node.childNodes.forEach(n=>{
     if(n.nodeType===3){out+=esc(n.nodeValue);return;}
     if(n.nodeType!==1)return;
-    const t=n.tagName,inner=clean(n);
-    if(t==='BR')out+='<br>';
-    else if(t==='B'||t==='STRONG')out+='<b>'+inner+'</b>';
-    else if(t==='I'||t==='EM')out+='<i>'+inner+'</i>';
-    else if(t==='U')out+='<u>'+inner+'</u>';
-    else if(t==='A'){const href=n.getAttribute('href')||'';out+=/^(https?:|mailto:)/i.test(href)?'<a href="'+esc(href)+'">'+inner+'</a>':inner;}
-    else if(t==='DIV'||t==='P'){if(out&&!/<br>$/.test(out))out+='<br>';out+=inner;}
-    else out+=inner;
+    const t=n.tagName;let inner=clean(n,ctx),h;
+    if(t==='BR')h='<br>';
+    else if(t==='B'||t==='STRONG')h='<b>'+inner+'</b>';
+    else if(t==='I'||t==='EM')h='<i>'+inner+'</i>';
+    else if(t==='U')h='<u>'+inner+'</u>';
+    else if(t==='S'||t==='STRIKE'||t==='DEL')h='<s>'+inner+'</s>';
+    else if(t==='A'){const href=n.getAttribute('href')||'';h=/^(https?:|mailto:)/i.test(href)?'<a href="'+esc(href)+'">'+inner+'</a>':inner;}
+    else if(t==='UL'||t==='OL'){out=out.replace(/<br>$/,'');h=inner.includes('<li>')?'<'+t.toLowerCase()+'>'+inner+'</'+t.toLowerCase()+'>':inner;}
+    else if(t==='LI')h='<li>'+inner.replace(/(<br>)+$/,'')+'</li>';
+    else if(t==='DIV'||t==='P'){h=(out&&!/(<br>|<\/[uo]l>)$/.test(out)?'<br>':'')+inner;}
+    else h=inner;
+    // colour, from the element's own style (or <font color>), checked against its stored name
+    const st=n.style||{},pick=(kind,raw)=>{const want=n.dataset&&n.dataset[kind]||'',hex=toHex(raw);
+      if(!raw)return ctx.keep&&okWord(kind,want)?want:'';  // no style left (Clear removes it): no colour, unless reading stored markup
+      if(okWord(kind,want)&&toHex(wordColor(kind,want,ctx.T))===hex)return want;
+      if(!hex||(kind==='fg'&&hex===ctx.base))return '';
+      return hex;};
+    const fg=pick('fg',st.color||(t==='FONT'?n.getAttribute('color'):'')),bg=pick('bg',st.backgroundColor);
+    if((fg||bg)&&t!=='BR'&&h)h='<span'+(fg?' data-fg="'+fg+'"':'')+(bg?' data-bg="'+bg+'"':'')+'>'+h+'</span>';
+    out+=h;
   });
   return out;
 }
-const strip=h=>{const d=document.createElement('div');d.innerHTML=String(h||'').replace(/<br>/g,'\n');return d.textContent;};
+const strip=h=>{const d=document.createElement('div');d.innerHTML=String(h||'').replace(/<br>/g,'\n');
+  // Lists become one line per item in the plain-text copy: "• " or "1. ".
+  d.querySelectorAll('li').forEach(li=>{const ol=li.parentElement&&li.parentElement.tagName==='OL';li.prepend(ol?([...li.parentElement.children].indexOf(li)+1)+'. ':'• ');li.append('\n');});
+  d.querySelectorAll('ul,ol').forEach(l=>{l.before('\n');});
+  return d.textContent.replace(/\n{3,}/g,'\n\n');};
 
 /* ---------- signature: smoothed pen strokes with speed-based width, baked to an image ---------- */
 /* Signature rendering. A stroke is an array of [x, y, width] points. Points
@@ -820,7 +959,16 @@ function initPad(){
 function rb(b,T,ed,pos){
   const A=(f,rich,ph)=>ed?' contenteditable="true" spellcheck="true" data-f="'+f+'"'+(rich?' data-rich="1"':'')+' data-ph="'+esc(ph||'')+'"':'';
   const has=v=>ed||!!strip(v).trim();
-  const links=(h,c)=>String(h||'').replace(/<a /g,'<a style="color:'+(c||T.accent)+';text-decoration:underline;" ');
+  /* Rich text out to email: links take the palette colour, coloured words get
+     their colours resolved from names, and lists get explicit margins because
+     every client's defaults differ. The data-* names stay on the canvas only,
+     so a later edit can still tell a palette colour from a custom one. */
+  const links=(h,c)=>String(h||'').replace(/<a /g,'<a style="color:'+(c||T.accent)+';text-decoration:underline;" ')
+    .replace(/<span((?: data-(?:fg|bg)="[^"]*")+)>/g,(m,at)=>{const fg=/data-fg="([^"]*)"/.exec(at),bg=/data-bg="([^"]*)"/.exec(at);
+      const st=(fg&&wordColor('fg',fg[1],T)?'color:'+wordColor('fg',fg[1],T)+';':'')+(bg&&wordColor('bg',bg[1],T)?'background-color:'+wordColor('bg',bg[1],T)+';':'');
+      return '<span'+(ed?at:'')+(st?' style="'+st+'"':'')+'>';})
+    .replace(/<(ul|ol)>/g,'<$1 style="margin:6px 0;padding:0 0 0 24px;">').replace(/<li>/g,'<li style="margin:0 0 4px;">')
+    .replace(/<s>/g,'<s style="text-decoration:line-through;">');
   const f=(fam,size,lh,color,x)=>'margin:0;font-family:'+fam+';font-size:'+size+'px;line-height:'+lh+'px;color:'+color+';'+(x||'');
   let pad=T.vp+'px '+T.pad+'px',bg='',html='',radius='';
   switch(b.type){
@@ -879,7 +1027,7 @@ function rb(b,T,ed,pos){
         '<div'+A('text',0,'Quote')+' style="'+f(T.hf,20,30,T.text,'font-style:italic;')+'">'+esc(b.text)+'</div>'+
         (has(b.cite)?'<div'+A('cite',0,'Who said it')+' style="'+f(T.bf,13,19,T.muted,'padding-top:8px;')+'">'+esc(b.cite)+'</div>':'')+'</td></tr></table>';break;
     case 'callout':
-      html='<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="'+T.tint+'" style="background-color:'+T.tint+';border-radius:10px;"><tr><td style="padding:18px 22px;">'+
+      html='<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="'+T.tint+'" style="background-color:'+T.tint+';border-radius:'+(T.cardR?10:0)+'px;"><tr><td style="padding:18px 22px;">'+
         (has(b.title)?'<div'+A('title',0,'Title')+' style="'+f(T.hf,16,22,T.text,'font-weight:bold;padding-bottom:6px;')+'">'+esc(b.title)+'</div>':'')+
         '<div'+A('html',1,'Details')+' style="'+f(T.bf,15,24,T.text)+'">'+links(b.html)+'</div></td></tr></table>';break;
     case 'divider':
@@ -893,11 +1041,80 @@ function rb(b,T,ed,pos){
         (b.rule?'<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="'+b.align+'" style="margin:'+({left:'6px auto 0 0',center:'6px auto 0',right:'6px 0 0 auto'}[b.align])+';"><tr><td width="220" height="1" bgcolor="'+T.muted+'" style="width:220px;height:1px;background-color:'+T.muted+';font-size:0;line-height:0;">&nbsp;</td></tr></table>':'')+
         (has(b.name)?'<div'+A('name',0,'Your name')+' style="'+f(T.hf,16,22,T.text,'font-weight:bold;text-align:'+b.align+';padding-top:8px;clear:both;')+'">'+esc(b.name)+'</div>':'')+
         (has(b.role)?'<div'+A('role',0,'Add a title')+' style="'+f(T.bf,13,19,T.muted,'text-align:'+b.align+';')+'">'+esc(b.role)+'</div>':'');break;}
+    case 'event':{const ev=evInfo(b),rr=T.cardR?10:0,lk=(u,t)=>'<a href="'+esc(u)+'" target="_blank" style="color:'+T.accent+';text-decoration:underline;">'+t+'</a>';
+      const badge='<td width="64" valign="top" style="width:64px;"><table role="presentation" width="64" cellpadding="0" cellspacing="0" border="0" bgcolor="'+T.accent+'" style="width:64px;background-color:'+T.accent+';border-radius:'+rr+'px;"><tr><td align="center" style="padding:9px 0 10px;text-align:center;">'+
+        '<div style="'+f(T.bf,11,14,T.on,'font-weight:bold;letter-spacing:1px;text-transform:uppercase;text-align:center;')+'">'+esc(ev.mon)+'</div><div style="'+f(T.hf,26,30,T.on,'font-weight:bold;text-align:center;')+'">'+esc(ev.day)+'</div></td></tr></table></td>';
+      html='<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'+badge+'<td valign="top" style="padding-left:18px;">'+
+        '<div'+A('title',0,'What is happening')+' style="'+f(T.hf,18,24,T.text,'font-weight:bold;')+'">'+esc(b.title)+'</div>'+
+        '<div style="'+f(T.bf,14,21,T.accent,'font-weight:bold;padding-top:3px;')+'">'+esc(ev.when)+'</div>'+
+        (has(b.place)?'<div'+A('place',0,'Where')+' style="'+f(T.bf,14,21,T.muted)+'">'+esc(b.place)+'</div>':'')+
+        (has(b.notes)?'<div'+A('notes',1,'Details')+' style="'+f(T.bf,15,23,T.text,'padding-top:8px;')+'">'+links(b.notes)+'</div>':'')+
+        (b.cal&&ev.ok?'<div style="'+f(T.bf,13,20,T.muted,'padding-top:10px;')+'">Add to calendar: '+lk(ev.google,'Google')+' &middot; '+lk(ev.outlook,'Outlook')+' &middot; '+lk(ev.outlookCom,'Outlook.com')+'</div>':'')+
+        '</td></tr></table>';break;}
+    case 'table':{const R=b.rows&&b.rows.length?b.rows:[['']],nc=Math.max(1,...R.map(r=>r.length)),w=Math.floor(100/nc);
+      // A real data table (no role="presentation"), with <th> for the header row so screen readers announce it.
+      html='<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;width:100%;">'+R.map((r,i)=>{const hd=b.head&&i===0,k=i-(b.head?1:0),
+          bgc=hd?mix(T.accent,T.card,.86):(b.stripes&&k%2===1?mix(T.accent2,T.card,.93):''),tag=hd?'th':'td';
+        return '<tr>'+Array.from({length:nc},(_,j)=>'<'+tag+(hd?' scope="col"':'')+(bgc?' bgcolor="'+bgc+'"':'')+' valign="top" align="left" width="'+w+'%" style="'+(bgc?'background-color:'+bgc+';':'')+'padding:8px 10px;border-bottom:1px solid '+T.line+';text-align:left;">'+
+          '<div'+A('rows.'+i+'.'+j,0,'')+' style="'+f(T.bf,14,20,T.text,hd?'font-weight:bold;':'')+'">'+esc(r[j]==null?'':r[j])+'</div></'+tag+'>').join('')+'</tr>';}).join('')+'</table>';break;}
+    case 'columns':{
+      /* Two columns that sit side by side and stack on a phone, without a
+         <style> block: each column is an inline-block with a max-width of half
+         the email, so when the screen is too narrow for both, the second one
+         wraps underneath. */
+      const half=Math.floor((600-T.pad*2)/2),g=12,photo=b.layout!=='text';
+      const textCol=(t,h,tk,hk)=>(has(t)?'<div'+A(tk,0,'Title')+' style="'+f(T.hf,17,23,T.text,'font-weight:bold;padding-bottom:4px;')+'">'+esc(t)+'</div>':'')+'<div'+A(hk,1,'Write something')+' style="'+f(T.bf,15,24,T.text)+'">'+links(h)+'</div>';
+      const photoCol='<div style="font-size:0;line-height:0;">'+pic(b,'pic',T,ed)+'</div>';
+      const left=b.layout==='photo-left'?photoCol:textCol(b.t1,b.h1,'t1','h1'),right=b.layout==='photo-right'?photoCol:textCol(b.t2,b.h2,'t2','h2');
+      const col=(inner,side)=>'<div style="display:inline-block;vertical-align:top;width:100%;max-width:'+half+'px;font-size:15px;line-height:24px;">'+
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td valign="top" style="padding:0 '+(side==='l'?g:0)+'px 14px '+(side==='r'?g:0)+'px;">'+inner+'</td></tr></table></div>';
+      pad=T.vp+'px '+T.pad+'px '+Math.max(0,T.vp-14)+'px';
+      html='<div style="font-size:0;line-height:0;text-align:left;">'+col(left,'l')+col(right,'r')+'</div>';if(!photo&&!ed&&!has(b.h1)&&!has(b.h2)&&!has(b.t1)&&!has(b.t2))html='';break;}
+    case 'links':{const it=b.items||[],lab=b.style==='labels';
+      html='<table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;"><tr>'+it.map((x,i)=>{const href=linkHref(x),k=LINK_KINDS[x.kind]?x.kind:'web',
+          img='<img src="'+iconPic(k,T,36)+'" width="36" height="36" alt="'+(lab?'':esc(x.label||LINK_KINDS[k][0]))+'" style="display:block;border:0;outline:none;width:36px;height:36px;margin:0 auto;">',
+          label=lab?'<div'+A('items.'+i+'.label',0,'Label')+' style="'+f(T.bf,12,16,T.muted,'padding-top:6px;text-align:center;')+'">'+esc(x.label)+'</div>':'';
+        return '<td align="center" valign="top" style="padding:0 10px;text-align:center;">'+(href||ed?'<a href="'+esc(href||'#')+'" target="_blank" style="text-decoration:none;color:'+T.muted+';">'+img+label+'</a>':img+label)+'</td>';}).join('')+'</tr></table>';break;}
     case 'footer':pad=T.vp+'px '+T.pad+'px '+(T.vp+2)+'px';
       html='<div style="border-top:1px solid '+T.line+';padding-top:16px;"><div'+A('html',1,'Footer text')+' style="'+f(T.bf,13,20,T.muted,'text-align:'+b.align+';')+'">'+links(b.html,T.muted)+'</div></div>';break;
   }
   return{pad,bg,html,radius};
 }
+/* Event details, worked out once for the renderer and the plain-text copy.
+   Times are the sender's local time; the calendar links carry them as UTC plus
+   the time zone name, so a reader in another zone gets the right local time.
+   Apple Calendar would need an .ics file, which an email body cannot carry. */
+function evInfo(b){
+  const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(b.date||''),out={ok:!!m,mon:'',day:'',when:'Pick a date',google:'',outlook:'',outlookCom:''};if(!m)return out;
+  const tm=t=>{const x=/^(\d{1,2}):(\d{2})$/.exec(t||'');return x?[+x[1],+x[2]]:null;},s=tm(b.start)||[9,0],e0=tm(b.end);
+  const d0=new Date(+m[1],+m[2]-1,+m[3],s[0],s[1]);let d1=e0?new Date(+m[1],+m[2]-1,+m[3],e0[0],e0[1]):new Date(d0.getTime()+36e5);if(d1<=d0)d1=new Date(d0.getTime()+36e5);
+  const day=new Date(+m[1],+m[2]-1,+m[3]),next=new Date(+m[1],+m[2]-1,+m[3]+1),ymd=x=>x.getFullYear()+String(x.getMonth()+1).padStart(2,'0')+String(x.getDate()).padStart(2,'0');
+  const t=x=>x.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}),utc=x=>x.toISOString().replace(/\.\d{3}Z$/,'Z');
+  out.mon=day.toLocaleDateString(undefined,{month:'short'});out.day=String(day.getDate());
+  out.when=day.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})+(b.allDay?'':', '+t(d0)+(b.end?' – '+t(d1):''));
+  const q=o=>Object.entries(o).filter(([,v])=>v!=='').map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+  const details=strip(b.notes||'').trim();
+  out.google='https://calendar.google.com/calendar/render?'+q({action:'TEMPLATE',text:b.title||'Event',dates:b.allDay?ymd(day)+'/'+ymd(next):utc(d0).replace(/[-:]/g,'')+'/'+utc(d1).replace(/[-:]/g,''),details,location:b.place||'',ctz:b.tz||''});
+  const ol={path:'/calendar/action/compose',rru:'addevent',subject:b.title||'Event',startdt:b.allDay?b.date:utc(d0),enddt:b.allDay?ymd(next).replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3'):utc(d1),allday:b.allDay?'true':'false',location:b.place||'',body:details};
+  out.outlook='https://outlook.office.com/calendar/0/deeplink/compose?'+q(ol);out.outlookCom='https://outlook.live.com/calendar/0/deeplink/compose?'+q(ol);
+  out.past=day<new Date(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());
+  return out;
+}
+// Where a link-row item points: email and phone become mailto: and tel:, bare addresses get https://.
+function linkHref(x){let u=String(x.url||'').trim();if(!u)return '';
+  if(x.kind==='email'&&!/^mailto:/i.test(u))u='mailto:'+u;
+  else if(x.kind==='phone'&&!/^tel:/i.test(u))u='tel:'+u.replace(/[^\d+]/g,'');
+  else if(!/^(https?:|mailto:|tel:|sms:)/i.test(u))u='https://'+u;
+  return /^(https?:|mailto:|tel:|sms:)/i.test(u)?u:'';}
+/* Link row icons are baked like photos: a filled circle in the main colour
+   with the glyph in the readable ink colour, at 2x for sharp screens. */
+const iconCache=new Map();
+function iconPic(kind,T,S){const k=kind+'|'+T.accent+'|'+T.on+'|'+S;if(iconCache.has(k))return iconCache.get(k);
+  const s=S*2,c=document.createElement('canvas');c.width=c.height=s;const g=c.getContext('2d');
+  g.fillStyle=T.accent;g.beginPath();g.arc(s/2,s/2,s/2,0,7);g.fill();
+  g.save();const z=s*.52/24;g.translate(s/2-12*z,s/2-12*z);g.scale(z,z);g.strokeStyle=T.on;g.lineWidth=1.9;g.lineCap='round';g.lineJoin='round';
+  try{g.stroke(new Path2D(LINK_KINDS[kind][1]));}catch(e){}g.restore();
+  const u=c.toDataURL('image/png');iconCache.set(k,u);return u;}
 const edgeless=(b)=>b&&((b.type==='header'&&(b.style==='band'||b.style==='tint'))||(b.type==='banner'&&b.bleed));
 
 /* ---------- canvas ---------- */
@@ -963,9 +1180,19 @@ const idb={db:null,
   open(){return new Promise(res=>{const t=setTimeout(()=>res(false),2500);try{const r=indexedDB.open('roundel',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');
     r.onsuccess=()=>{idb.db=r.result;clearTimeout(t);res(true);};r.onerror=()=>{clearTimeout(t);res(false);};}catch(e){clearTimeout(t);res(false);}});},
   get(k){return new Promise(res=>{try{const q=idb.db.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(null);}catch(e){res(null);}});},
-  set(k,v){try{idb.db.transaction('kv','readwrite').objectStore('kv').put(v,k);}catch(e){}}};
-function usedImages(){const ids=new Set();doc.blocks.forEach(b=>{if(b.img)ids.add(b.img);(b.items||[]).forEach(i=>i.img&&ids.add(i.img));});return ids;}
-function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{if(!idb.db)return;const im={};usedImages().forEach(id=>{if(images[id])im[id]=images[id].src;});idb.set('draft',{doc,images:im});},600);}
+  set(k,v){try{idb.db.transaction('kv','readwrite').objectStore('kv').put(v,k);}catch(e){}},
+  del(k){try{idb.db.transaction('kv','readwrite').objectStore('kv').delete(k);}catch(e){}}};
+function blockImages(b,ids){ids=ids||new Set();if(b.img)ids.add(b.img);if(b.pic&&b.pic.img)ids.add(b.pic.img);(b.items||[]).forEach(i=>i.img&&ids.add(i.img));return ids;}
+function usedImages(){const ids=new Set();doc.blocks.forEach(b=>blockImages(b,ids));return ids;}
+function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,600);}
+/* Drafts. Several emails can be in progress at once: each is stored under its
+   own key ("d:<id>") with the photos it uses, "drafts" is the list shown in the
+   Drafts dialog, and "current" remembers which one was open. */
+const draftName=()=>doc.subject.trim()||'Untitled email';
+function draftData(){const im={};usedImages().forEach(id=>{if(images[id])im[id]=images[id].src;});return{doc:JSON.parse(JSON.stringify(doc)),images:im};}
+function saveNow(){clearTimeout(saveTimer);if(!idb.db||!draftId)return;idb.set('d:'+draftId,draftData());
+  let e=drafts.find(x=>x.id===draftId);if(!e){e={id:draftId};drafts.push(e);}e.name=draftName();e.when=Date.now();
+  idb.set('drafts',drafts);idb.set('current',draftId);}
 
 /* ---------- mutations ---------- */
 function insert(b,at){if(at==null){const i=doc.blocks.findIndex(x=>x.id===sel.id);at=i<0?doc.blocks.length:i+1;}doc.blocks.splice(at,0,b);sel={id:b.id,sub:''};renderAll();commit();
@@ -1037,7 +1264,11 @@ canvas.addEventListener('click',e=>{
   if(e.target.closest('.sign-ph'))openSign(blk.dataset.id);
 });
 canvas.addEventListener('dblclick',e=>{const sg=e.target.closest('img[data-sign]');if(sg){openSign(sg.closest('.blk').dataset.id);return;}const im=e.target.closest('img[data-img]');if(im)pickFile({id:im.closest('.blk').dataset.id,sub:im.dataset.img});});
-canvas.addEventListener('focusin',e=>{const blk=e.target.closest&&e.target.closest('.blk');if(blk&&sel.id!==blk.dataset.id)select(blk.dataset.id,'');});
+canvas.addEventListener('focusin',e=>{const blk=e.target.closest&&e.target.closest('.blk');if(!blk)return;
+  const f=e.target.closest('[data-f]'),cell=f&&/^rows\.\d+\.\d+$/.test(f.dataset.f)?f.dataset.f:'';
+  if(sel.id!==blk.dataset.id||(cell&&sel.sub!==cell))select(blk.dataset.id,cell);});
+// The canvas is for editing: links in it (calendar, link row, buttons) must not navigate away.
+canvas.addEventListener('click',e=>{if(e.target.closest('a[href]'))e.preventDefault();},true);
 canvas.addEventListener('input',e=>{
   const el=e.target.closest('[data-f]');if(!el)return;const b=byId(el.closest('.blk').dataset.id);if(!b)return;
   setPath(b,el.dataset.f,el.dataset.rich?clean(el):el.textContent.replace(/\n/g,' '));soon();
@@ -1045,6 +1276,9 @@ canvas.addEventListener('input',e=>{
 });
 canvas.addEventListener('keydown',e=>{
   const el=e.target.closest('[data-f]');if(!el||e.key!=='Enter')return;
+  // In a list, let the browser make the next item (or leave the list on an empty one).
+  const s=getSelection(),n=s.anchorNode,li=n&&(n.nodeType===1?n:n.parentElement).closest('li');
+  if(li&&el.contains(li))return;
   e.preventDefault();if(el.dataset.rich)document.execCommand('insertLineBreak');else el.blur();
 });
 document.addEventListener('selectionchange',()=>{const s=getSelection();if(!s.rangeCount)return;const n=s.anchorNode,el=n&&(n.nodeType===1?n:n.parentElement);
@@ -1102,7 +1336,7 @@ window.addEventListener('drop',e=>{
   const files=hasType(e,'Files'),ours=hasType(e,MIME);if(!files&&!ours)return;
   e.preventDefault();const inStage=stage.contains(e.target),at=inStage?dropIndex(e.clientY):doc.blocks.length;
   const im=e.target.closest&&e.target.closest('#canvas img[data-img]');clearDrag();
-  if(files){const fl=e.dataTransfer.files;
+  if(files){const fl=e.dataTransfer.files,bf=[...fl].find(f=>/\.brevity$/i.test(f.name));if(bf){openBrevity(bf);return;}
     if(im&&[...fl].filter(f=>/^image\//.test(f.type)).length===1)takeFiles(fl,{id:im.closest('.blk').dataset.id,sub:im.dataset.img});else takeFiles(fl,{index:at});return;}
   if(!inStage)return;
   const d=e.dataTransfer.getData(MIME);
@@ -1113,13 +1347,23 @@ document.addEventListener('paste',e=>{
   const cd=e.clipboardData;if(!cd)return;
   const imgs=[...cd.files].filter(f=>/^image\//.test(f.type));
   if(imgs.length){e.preventDefault();const b=selBlock();
-    const tgt=b&&imgs.length===1&&(('img' in b&&(b.type!=='header'||b.style==='monogram'||b.logo!=='none'))||(b.type==='people'&&sel.sub))?{id:b.id,sub:b.type==='people'?sel.sub:''}:null;takeFiles(imgs,tgt);return;}
-  if(e.target.closest&&e.target.closest('#canvas [data-f]')){e.preventDefault();document.execCommand('insertText',false,cd.getData('text/plain').replace(/\r/g,''));}
+    const tgt=b&&imgs.length===1&&(('img' in b&&(b.type!=='header'||b.style==='monogram'||b.logo!=='none'))||(b.type==='people'&&sel.sub)||(b.type==='columns'&&b.layout!=='text'))?{id:b.id,sub:b.type==='people'?sel.sub:b.type==='columns'?'pic':''}:null;takeFiles(imgs,tgt);return;}
+  const fe=e.target.closest&&e.target.closest('#canvas [data-f]');
+  // Cells copied from a spreadsheet arrive as tab-separated lines: fill the table from the cell being pasted into.
+  const tm=fe&&/^rows\.(\d+)\.(\d+)$/.exec(fe.dataset.f),txt=cd.getData('text/plain').replace(/\r/g,'').replace(/\n$/,'');
+  if(tm&&/[\t\n]/.test(txt)){e.preventDefault();const b=byId(fe.closest('.blk').dataset.id);if(!b)return;
+    const grid=txt.split('\n').map(l=>l.split('\t').slice(0,6)),r0=+tm[1],c0=+tm[2];
+    grid.forEach((row,i)=>{const r=r0+i;if(r>=40)return;while(b.rows.length<=r)b.rows.push([]);row.forEach((v,j)=>{if(c0+j<6)b.rows[r][c0+j]=v.trim();});});
+    const nc=Math.max(...b.rows.map(r=>r.length));b.rows.forEach(r=>{for(let j=0;j<nc;j++)if(r[j]==null)r[j]='';});
+    renderAll();commit();toast('Filled '+grid.length+(grid.length===1?' row':' rows')+' from the pasted cells.');return;}
+  if(fe){e.preventDefault();document.execCommand('insertText',false,txt.replace(/\n/g,fe.dataset.rich?'\n':' '));}
 });
 
 /* ---------- inspector ---------- */
 const insp=$('#inspector');
 function segF(k,label,opts,val){return '<div class="field"><span class="lab">'+label+'</span><div class="seg'+(opts.length>4?' grid3':'')+'" role="group" aria-label="'+label+'">'+opts.map(o=>'<button data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(String(val)===String(o[0]))+'">'+o[1]+'</button>').join('')+'</div></div>';}
+// Which photo the inspector is editing: a person in a row, the two-column photo, or the block's own.
+function photoPath(b){return b.type==='people'?(sel.sub||null):b.type==='columns'?'pic':'';}
 const ALIGN=[['left','Left'],['center','Center'],['right','Right']],FRAMES=[['plain','Plain'],['ring','Ring'],['double','Double'],['halo','Halo']];
 /* The right panel. It is regenerated from the selected block each time rather
    than kept in sync, and every control carries data-k="fieldPath" so one input
@@ -1130,14 +1374,24 @@ function renderInspector(){
     '<h2>Photos</h2><p class="hint">Drop image files anywhere, or paste a copied image with Ctrl+V or ⌘V. One photo becomes a framed circle, and two to four dropped together become a row.</p>'+
     '<h2>Shortcuts</h2><p class="hint">Undo: Ctrl+Z<br>Redo: Ctrl+Shift+Z<br>Duplicate block: Ctrl+D<br>Move block: Alt+↑ or Alt+↓<br>Delete block: Delete<br>On a Mac, use ⌘ in place of Ctrl.</p>';return;}
   let h='<h2>'+LABEL[b.type]+'</h2>';
-  const pre=b.type==='people'?(sel.sub?sel.sub+'.':null):'';
-  const photoUI=()=>{if(pre===null)return '<p class="hint">Click a photo in the row to adjust or replace it.</p>';const p=getPath(b,sel.sub||'');
+  const pp=photoPath(b),pre=pp===null?null:pp?pp+'.':'';
+  const photoUI=()=>{if(pre===null)return '<p class="hint">Click a photo in the row to adjust or replace it.</p>';const p=getPath(b,pp);
     return (b.type==='people'?'<p class="hint">Photo '+(+sel.sub.split('.')[1]+1)+' of '+b.items.length+'</p>':'')+
       '<div class="field row"><button class="btn" data-do="replace">'+(p.img?'Replace photo':'Choose a photo')+'</button>'+(p.img?'<button class="btn" data-do="recenter">Recenter</button>':'')+'</div>'+
       '<div class="field"><label for="f-zoom">Zoom</label><input id="f-zoom" type="range" min="1" max="3" step="0.01" data-k="'+pre+'zoom" value="'+(p.zoom||1)+'"'+(p.img?'':' disabled')+'></div>'+
       '<div class="field"><label for="f-alt">Description for screen readers</label><input id="f-alt" type="text" data-k="'+pre+'alt" value="'+esc(p.alt||'')+'" placeholder="Who or what is pictured"></div>'+
       (p.img?'<p class="hint">Drag the photo on the canvas to reposition it.</p>':'');};
-  const rich='<div class="field"><span class="lab">Selected words</span><div class="row rt"><button class="btn" data-cmd="bold" aria-label="Bold">B</button><button class="btn" data-cmd="italic" aria-label="Italic" style="font-style:italic">I</button><button class="btn" data-cmd="underline" aria-label="Underline" style="text-decoration:underline">U</button><button class="btn" data-cmd="unlink" style="font-weight:500">Remove link</button></div>'+
+  const T=theme(),sw=(kind,v,label,c)=>'<button class="sw-b" data-paint="'+kind+':'+v+'" aria-label="'+label+'" title="'+label+'"><i style="background:'+c+'"></i></button>';
+  const rich='<div class="field"><span class="lab">Selected words</span><div class="row rt"><button class="btn" data-cmd="bold" aria-label="Bold" title="Bold">B</button><button class="btn" data-cmd="italic" aria-label="Italic" title="Italic" style="font-style:italic">I</button><button class="btn" data-cmd="underline" aria-label="Underline" title="Underline" style="text-decoration:underline">U</button><button class="btn" data-cmd="strikeThrough" aria-label="Strikethrough" title="Strikethrough" style="text-decoration:line-through">S</button><button class="btn" data-cmd="removeFormat" style="font-weight:500" title="Remove bold, italic, colours and highlights from the selected words">Clear</button></div>'+
+    '<div class="row rt" style="margin-top:6px"><button class="btn" data-cmd="insertUnorderedList" style="font-weight:500">• List</button><button class="btn" data-cmd="insertOrderedList" style="font-weight:500">1. List</button><button class="btn" data-cmd="unlink" style="font-weight:500">Remove link</button></div>'+
+    '<span class="lab" style="margin-top:10px">Text colour</span><div class="paint" role="group" aria-label="Text colour">'+
+      '<button class="sw-b none" data-paint="fg:" aria-label="Default text colour" title="Default"><i></i></button>'+
+      Object.entries(WORD_FG).filter(([k])=>!(k==='accent2'&&T.accent2===T.accent)).map(([k,[n]])=>sw('fg',k,n,wordColor('fg',k,T))).join('')+
+      '<input type="color" data-paint-custom="fg" aria-label="Custom text colour" title="Custom colour" value="'+T.text+'"></div>'+
+    '<span class="lab" style="margin-top:8px">Highlight</span><div class="paint" role="group" aria-label="Highlight">'+
+      '<button class="sw-b none" data-paint="bg:" aria-label="No highlight" title="None"><i></i></button>'+
+      Object.entries(WORD_BG).filter(([k])=>!(k==='accent2'&&T.accent2===T.accent)).map(([k,[n]])=>sw('bg',k,n+' highlight',wordColor('bg',k,T))).join('')+
+      '<input type="color" data-paint-custom="bg" aria-label="Custom highlight colour" title="Custom colour" value="#fff3a0"></div>'+
     '<div class="row" style="margin-top:6px"><input type="url" id="linkUrl" placeholder="https://" aria-label="Link address" style="flex:1;min-width:0"><button class="btn" data-do="link">Add link</button></div></div>';
   switch(b.type){
     case 'header':h+=segF('style','Look',[['band','Color band'],['tint','Soft band'],['plain','Underline'],['masthead','Masthead'],['split','Split'],['monogram','Badge']],b.style)+
@@ -1163,7 +1417,8 @@ function renderInspector(){
     case 'profile':h+=photoUI()+segF('frame','Frame',FRAMES,b.frame)+segF('side','Photo side',[['left','Left'],['right','Right']],b.side)+rich;break;
     case 'banner':h+=photoUI()+segF('ratio','Shape',[['1.78','16:9'],['2','2:1'],['3','3:1']],b.ratio)+
       '<div class="field"><label class="check"><input type="checkbox" data-k="bleed"'+(b.bleed?' checked':'')+'> Run edge to edge</label></div>'+
-      '<div class="field"><label class="check"><input type="checkbox" data-k="rounded"'+(b.rounded?' checked':'')+(b.bleed?' disabled':'')+'> Round the corners</label></div>';break;
+      '<div class="field"><label class="check"><input type="checkbox" data-k="rounded"'+(b.rounded?' checked':'')+(b.bleed||doc.corners==='square'?' disabled':'')+'> Round the corners</label>'+
+      (doc.corners==='square'&&!b.bleed?'<p class="hint">Page corners are set to Square in the Style tab, so photos are square too.</p>':'')+'</div>';break;
     case 'button':h+='<div class="field"><label for="f-url">Link address</label><input id="f-url" type="url" data-k="url" value="'+esc(b.url)+'" placeholder="https://"></div>'+
       segF('style','Look',[['solid','Filled'],['outline','Outline']],b.style)+segF('align','Align',ALIGN,b.align)+
       '<div class="field"><label class="check"><input type="checkbox" data-k="full"'+(b.full?' checked':'')+'> Full width</label></div>';break;
@@ -1172,10 +1427,54 @@ function renderInspector(){
     case 'spacer':h+='<div class="field"><label for="f-h">Height</label><input id="f-h" type="range" min="8" max="80" step="4" data-k="h" value="'+b.h+'"></div>';break;
     case 'footer':h+=rich+segF('align','Align',ALIGN,b.align);break;
     case 'quote':h+='<p class="hint">Type on the canvas to edit the quote and who said it.</p>';break;
+    case 'event':{const ev=evInfo(b);
+      h+='<div class="field"><label for="f-date">Date</label><input id="f-date" type="date" data-k="date" value="'+esc(b.date)+'"></div>'+
+        '<div class="field"><label class="check"><input type="checkbox" data-k="allDay"'+(b.allDay?' checked':'')+'> All day</label></div>'+
+        (b.allDay?'':'<div class="field row two"><label>Starts<input type="time" data-k="start" value="'+esc(b.start)+'"></label><label>Ends<input type="time" data-k="end" value="'+esc(b.end)+'"></label></div>')+
+        '<div class="field"><label class="check"><input type="checkbox" data-k="cal"'+(b.cal?' checked':'')+'> Show “Add to calendar” links</label></div>'+
+        '<p class="hint">Type the event name, place and details on the canvas. '+(b.tz?'Times are in '+esc(b.tz.replace(/_/g,' '))+'; the calendar links say so, so readers elsewhere see their own local time.':'')+(ev.past?' <b>This date has passed.</b>':'')+'</p>'+
+        '<p class="hint">Apple Calendar users can add it from the Google link, or by tapping the date in Apple Mail.</p>'+rich;break;}
+    case 'table':{const R=b.rows||[],nc=Math.max(1,...R.map(r=>r.length)),m=/^rows\.(\d+)\.(\d+)$/.exec(sel.sub||''),r=m?+m[1]:-1,c=m?+m[2]:-1;
+      h+='<div class="field"><label class="check"><input type="checkbox" data-k="head"'+(b.head?' checked':'')+'> First row is a heading</label></div>'+
+        '<div class="field"><label class="check"><input type="checkbox" data-k="stripes"'+(b.stripes?' checked':'')+'> Shade every other row</label></div>'+
+        '<span class="lab" style="margin-top:12px">'+(m?'Row '+(r+1)+', column '+(c+1):'Rows and columns')+'</span>'+
+        '<div class="row" style="margin-top:4px">'+(R.length<40?'<button class="btn" data-do="rowAdd">'+(m?'Add row below':'Add row')+'</button>':'')+(m&&R.length>1?'<button class="btn" data-do="rowDel">Delete row</button>':'')+'</div>'+
+        '<div class="row" style="margin-top:6px">'+(nc<6?'<button class="btn" data-do="colAdd">'+(m?'Add column right':'Add column')+'</button>':'')+(m&&nc>1?'<button class="btn" data-do="colDel">Delete column</button>':'')+'</div>'+
+        '<p class="hint">'+(m?'':'Click a cell to add or delete rows and columns around it. ')+'Paste cells copied from a spreadsheet into any cell to fill the table from there.</p>';break;}
+    case 'columns':h+=segF('layout','Layout',[['text','Two texts'],['photo-left','Photo left'],['photo-right','Photo right']],b.layout)+
+      (b.layout!=='text'?'<h2>Photo</h2>'+photoUI():'')+'<p class="hint">Side by side on a computer, one above the other on a phone.</p>'+rich;break;
+    case 'links':h+=segF('style','Look',[['labels','Icons and labels'],['icons','Icons only']],b.style)+
+      (b.items||[]).map((x,i)=>{const k=LINK_KINDS[x.kind]?x.kind:'web';return '<div class="linkitem"><div class="row"><select data-k="items.'+i+'.kind" aria-label="Link '+(i+1)+' type">'+
+        Object.entries(LINK_KINDS).map(([kk,v])=>'<option value="'+kk+'"'+(kk===k?' selected':'')+'>'+v[0]+'</option>').join('')+'</select>'+
+        '<button class="btn" data-do="linkDel" data-i="'+i+'" aria-label="Remove link '+(i+1)+'">Remove</button></div>'+
+        '<input type="text" data-k="items.'+i+'.url" value="'+esc(x.url)+'" placeholder="'+esc(LINK_KINDS[k][2])+'" aria-label="Link '+(i+1)+' address">'+
+        (b.style==='labels'?'':'<input type="text" data-k="items.'+i+'.label" value="'+esc(x.label)+'" placeholder="What screen readers say" aria-label="Link '+(i+1)+' description">')+'</div>';}).join('')+
+      ((b.items||[]).length<6?'<div class="field"><button class="btn" data-do="linkAdd">Add a link</button></div>':'')+
+      '<p class="hint">Icons are simple drawings in your main colour, so they work in every mail app.</p>';break;
   }
+  h+='<div class="field secsave"><label for="secName">Save this block for reuse</label><div class="row"><input id="secName" type="text" placeholder="Name it, e.g. School footer"><button class="btn" data-do="section">Save</button></div></div>';
   insp.innerHTML=h;
 }
-insp.addEventListener('mousedown',e=>{if(e.target.closest('[data-cmd]'))e.preventDefault();});
+insp.addEventListener('mousedown',e=>{if(e.target.closest('[data-cmd],[data-paint]'))e.preventDefault();});
+/* Colour the selected words. The browser does the splitting and nesting
+   (execCommand with styleWithCSS writes inline colour styles), then the spans
+   it coloured with a swatch's colour are tagged with the swatch's name so the
+   colour follows the palette. "Default" applies the field's own colour, which
+   the browser and clean() turn into no colour at all. */
+function paint(kind,v){
+  const el=restoreRange();if(!el||getSelection().isCollapsed){toast('Select some words in the email first.');return;}
+  const T=theme(),c=v?wordColor(kind,v,T):'';
+  document.execCommand('styleWithCSS',false,true);
+  if(kind==='fg')document.execCommand('foreColor',false,c||getComputedStyle(el).color);
+  else document.execCommand('hiliteColor',false,c||'transparent');
+  document.execCommand('styleWithCSS',false,false);
+  const prop=kind==='fg'?'color':'backgroundColor',hex=toHex(c);
+  $$('*',el).forEach(x=>{if(!x.style||!x.style[prop])return;
+    if(hex&&toHex(x.style[prop])===hex){if(/^#/.test(v))delete x.dataset[kind];else x.dataset[kind]=v;}
+    else if(!hex&&toHex(x.style[prop])==='')delete x.dataset[kind];});
+  syncRich(el);
+}
+insp.addEventListener('change',e=>{const c=e.target.closest('[data-paint-custom]');if(c)paint(c.dataset.paintCustom,c.value.toLowerCase());});
 /* Rich-text controls live outside the editable region, so the text selection
    is captured on selectionchange and restored before execCommand runs. */
 function restoreRange(){if(!savedRange||!canvas.contains(savedRange.commonAncestorContainer))return null;const s=getSelection();s.removeAllRanges();s.addRange(savedRange);
@@ -1183,31 +1482,184 @@ function restoreRange(){if(!savedRange||!canvas.contains(savedRange.commonAncest
 function syncRich(el){if(!el)return;const b=byId(el.closest('.blk').dataset.id);if(b){setPath(b,el.dataset.f,clean(el));soon();}}
 insp.addEventListener('click',e=>{
   const b=selBlock();if(!b)return;
+  const pt=e.target.closest('[data-paint]');
+  if(pt){const [k,v]=pt.dataset.paint.split(':');paint(k,v);return;}
   const cmd=e.target.closest('[data-cmd]');
   if(cmd){const el=restoreRange();if(!el){toast('Select some words in the email first.');return;}document.execCommand(cmd.dataset.cmd);syncRich(el);return;}
   const seg=e.target.closest('button[data-k]');
   if(seg){setPath(b,seg.dataset.k,seg.dataset.v);renderCanvas();renderInspector();commit();return;}
   const d=e.target.closest('[data-do]');if(!d)return;
   const a=d.dataset.do;
-  if(a==='replace')pickFile({id:b.id,sub:sel.sub});
+  if(a==='replace')pickFile({id:b.id,sub:photoPath(b)||''});
   else if(a==='sign')openSign(b.id);
   else if(a==='unsign'){b.strokes=[];b.typed='';b.sv='';renderAll();commit();}
-  else if(a==='recenter'){const p=getPath(b,sel.sub||'');p.ox=0;p.oy=0;p.zoom=1;renderCanvas();renderInspector();commit();}
+  else if(a==='recenter'){const p=getPath(b,photoPath(b)||'');p.ox=0;p.oy=0;p.zoom=1;renderCanvas();renderInspector();commit();}
   else if(a==='addPerson'){b.items.push(Object.assign(P0(),{name:'Name',role:'Role'}));sel.sub='items.'+(b.items.length-1);renderAll();commit();}
   else if(a==='rmPerson'){b.items.splice(+sel.sub.split('.')[1],1);sel.sub='';renderAll();commit();}
+  else if(/^(row|col)(Add|Del)$/.test(a)){const R=b.rows,nc=Math.max(1,...R.map(r=>r.length)),m=/^rows\.(\d+)\.(\d+)$/.exec(sel.sub||''),r=m?+m[1]:R.length-1,c=m?+m[2]:nc-1;
+    R.forEach(row=>{while(row.length<nc)row.push('');});
+    if(a==='rowAdd')R.splice(r+1,0,Array(nc).fill(''));
+    else if(a==='rowDel'&&R.length>1){R.splice(r,1);sel.sub='';}
+    else if(a==='colAdd'&&nc<6)R.forEach(row=>row.splice(c+1,0,''));
+    else if(a==='colDel'&&nc>1){R.forEach(row=>row.splice(c,1));sel.sub='';}
+    renderAll();commit();}
+  else if(a==='section'){if(saveSection(b,$('#secName').value))$('#secName').value='';}
+  else if(a==='linkAdd'){b.items.push({kind:'web',url:'',label:'Website'});renderAll();commit();}
+  else if(a==='linkDel'){b.items.splice(+d.dataset.i,1);renderAll();commit();}
   else if(a==='link'){let url=$('#linkUrl').value.trim();if(!url){toast('Type a link address first.');return;}if(!/^(https?:|mailto:)/i.test(url))url='https://'+url;
     const el=restoreRange();if(!el||getSelection().isCollapsed){toast('Select the words to link in the email first.');return;}
     document.execCommand('createLink',false,url);syncRich(el);$('#linkUrl').value='';toast('Link added.');}
 });
 insp.addEventListener('input',e=>{
-  const el=e.target.closest('input[data-k]');const b=selBlock();if(!el||!b)return;
+  const el=e.target.closest('input[data-k],select[data-k]');const b=selBlock();if(!el||!b)return;
   const v=el.type==='range'?parseFloat(el.value):el.type==='checkbox'?el.checked:el.value;
-  setPath(b,el.dataset.k,v);renderCanvas();soon();if(el.type==='checkbox')renderInspector();
+  setPath(b,el.dataset.k,v);renderCanvas();soon();if(el.type==='checkbox'||el.tagName==='SELECT')renderInspector();
 });
 
 /* ---------- left panel ---------- */
 $('#palette').innerHTML=Object.keys(LABEL).map(t=>'<button data-type="'+t+'" draggable="true">'+ico(t)+LABEL[t]+'</button>').join('');
 $('#palette').addEventListener('click',e=>{const b=e.target.closest('button[data-type]');if(!b)return;insert(make(b.dataset.type));if(matchMedia('(max-width:920px)').matches)setPane('canvas');});
+
+/* ---------- emoji ----------
+   Every fully qualified emoji in the Unicode list (through Emoji 17.0), in
+   Unicode's own groups and order. Each group is one string of "emoji name"
+   pairs joined by |, which keeps the list to ~41 KB. A * after the emoji marks
+   one that takes skin tones; a + marks one added after Emoji 15.0 (2022),
+   which phones and computers that have not updated show as an empty box. */
+const EMOJI=[["Smileys and Emotion","😀 grinning face|😃 grinning face with big eyes|😄 grinning face with smiling eyes|😁 beaming face with smiling eyes|😆 grinning squinting face|😅 grinning face with sweat|🤣 rolling on the floor laughing|😂 face with tears of joy|🙂 slightly smiling face|🙃 upside-down face|🫠 melting face|😉 winking face|😊 smiling face with smiling eyes|😇 smiling face with halo|🥰 smiling face with hearts|😍 smiling face with heart-eyes|🤩 star-struck|😘 face blowing a kiss|😗 kissing face|☺️ smiling face|😚 kissing face with closed eyes|😙 kissing face with smiling eyes|🥲 smiling face with tear|😋 face savoring food|😛 face with tongue|😜 winking face with tongue|🤪 zany face|😝 squinting face with tongue|🤑 money-mouth face|🤗 smiling face with open hands|🤭 face with hand over mouth|🫢 face with open eyes and hand over mouth|🫣 face with peeking eye|🤫 shushing face|🤔 thinking face|🫡 saluting face|🤐 zipper-mouth face|🤨 face with raised eyebrow|😐 neutral face|😑 expressionless face|😶 face without mouth|🫥 dotted line face|😶‍🌫️ face in clouds|😏 smirking face|😒 unamused face|🙄 face with rolling eyes|😬 grimacing face|😮‍💨 face exhaling|🤥 lying face|🫨 shaking face|🙂‍↔️+ head shaking horizontally|🙂‍↕️+ head shaking vertically|😌 relieved face|😔 pensive face|😪 sleepy face|🤤 drooling face|😴 sleeping face|🫩+ face with bags under eyes|😷 face with medical mask|🤒 face with thermometer|🤕 face with head-bandage|🤢 nauseated face|🤮 face vomiting|🤧 sneezing face|🥵 hot face|🥶 cold face|🥴 woozy face|😵 face with crossed-out eyes|😵‍💫 face with spiral eyes|🤯 exploding head|🤠 cowboy hat face|🥳 partying face|🥸 disguised face|😎 smiling face with sunglasses|🤓 nerd face|🧐 face with monocle|😕 confused face|🫤 face with diagonal mouth|😟 worried face|🙁 slightly frowning face|☹️ frowning face|😮 face with open mouth|😯 hushed face|😲 astonished face|😳 flushed face|🫪+ distorted face|🥺 pleading face|🥹 face holding back tears|😦 frowning face with open mouth|😧 anguished face|😨 fearful face|😰 anxious face with sweat|😥 sad but relieved face|😢 crying face|😭 loudly crying face|😱 face screaming in fear|😖 confounded face|😣 persevering face|😞 disappointed face|😓 downcast face with sweat|😩 weary face|😫 tired face|🥱 yawning face|😤 face with steam from nose|😡 enraged face|😠 angry face|🤬 face with symbols on mouth|😈 smiling face with horns|👿 angry face with horns|💀 skull|☠️ skull and crossbones|💩 pile of poo|🤡 clown face|👹 ogre|👺 goblin|👻 ghost|👽 alien|👾 alien monster|🤖 robot|😺 grinning cat|😸 grinning cat with smiling eyes|😹 cat with tears of joy|😻 smiling cat with heart-eyes|😼 cat with wry smile|😽 kissing cat|🙀 weary cat|😿 crying cat|😾 pouting cat|🙈 see-no-evil monkey|🙉 hear-no-evil monkey|🙊 speak-no-evil monkey|💌 love letter|💘 heart with arrow|💝 heart with ribbon|💖 sparkling heart|💗 growing heart|💓 beating heart|💞 revolving hearts|💕 two hearts|💟 heart decoration|❣️ heart exclamation|💔 broken heart|❤️‍🔥 heart on fire|❤️‍🩹 mending heart|❤️ red heart|🩷 pink heart|🧡 orange heart|💛 yellow heart|💚 green heart|💙 blue heart|🩵 light blue heart|💜 purple heart|🤎 brown heart|🖤 black heart|🩶 grey heart|🤍 white heart|💋 kiss mark|💯 hundred points|💢 anger symbol|🫯+ fight cloud|💥 collision|💫 dizzy|💦 sweat droplets|💨 dashing away|🕳️ hole|💬 speech balloon|👁️‍🗨️ eye in speech bubble|🗨️ left speech bubble|🗯️ right anger bubble|💭 thought balloon|💤 ZZZ"],["People and Body","👋* waving hand|🤚* raised back of hand|🖐️* hand with fingers splayed|✋* raised hand|🖖* vulcan salute|🫱* rightwards hand|🫲* leftwards hand|🫳* palm down hand|🫴* palm up hand|🫷* leftwards pushing hand|🫸* rightwards pushing hand|👌* OK hand|🤌* pinched fingers|🤏* pinching hand|✌️* victory hand|🤞* crossed fingers|🫰* hand with index finger and thumb crossed|🤟* love-you gesture|🤘* sign of the horns|🤙* call me hand|👈* backhand index pointing left|👉* backhand index pointing right|👆* backhand index pointing up|🖕* middle finger|👇* backhand index pointing down|☝️* index pointing up|🫵* index pointing at the viewer|👍* thumbs up|👎* thumbs down|✊* raised fist|👊* oncoming fist|🤛* left-facing fist|🤜* right-facing fist|👏* clapping hands|🙌* raising hands|🫶* heart hands|👐* open hands|🤲* palms up together|🤝* handshake|🙏* folded hands|✍️* writing hand|💅* nail polish|🤳* selfie|💪* flexed biceps|🦾 mechanical arm|🦿 mechanical leg|🦵* leg|🦶* foot|👂* ear|🦻* ear with hearing aid|👃* nose|🧠 brain|🫀 anatomical heart|🫁 lungs|🦷 tooth|🦴 bone|👀 eyes|👁️ eye|👅 tongue|👄 mouth|🫦 biting lip|👶* baby|🧒* child|👦* boy|👧* girl|🧑* person|👱* person blond hair|👨* man|🧔* person beard|🧔‍♂️* man beard|🧔‍♀️* woman beard|👨‍🦰* man red hair|👨‍🦱* man curly hair|👨‍🦳* man white hair|👨‍🦲* man bald|👩* woman|👩‍🦰* woman red hair|🧑‍🦰* person red hair|👩‍🦱* woman curly hair|🧑‍🦱* person curly hair|👩‍🦳* woman white hair|🧑‍🦳* person white hair|👩‍🦲* woman bald|🧑‍🦲* person bald|👱‍♀️* woman blond hair|👱‍♂️* man blond hair|🧓* older person|👴* old man|👵* old woman|🙍* person frowning|🙍‍♂️* man frowning|🙍‍♀️* woman frowning|🙎* person pouting|🙎‍♂️* man pouting|🙎‍♀️* woman pouting|🙅* person gesturing NO|🙅‍♂️* man gesturing NO|🙅‍♀️* woman gesturing NO|🙆* person gesturing OK|🙆‍♂️* man gesturing OK|🙆‍♀️* woman gesturing OK|💁* person tipping hand|💁‍♂️* man tipping hand|💁‍♀️* woman tipping hand|🙋* person raising hand|🙋‍♂️* man raising hand|🙋‍♀️* woman raising hand|🧏* deaf person|🧏‍♂️* deaf man|🧏‍♀️* deaf woman|🙇* person bowing|🙇‍♂️* man bowing|🙇‍♀️* woman bowing|🤦* person facepalming|🤦‍♂️* man facepalming|🤦‍♀️* woman facepalming|🤷* person shrugging|🤷‍♂️* man shrugging|🤷‍♀️* woman shrugging|🧑‍⚕️* health worker|👨‍⚕️* man health worker|👩‍⚕️* woman health worker|🧑‍🎓* student|👨‍🎓* man student|👩‍🎓* woman student|🧑‍🏫* teacher|👨‍🏫* man teacher|👩‍🏫* woman teacher|🧑‍⚖️* judge|👨‍⚖️* man judge|👩‍⚖️* woman judge|🧑‍🌾* farmer|👨‍🌾* man farmer|👩‍🌾* woman farmer|🧑‍🍳* cook|👨‍🍳* man cook|👩‍🍳* woman cook|🧑‍🔧* mechanic|👨‍🔧* man mechanic|👩‍🔧* woman mechanic|🧑‍🏭* factory worker|👨‍🏭* man factory worker|👩‍🏭* woman factory worker|🧑‍💼* office worker|👨‍💼* man office worker|👩‍💼* woman office worker|🧑‍🔬* scientist|👨‍🔬* man scientist|👩‍🔬* woman scientist|🧑‍💻* technologist|👨‍💻* man technologist|👩‍💻* woman technologist|🧑‍🎤* singer|👨‍🎤* man singer|👩‍🎤* woman singer|🧑‍🎨* artist|👨‍🎨* man artist|👩‍🎨* woman artist|🧑‍✈️* pilot|👨‍✈️* man pilot|👩‍✈️* woman pilot|🧑‍🚀* astronaut|👨‍🚀* man astronaut|👩‍🚀* woman astronaut|🧑‍🚒* firefighter|👨‍🚒* man firefighter|👩‍🚒* woman firefighter|👮* police officer|👮‍♂️* man police officer|👮‍♀️* woman police officer|🕵️* detective|🕵️‍♂️* man detective|🕵️‍♀️* woman detective|💂* guard|💂‍♂️* man guard|💂‍♀️* woman guard|🥷* ninja|👷* construction worker|👷‍♂️* man construction worker|👷‍♀️* woman construction worker|🫅* person with crown|🤴* prince|👸* princess|👳* person wearing turban|👳‍♂️* man wearing turban|👳‍♀️* woman wearing turban|👲* person with skullcap|🧕* woman with headscarf|🤵* person in tuxedo|🤵‍♂️* man in tuxedo|🤵‍♀️* woman in tuxedo|👰* person with veil|👰‍♂️* man with veil|👰‍♀️* woman with veil|🤰* pregnant woman|🫃* pregnant man|🫄* pregnant person|🤱* breast-feeding|👩‍🍼* woman feeding baby|👨‍🍼* man feeding baby|🧑‍🍼* person feeding baby|👼* baby angel|🎅* Santa Claus|🤶* Mrs. Claus|🧑‍🎄* Mx Claus|🦸* superhero|🦸‍♂️* man superhero|🦸‍♀️* woman superhero|🦹* supervillain|🦹‍♂️* man supervillain|🦹‍♀️* woman supervillain|🧙* mage|🧙‍♂️* man mage|🧙‍♀️* woman mage|🧚* fairy|🧚‍♂️* man fairy|🧚‍♀️* woman fairy|🧛* vampire|🧛‍♂️* man vampire|🧛‍♀️* woman vampire|🧜* merperson|🧜‍♂️* merman|🧜‍♀️* mermaid|🧝* elf|🧝‍♂️* man elf|🧝‍♀️* woman elf|🧞 genie|🧞‍♂️ man genie|🧞‍♀️ woman genie|🧟 zombie|🧟‍♂️ man zombie|🧟‍♀️ woman zombie|🧌 troll|🫈+ hairy creature|💆* person getting massage|💆‍♂️* man getting massage|💆‍♀️* woman getting massage|💇* person getting haircut|💇‍♂️* man getting haircut|💇‍♀️* woman getting haircut|🚶* person walking|🚶‍♂️* man walking|🚶‍♀️* woman walking|🚶‍➡️*+ person walking facing right|🚶‍♀️‍➡️*+ woman walking facing right|🚶‍♂️‍➡️*+ man walking facing right|🧍* person standing|🧍‍♂️* man standing|🧍‍♀️* woman standing|🧎* person kneeling|🧎‍♂️* man kneeling|🧎‍♀️* woman kneeling|🧎‍➡️*+ person kneeling facing right|🧎‍♀️‍➡️*+ woman kneeling facing right|🧎‍♂️‍➡️*+ man kneeling facing right|🧑‍🦯* person with white cane|🧑‍🦯‍➡️*+ person with white cane facing right|👨‍🦯* man with white cane|👨‍🦯‍➡️*+ man with white cane facing right|👩‍🦯* woman with white cane|👩‍🦯‍➡️*+ woman with white cane facing right|🧑‍🦼* person in motorized wheelchair|🧑‍🦼‍➡️*+ person in motorized wheelchair facing right|👨‍🦼* man in motorized wheelchair|👨‍🦼‍➡️*+ man in motorized wheelchair facing right|👩‍🦼* woman in motorized wheelchair|👩‍🦼‍➡️*+ woman in motorized wheelchair facing right|🧑‍🦽* person in manual wheelchair|🧑‍🦽‍➡️*+ person in manual wheelchair facing right|👨‍🦽* man in manual wheelchair|👨‍🦽‍➡️*+ man in manual wheelchair facing right|👩‍🦽* woman in manual wheelchair|👩‍🦽‍➡️*+ woman in manual wheelchair facing right|🏃* person running|🏃‍♂️* man running|🏃‍♀️* woman running|🏃‍➡️*+ person running facing right|🏃‍♀️‍➡️*+ woman running facing right|🏃‍♂️‍➡️*+ man running facing right|🧑‍🩰*+ ballet dancer|💃* woman dancing|🕺* man dancing|🕴️* person in suit levitating|👯* people with bunny ears|👯‍♂️* men with bunny ears|👯‍♀️* women with bunny ears|🧖* person in steamy room|🧖‍♂️* man in steamy room|🧖‍♀️* woman in steamy room|🧗* person climbing|🧗‍♂️* man climbing|🧗‍♀️* woman climbing|🤺 person fencing|🏇* horse racing|⛷️ skier|🏂* snowboarder|🏌️* person golfing|🏌️‍♂️* man golfing|🏌️‍♀️* woman golfing|🏄* person surfing|🏄‍♂️* man surfing|🏄‍♀️* woman surfing|🚣* person rowing boat|🚣‍♂️* man rowing boat|🚣‍♀️* woman rowing boat|🏊* person swimming|🏊‍♂️* man swimming|🏊‍♀️* woman swimming|⛹️* person bouncing ball|⛹️‍♂️* man bouncing ball|⛹️‍♀️* woman bouncing ball|🏋️* person lifting weights|🏋️‍♂️* man lifting weights|🏋️‍♀️* woman lifting weights|🚴* person biking|🚴‍♂️* man biking|🚴‍♀️* woman biking|🚵* person mountain biking|🚵‍♂️* man mountain biking|🚵‍♀️* woman mountain biking|🤸* person cartwheeling|🤸‍♂️* man cartwheeling|🤸‍♀️* woman cartwheeling|🤼* people wrestling|🤼‍♂️* men wrestling|🤼‍♀️* women wrestling|🤽* person playing water polo|🤽‍♂️* man playing water polo|🤽‍♀️* woman playing water polo|🤾* person playing handball|🤾‍♂️* man playing handball|🤾‍♀️* woman playing handball|🤹* person juggling|🤹‍♂️* man juggling|🤹‍♀️* woman juggling|🧘* person in lotus position|🧘‍♂️* man in lotus position|🧘‍♀️* woman in lotus position|🛀* person taking bath|🛌* person in bed|🧑‍🤝‍🧑* people holding hands|👭* women holding hands|👫* woman and man holding hands|👬* men holding hands|💏* kiss|👩‍❤️‍💋‍👨* kiss woman, man|👨‍❤️‍💋‍👨* kiss man, man|👩‍❤️‍💋‍👩* kiss woman, woman|💑* couple with heart|👩‍❤️‍👨* couple with heart woman, man|👨‍❤️‍👨* couple with heart man, man|👩‍❤️‍👩* couple with heart woman, woman|👨‍👩‍👦 family man, woman, boy|👨‍👩‍👧 family man, woman, girl|👨‍👩‍👧‍👦 family man, woman, girl, boy|👨‍👩‍👦‍👦 family man, woman, boy, boy|👨‍👩‍👧‍👧 family man, woman, girl, girl|👨‍👨‍👦 family man, man, boy|👨‍👨‍👧 family man, man, girl|👨‍👨‍👧‍👦 family man, man, girl, boy|👨‍👨‍👦‍👦 family man, man, boy, boy|👨‍👨‍👧‍👧 family man, man, girl, girl|👩‍👩‍👦 family woman, woman, boy|👩‍👩‍👧 family woman, woman, girl|👩‍👩‍👧‍👦 family woman, woman, girl, boy|👩‍👩‍👦‍👦 family woman, woman, boy, boy|👩‍👩‍👧‍👧 family woman, woman, girl, girl|👨‍👦 family man, boy|👨‍👦‍👦 family man, boy, boy|👨‍👧 family man, girl|👨‍👧‍👦 family man, girl, boy|👨‍👧‍👧 family man, girl, girl|👩‍👦 family woman, boy|👩‍👦‍👦 family woman, boy, boy|👩‍👧 family woman, girl|👩‍👧‍👦 family woman, girl, boy|👩‍👧‍👧 family woman, girl, girl|🗣️ speaking head|👤 bust in silhouette|👥 busts in silhouette|🫂 people hugging|👪 family|🧑‍🧑‍🧒+ family adult, adult, child|🧑‍🧑‍🧒‍🧒+ family adult, adult, child, child|🧑‍🧒+ family adult, child|🧑‍🧒‍🧒+ family adult, child, child|👣 footprints|🫆+ fingerprint"],["Animals and Nature","🐵 monkey face|🐒 monkey|🦍 gorilla|🦧 orangutan|🐶 dog face|🐕 dog|🦮 guide dog|🐕‍🦺 service dog|🐩 poodle|🐺 wolf|🦊 fox|🦝 raccoon|🐱 cat face|🐈 cat|🐈‍⬛ black cat|🦁 lion|🐯 tiger face|🐅 tiger|🐆 leopard|🐴 horse face|🫎 moose|🫏 donkey|🐎 horse|🦄 unicorn|🦓 zebra|🦌 deer|🦬 bison|🐮 cow face|🐂 ox|🐃 water buffalo|🐄 cow|🐷 pig face|🐖 pig|🐗 boar|🐽 pig nose|🐏 ram|🐑 ewe|🐐 goat|🐪 camel|🐫 two-hump camel|🦙 llama|🦒 giraffe|🐘 elephant|🦣 mammoth|🦏 rhinoceros|🦛 hippopotamus|🐭 mouse face|🐁 mouse|🐀 rat|🐹 hamster|🐰 rabbit face|🐇 rabbit|🐿️ chipmunk|🦫 beaver|🦔 hedgehog|🦇 bat|🐻 bear|🐻‍❄️ polar bear|🐨 koala|🐼 panda|🦥 sloth|🦦 otter|🦨 skunk|🦘 kangaroo|🦡 badger|🐾 paw prints|🦃 turkey|🐔 chicken|🐓 rooster|🐣 hatching chick|🐤 baby chick|🐥 front-facing baby chick|🐦 bird|🐧 penguin|🕊️ dove|🦅 eagle|🦆 duck|🦢 swan|🦉 owl|🦤 dodo|🪶 feather|🦩 flamingo|🦚 peacock|🦜 parrot|🪽 wing|🐦‍⬛ black bird|🪿 goose|🐦‍🔥+ phoenix|🐸 frog|🐊 crocodile|🐢 turtle|🦎 lizard|🐍 snake|🐲 dragon face|🐉 dragon|🦕 sauropod|🦖 T-Rex|🐳 spouting whale|🐋 whale|🐬 dolphin|🫍+ orca|🦭 seal|🐟 fish|🐠 tropical fish|🐡 blowfish|🦈 shark|🐙 octopus|🐚 spiral shell|🪸 coral|🪼 jellyfish|🦀 crab|🦞 lobster|🦐 shrimp|🦑 squid|🦪 oyster|🐌 snail|🦋 butterfly|🐛 bug|🐜 ant|🐝 honeybee|🪲 beetle|🐞 lady beetle|🦗 cricket|🪳 cockroach|🕷️ spider|🕸️ spider web|🦂 scorpion|🦟 mosquito|🪰 fly|🪱 worm|🦠 microbe|💐 bouquet|🌸 cherry blossom|💮 white flower|🪷 lotus|🏵️ rosette|🌹 rose|🥀 wilted flower|🌺 hibiscus|🌻 sunflower|🌼 blossom|🌷 tulip|🪻 hyacinth|🌱 seedling|🪴 potted plant|🌲 evergreen tree|🌳 deciduous tree|🌴 palm tree|🌵 cactus|🌾 sheaf of rice|🌿 herb|☘️ shamrock|🍀 four leaf clover|🍁 maple leaf|🍂 fallen leaf|🍃 leaf fluttering in wind|🪹 empty nest|🪺 nest with eggs|🍄 mushroom|🪾+ leafless tree"],["Food and Drink","🍇 grapes|🍈 melon|🍉 watermelon|🍊 tangerine|🍋 lemon|🍋‍🟩+ lime|🍌 banana|🍍 pineapple|🥭 mango|🍎 red apple|🍏 green apple|🍐 pear|🍑 peach|🍒 cherries|🍓 strawberry|🫐 blueberries|🥝 kiwi fruit|🍅 tomato|🫒 olive|🥥 coconut|🥑 avocado|🍆 eggplant|🥔 potato|🥕 carrot|🌽 ear of corn|🌶️ hot pepper|🫑 bell pepper|🥒 cucumber|🥬 leafy green|🥦 broccoli|🧄 garlic|🧅 onion|🥜 peanuts|🫘 beans|🌰 chestnut|🫚 ginger root|🫛 pea pod|🍄‍🟫+ brown mushroom|🫜+ root vegetable|🍞 bread|🥐 croissant|🥖 baguette bread|🫓 flatbread|🥨 pretzel|🥯 bagel|🥞 pancakes|🧇 waffle|🧀 cheese wedge|🍖 meat on bone|🍗 poultry leg|🥩 cut of meat|🥓 bacon|🍔 hamburger|🍟 french fries|🍕 pizza|🌭 hot dog|🥪 sandwich|🌮 taco|🌯 burrito|🫔 tamale|🥙 stuffed flatbread|🧆 falafel|🥚 egg|🍳 cooking|🥘 shallow pan of food|🍲 pot of food|🫕 fondue|🥣 bowl with spoon|🥗 green salad|🍿 popcorn|🧈 butter|🧂 salt|🥫 canned food|🍱 bento box|🍘 rice cracker|🍙 rice ball|🍚 cooked rice|🍛 curry rice|🍜 steaming bowl|🍝 spaghetti|🍠 roasted sweet potato|🍢 oden|🍣 sushi|🍤 fried shrimp|🍥 fish cake with swirl|🥮 moon cake|🍡 dango|🥟 dumpling|🥠 fortune cookie|🥡 takeout box|🍦 soft ice cream|🍧 shaved ice|🍨 ice cream|🍩 doughnut|🍪 cookie|🎂 birthday cake|🍰 shortcake|🧁 cupcake|🥧 pie|🍫 chocolate bar|🍬 candy|🍭 lollipop|🍮 custard|🍯 honey pot|🍼 baby bottle|🥛 glass of milk|☕ hot beverage|🫖 teapot|🍵 teacup without handle|🍶 sake|🍾 bottle with popping cork|🍷 wine glass|🍸 cocktail glass|🍹 tropical drink|🍺 beer mug|🍻 clinking beer mugs|🥂 clinking glasses|🥃 tumbler glass|🫗 pouring liquid|🥤 cup with straw|🧋 bubble tea|🧃 beverage box|🧉 mate|🧊 ice|🥢 chopsticks|🍽️ fork and knife with plate|🍴 fork and knife|🥄 spoon|🔪 kitchen knife|🫙 jar|🏺 amphora"],["Travel and Places","🌍 globe showing Europe-Africa|🌎 globe showing Americas|🌏 globe showing Asia-Australia|🌐 globe with meridians|🗺️ world map|🗾 map of Japan|🧭 compass|🏔️ snow-capped mountain|⛰️ mountain|🛘+ landslide|🌋 volcano|🗻 mount fuji|🏕️ camping|🏖️ beach with umbrella|🏜️ desert|🏝️ desert island|🏞️ national park|🏟️ stadium|🏛️ classical building|🏗️ building construction|🧱 brick|🪨 rock|🪵 wood|🛖 hut|🏘️ houses|🏚️ derelict house|🏠 house|🏡 house with garden|🏢 office building|🏣 Japanese post office|🏤 post office|🏥 hospital|🏦 bank|🏨 hotel|🏩 love hotel|🏪 convenience store|🏫 school|🏬 department store|🏭 factory|🏯 Japanese castle|🏰 castle|💒 wedding|🗼 Tokyo tower|🗽 Statue of Liberty|⛪ church|🕌 mosque|🛕 hindu temple|🕍 synagogue|⛩️ shinto shrine|🕋 kaaba|⛲ fountain|⛺ tent|🌁 foggy|🌃 night with stars|🏙️ cityscape|🌄 sunrise over mountains|🌅 sunrise|🌆 cityscape at dusk|🌇 sunset|🌉 bridge at night|♨️ hot springs|🎠 carousel horse|🛝 playground slide|🎡 ferris wheel|🎢 roller coaster|💈 barber pole|🎪 circus tent|🚂 locomotive|🚃 railway car|🚄 high-speed train|🚅 bullet train|🚆 train|🚇 metro|🚈 light rail|🚉 station|🚊 tram|🚝 monorail|🚞 mountain railway|🚋 tram car|🚌 bus|🚍 oncoming bus|🚎 trolleybus|🚐 minibus|🚑 ambulance|🚒 fire engine|🚓 police car|🚔 oncoming police car|🚕 taxi|🚖 oncoming taxi|🚗 automobile|🚘 oncoming automobile|🚙 sport utility vehicle|🛻 pickup truck|🚚 delivery truck|🚛 articulated lorry|🚜 tractor|🏎️ racing car|🏍️ motorcycle|🛵 motor scooter|🦽 manual wheelchair|🦼 motorized wheelchair|🛺 auto rickshaw|🚲 bicycle|🛴 kick scooter|🛹 skateboard|🛼 roller skate|🚏 bus stop|🛣️ motorway|🛤️ railway track|🛢️ oil drum|⛽ fuel pump|🛞 wheel|🚨 police car light|🚥 horizontal traffic light|🚦 vertical traffic light|🛑 stop sign|🚧 construction|⚓ anchor|🛟 ring buoy|⛵ sailboat|🛶 canoe|🚤 speedboat|🛳️ passenger ship|⛴️ ferry|🛥️ motor boat|🚢 ship|✈️ airplane|🛩️ small airplane|🛫 airplane departure|🛬 airplane arrival|🪂 parachute|💺 seat|🚁 helicopter|🚟 suspension railway|🚠 mountain cableway|🚡 aerial tramway|🛰️ satellite|🚀 rocket|🛸 flying saucer|🛎️ bellhop bell|🧳 luggage|⌛ hourglass done|⏳ hourglass not done|⌚ watch|⏰ alarm clock|⏱️ stopwatch|⏲️ timer clock|🕰️ mantelpiece clock|🕛 twelve o’clock|🕧 twelve-thirty|🕐 one o’clock|🕜 one-thirty|🕑 two o’clock|🕝 two-thirty|🕒 three o’clock|🕞 three-thirty|🕓 four o’clock|🕟 four-thirty|🕔 five o’clock|🕠 five-thirty|🕕 six o’clock|🕡 six-thirty|🕖 seven o’clock|🕢 seven-thirty|🕗 eight o’clock|🕣 eight-thirty|🕘 nine o’clock|🕤 nine-thirty|🕙 ten o’clock|🕥 ten-thirty|🕚 eleven o’clock|🕦 eleven-thirty|🌑 new moon|🌒 waxing crescent moon|🌓 first quarter moon|🌔 waxing gibbous moon|🌕 full moon|🌖 waning gibbous moon|🌗 last quarter moon|🌘 waning crescent moon|🌙 crescent moon|🌚 new moon face|🌛 first quarter moon face|🌜 last quarter moon face|🌡️ thermometer|☀️ sun|🌝 full moon face|🌞 sun with face|🪐 ringed planet|⭐ star|🌟 glowing star|🌠 shooting star|🌌 milky way|☁️ cloud|⛅ sun behind cloud|⛈️ cloud with lightning and rain|🌤️ sun behind small cloud|🌥️ sun behind large cloud|🌦️ sun behind rain cloud|🌧️ cloud with rain|🌨️ cloud with snow|🌩️ cloud with lightning|🌪️ tornado|🌫️ fog|🌬️ wind face|🌀 cyclone|🌈 rainbow|🌂 closed umbrella|☂️ umbrella|☔ umbrella with rain drops|⛱️ umbrella on ground|⚡ high voltage|❄️ snowflake|☃️ snowman|⛄ snowman without snow|☄️ comet|🔥 fire|💧 droplet|🌊 water wave"],["Activities","🎃 jack-o-lantern|🎄 Christmas tree|🎆 fireworks|🎇 sparkler|🧨 firecracker|✨ sparkles|🎈 balloon|🎉 party popper|🎊 confetti ball|🎋 tanabata tree|🎍 pine decoration|🎎 Japanese dolls|🎏 carp streamer|🎐 wind chime|🎑 moon viewing ceremony|🧧 red envelope|🎀 ribbon|🎁 wrapped gift|🎗️ reminder ribbon|🎟️ admission tickets|🎫 ticket|🎖️ military medal|🏆 trophy|🏅 sports medal|🥇 1st place medal|🥈 2nd place medal|🥉 3rd place medal|⚽ soccer ball|⚾ baseball|🥎 softball|🏀 basketball|🏐 volleyball|🏈 american football|🏉 rugby football|🎾 tennis|🥏 flying disc|🎳 bowling|🏏 cricket game|🏑 field hockey|🏒 ice hockey|🥍 lacrosse|🏓 ping pong|🏸 badminton|🥊 boxing glove|🥋 martial arts uniform|🥅 goal net|⛳ flag in hole|⛸️ ice skate|🎣 fishing pole|🤿 diving mask|🎽 running shirt|🎿 skis|🛷 sled|🥌 curling stone|🎯 bullseye|🪀 yo-yo|🪁 kite|🔫 water pistol|🎱 pool 8 ball|🔮 crystal ball|🪄 magic wand|🎮 video game|🕹️ joystick|🎰 slot machine|🎲 game die|🧩 puzzle piece|🧸 teddy bear|🪅 piñata|🪩 mirror ball|🪆 nesting dolls|♠️ spade suit|♥️ heart suit|♦️ diamond suit|♣️ club suit|♟️ chess pawn|🃏 joker|🀄 mahjong red dragon|🎴 flower playing cards|🎭 performing arts|🖼️ framed picture|🎨 artist palette|🧵 thread|🪡 sewing needle|🧶 yarn|🪢 knot"],["Objects","👓 glasses|🕶️ sunglasses|🥽 goggles|🥼 lab coat|🦺 safety vest|👔 necktie|👕 t-shirt|👖 jeans|🧣 scarf|🧤 gloves|🧥 coat|🧦 socks|👗 dress|👘 kimono|🥻 sari|🩱 one-piece swimsuit|🩲 briefs|🩳 shorts|👙 bikini|👚 woman’s clothes|🪭 folding hand fan|👛 purse|👜 handbag|👝 clutch bag|🛍️ shopping bags|🎒 backpack|🩴 thong sandal|👞 man’s shoe|👟 running shoe|🥾 hiking boot|🥿 flat shoe|👠 high-heeled shoe|👡 woman’s sandal|🩰 ballet shoes|👢 woman’s boot|🪮 hair pick|👑 crown|👒 woman’s hat|🎩 top hat|🎓 graduation cap|🧢 billed cap|🪖 military helmet|⛑️ rescue worker’s helmet|📿 prayer beads|💄 lipstick|💍 ring|💎 gem stone|🔇 muted speaker|🔈 speaker low volume|🔉 speaker medium volume|🔊 speaker high volume|📢 loudspeaker|📣 megaphone|📯 postal horn|🔔 bell|🔕 bell with slash|🎼 musical score|🎵 musical note|🎶 musical notes|🎙️ studio microphone|🎚️ level slider|🎛️ control knobs|🎤 microphone|🎧 headphone|📻 radio|🎷 saxophone|🎺 trumpet|🪊+ trombone|🪗 accordion|🎸 guitar|🎹 musical keyboard|🎻 violin|🪕 banjo|🥁 drum|🪘 long drum|🪇 maracas|🪈 flute|🪉+ harp|📱 mobile phone|📲 mobile phone with arrow|☎️ telephone|📞 telephone receiver|📟 pager|📠 fax machine|🔋 battery|🪫 low battery|🔌 electric plug|💻 laptop|🖥️ desktop computer|🖨️ printer|⌨️ keyboard|🖱️ computer mouse|🖲️ trackball|💽 computer disk|💾 floppy disk|💿 optical disk|📀 dvd|🧮 abacus|🎥 movie camera|🎞️ film frames|📽️ film projector|🎬 clapper board|📺 television|📷 camera|📸 camera with flash|📹 video camera|📼 videocassette|🔍 magnifying glass tilted left|🔎 magnifying glass tilted right|🕯️ candle|💡 light bulb|🔦 flashlight|🏮 red paper lantern|🪔 diya lamp|📔 notebook with decorative cover|📕 closed book|📖 open book|📗 green book|📘 blue book|📙 orange book|📚 books|📓 notebook|📒 ledger|📃 page with curl|📜 scroll|📄 page facing up|📰 newspaper|🗞️ rolled-up newspaper|📑 bookmark tabs|🔖 bookmark|🏷️ label|🪙 coin|💰 money bag|🪎+ treasure chest|💴 yen banknote|💵 dollar banknote|💶 euro banknote|💷 pound banknote|💸 money with wings|💳 credit card|🧾 receipt|💹 chart increasing with yen|✉️ envelope|📧 e-mail|📨 incoming envelope|📩 envelope with arrow|📤 outbox tray|📥 inbox tray|📦 package|📫 closed mailbox with raised flag|📪 closed mailbox with lowered flag|📬 open mailbox with raised flag|📭 open mailbox with lowered flag|📮 postbox|🗳️ ballot box with ballot|✏️ pencil|✒️ black nib|🖋️ fountain pen|🖊️ pen|🖌️ paintbrush|🖍️ crayon|📝 memo|💼 briefcase|📁 file folder|📂 open file folder|🗂️ card index dividers|📅 calendar|📆 tear-off calendar|🗒️ spiral notepad|🗓️ spiral calendar|📇 card index|📈 chart increasing|📉 chart decreasing|📊 bar chart|📋 clipboard|📌 pushpin|📍 round pushpin|📎 paperclip|🖇️ linked paperclips|📏 straight ruler|📐 triangular ruler|✂️ scissors|🗃️ card file box|🗄️ file cabinet|🗑️ wastebasket|🔒 locked|🔓 unlocked|🔏 locked with pen|🔐 locked with key|🔑 key|🗝️ old key|🔨 hammer|🪓 axe|⛏️ pick|⚒️ hammer and pick|🛠️ hammer and wrench|🗡️ dagger|⚔️ crossed swords|💣 bomb|🪃 boomerang|🏹 bow and arrow|🛡️ shield|🪚 carpentry saw|🔧 wrench|🪛 screwdriver|🔩 nut and bolt|⚙️ gear|🗜️ clamp|⚖️ balance scale|🦯 white cane|🔗 link|⛓️‍💥+ broken chain|⛓️ chains|🪝 hook|🧰 toolbox|🧲 magnet|🪜 ladder|🪏+ shovel|⚗️ alembic|🧪 test tube|🧫 petri dish|🧬 dna|🔬 microscope|🔭 telescope|📡 satellite antenna|💉 syringe|🩸 drop of blood|💊 pill|🩹 adhesive bandage|🩼 crutch|🩺 stethoscope|🩻 x-ray|🚪 door|🛗 elevator|🪞 mirror|🪟 window|🛏️ bed|🛋️ couch and lamp|🪑 chair|🚽 toilet|🪠 plunger|🚿 shower|🛁 bathtub|🪤 mouse trap|🪒 razor|🧴 lotion bottle|🧷 safety pin|🧹 broom|🧺 basket|🧻 roll of paper|🪣 bucket|🧼 soap|🫧 bubbles|🪥 toothbrush|🧽 sponge|🧯 fire extinguisher|🛒 shopping cart|🚬 cigarette|⚰️ coffin|🪦 headstone|⚱️ funeral urn|🧿 nazar amulet|🪬 hamsa|🗿 moai|🪧 placard|🪪 identification card"],["Symbols","🏧 ATM sign|🚮 litter in bin sign|🚰 potable water|♿ wheelchair symbol|🚹 men’s room|🚺 women’s room|🚻 restroom|🚼 baby symbol|🚾 water closet|🛂 passport control|🛃 customs|🛄 baggage claim|🛅 left luggage|⚠️ warning|🚸 children crossing|⛔ no entry|🚫 prohibited|🚳 no bicycles|🚭 no smoking|🚯 no littering|🚱 non-potable water|🚷 no pedestrians|📵 no mobile phones|🔞 no one under eighteen|☢️ radioactive|☣️ biohazard|⬆️ up arrow|↗️ up-right arrow|➡️ right arrow|↘️ down-right arrow|⬇️ down arrow|↙️ down-left arrow|⬅️ left arrow|↖️ up-left arrow|↕️ up-down arrow|↔️ left-right arrow|↩️ right arrow curving left|↪️ left arrow curving right|⤴️ right arrow curving up|⤵️ right arrow curving down|🔃 clockwise vertical arrows|🔄 counterclockwise arrows button|🔙 BACK arrow|🔚 END arrow|🔛 ON! arrow|🔜 SOON arrow|🔝 TOP arrow|🛐 place of worship|⚛️ atom symbol|🕉️ om|✡️ star of David|☸️ wheel of dharma|☯️ yin yang|✝️ latin cross|☦️ orthodox cross|☪️ star and crescent|☮️ peace symbol|🕎 menorah|🔯 dotted six-pointed star|🪯 khanda|♈ Aries|♉ Taurus|♊ Gemini|♋ Cancer|♌ Leo|♍ Virgo|♎ Libra|♏ Scorpio|♐ Sagittarius|♑ Capricorn|♒ Aquarius|♓ Pisces|⛎ Ophiuchus|🔀 shuffle tracks button|🔁 repeat button|🔂 repeat single button|▶️ play button|⏩ fast-forward button|⏭️ next track button|⏯️ play or pause button|◀️ reverse button|⏪ fast reverse button|⏮️ last track button|🔼 upwards button|⏫ fast up button|🔽 downwards button|⏬ fast down button|⏸️ pause button|⏹️ stop button|⏺️ record button|⏏️ eject button|🎦 cinema|🔅 dim button|🔆 bright button|📶 antenna bars|🛜 wireless|📳 vibration mode|📴 mobile phone off|♀️ female sign|♂️ male sign|⚧️ transgender symbol|✖️ multiply|➕ plus|➖ minus|➗ divide|🟰 heavy equals sign|♾️ infinity|‼️ double exclamation mark|⁉️ exclamation question mark|❓ red question mark|❔ white question mark|❕ white exclamation mark|❗ red exclamation mark|〰️ wavy dash|💱 currency exchange|💲 heavy dollar sign|⚕️ medical symbol|♻️ recycling symbol|⚜️ fleur-de-lis|🔱 trident emblem|📛 name badge|🔰 Japanese symbol for beginner|⭕ hollow red circle|✅ check mark button|☑️ check box with check|✔️ check mark|❌ cross mark|❎ cross mark button|➰ curly loop|➿ double curly loop|〽️ part alternation mark|✳️ eight-spoked asterisk|✴️ eight-pointed star|❇️ sparkle|©️ copyright|®️ registered|™️ trade mark|🫟+ splatter|#️⃣ keycap #|*️⃣ keycap *|0️⃣ keycap 0|1️⃣ keycap 1|2️⃣ keycap 2|3️⃣ keycap 3|4️⃣ keycap 4|5️⃣ keycap 5|6️⃣ keycap 6|7️⃣ keycap 7|8️⃣ keycap 8|9️⃣ keycap 9|🔟 keycap 10|🔠 input latin uppercase|🔡 input latin lowercase|🔢 input numbers|🔣 input symbols|🔤 input latin letters|🅰️ A button (blood type)|🆎 AB button (blood type)|🅱️ B button (blood type)|🆑 CL button|🆒 COOL button|🆓 FREE button|ℹ️ information|🆔 ID button|Ⓜ️ circled M|🆕 NEW button|🆖 NG button|🅾️ O button (blood type)|🆗 OK button|🅿️ P button|🆘 SOS button|🆙 UP! button|🆚 VS button|🈁 Japanese “here” button|🈂️ Japanese “service charge” button|🈷️ Japanese “monthly amount” button|🈶 Japanese “not free of charge” button|🈯 Japanese “reserved” button|🉐 Japanese “bargain” button|🈹 Japanese “discount” button|🈚 Japanese “free of charge” button|🈲 Japanese “prohibited” button|🉑 Japanese “acceptable” button|🈸 Japanese “application” button|🈴 Japanese “passing grade” button|🈳 Japanese “vacancy” button|㊗️ Japanese “congratulations” button|㊙️ Japanese “secret” button|🈺 Japanese “open for business” button|🈵 Japanese “no vacancy” button|🔴 red circle|🟠 orange circle|🟡 yellow circle|🟢 green circle|🔵 blue circle|🟣 purple circle|🟤 brown circle|⚫ black circle|⚪ white circle|🟥 red square|🟧 orange square|🟨 yellow square|🟩 green square|🟦 blue square|🟪 purple square|🟫 brown square|⬛ black large square|⬜ white large square|◼️ black medium square|◻️ white medium square|◾ black medium-small square|◽ white medium-small square|▪️ black small square|▫️ white small square|🔶 large orange diamond|🔷 large blue diamond|🔸 small orange diamond|🔹 small blue diamond|🔺 red triangle pointed up|🔻 red triangle pointed down|💠 diamond with a dot|🔘 radio button|🔳 white square button|🔲 black square button"],["Flags","🏁 chequered flag|🚩 triangular flag|🎌 crossed flags|🏴 black flag|🏳️ white flag|🏳️‍🌈 rainbow flag|🏳️‍⚧️ transgender flag|🏴‍☠️ pirate flag|🇦🇨 flag Ascension Island|🇦🇩 flag Andorra|🇦🇪 flag United Arab Emirates|🇦🇫 flag Afghanistan|🇦🇬 flag Antigua & Barbuda|🇦🇮 flag Anguilla|🇦🇱 flag Albania|🇦🇲 flag Armenia|🇦🇴 flag Angola|🇦🇶 flag Antarctica|🇦🇷 flag Argentina|🇦🇸 flag American Samoa|🇦🇹 flag Austria|🇦🇺 flag Australia|🇦🇼 flag Aruba|🇦🇽 flag Åland Islands|🇦🇿 flag Azerbaijan|🇧🇦 flag Bosnia & Herzegovina|🇧🇧 flag Barbados|🇧🇩 flag Bangladesh|🇧🇪 flag Belgium|🇧🇫 flag Burkina Faso|🇧🇬 flag Bulgaria|🇧🇭 flag Bahrain|🇧🇮 flag Burundi|🇧🇯 flag Benin|🇧🇱 flag St. Barthélemy|🇧🇲 flag Bermuda|🇧🇳 flag Brunei|🇧🇴 flag Bolivia|🇧🇶 flag Caribbean Netherlands|🇧🇷 flag Brazil|🇧🇸 flag Bahamas|🇧🇹 flag Bhutan|🇧🇻 flag Bouvet Island|🇧🇼 flag Botswana|🇧🇾 flag Belarus|🇧🇿 flag Belize|🇨🇦 flag Canada|🇨🇨 flag Cocos (Keeling) Islands|🇨🇩 flag Congo - Kinshasa|🇨🇫 flag Central African Republic|🇨🇬 flag Congo - Brazzaville|🇨🇭 flag Switzerland|🇨🇮 flag Côte d’Ivoire|🇨🇰 flag Cook Islands|🇨🇱 flag Chile|🇨🇲 flag Cameroon|🇨🇳 flag China|🇨🇴 flag Colombia|🇨🇵 flag Clipperton Island|🇨🇶+ flag Sark|🇨🇷 flag Costa Rica|🇨🇺 flag Cuba|🇨🇻 flag Cape Verde|🇨🇼 flag Curaçao|🇨🇽 flag Christmas Island|🇨🇾 flag Cyprus|🇨🇿 flag Czechia|🇩🇪 flag Germany|🇩🇬 flag Diego Garcia|🇩🇯 flag Djibouti|🇩🇰 flag Denmark|🇩🇲 flag Dominica|🇩🇴 flag Dominican Republic|🇩🇿 flag Algeria|🇪🇦 flag Ceuta & Melilla|🇪🇨 flag Ecuador|🇪🇪 flag Estonia|🇪🇬 flag Egypt|🇪🇭 flag Western Sahara|🇪🇷 flag Eritrea|🇪🇸 flag Spain|🇪🇹 flag Ethiopia|🇪🇺 flag European Union|🇫🇮 flag Finland|🇫🇯 flag Fiji|🇫🇰 flag Falkland Islands|🇫🇲 flag Micronesia|🇫🇴 flag Faroe Islands|🇫🇷 flag France|🇬🇦 flag Gabon|🇬🇧 flag United Kingdom|🇬🇩 flag Grenada|🇬🇪 flag Georgia|🇬🇫 flag French Guiana|🇬🇬 flag Guernsey|🇬🇭 flag Ghana|🇬🇮 flag Gibraltar|🇬🇱 flag Greenland|🇬🇲 flag Gambia|🇬🇳 flag Guinea|🇬🇵 flag Guadeloupe|🇬🇶 flag Equatorial Guinea|🇬🇷 flag Greece|🇬🇸 flag South Georgia & South Sandwich Islands|🇬🇹 flag Guatemala|🇬🇺 flag Guam|🇬🇼 flag Guinea-Bissau|🇬🇾 flag Guyana|🇭🇰 flag Hong Kong SAR China|🇭🇲 flag Heard & McDonald Islands|🇭🇳 flag Honduras|🇭🇷 flag Croatia|🇭🇹 flag Haiti|🇭🇺 flag Hungary|🇮🇨 flag Canary Islands|🇮🇩 flag Indonesia|🇮🇪 flag Ireland|🇮🇱 flag Israel|🇮🇲 flag Isle of Man|🇮🇳 flag India|🇮🇴 flag British Indian Ocean Territory|🇮🇶 flag Iraq|🇮🇷 flag Iran|🇮🇸 flag Iceland|🇮🇹 flag Italy|🇯🇪 flag Jersey|🇯🇲 flag Jamaica|🇯🇴 flag Jordan|🇯🇵 flag Japan|🇰🇪 flag Kenya|🇰🇬 flag Kyrgyzstan|🇰🇭 flag Cambodia|🇰🇮 flag Kiribati|🇰🇲 flag Comoros|🇰🇳 flag St. Kitts & Nevis|🇰🇵 flag North Korea|🇰🇷 flag South Korea|🇰🇼 flag Kuwait|🇰🇾 flag Cayman Islands|🇰🇿 flag Kazakhstan|🇱🇦 flag Laos|🇱🇧 flag Lebanon|🇱🇨 flag St. Lucia|🇱🇮 flag Liechtenstein|🇱🇰 flag Sri Lanka|🇱🇷 flag Liberia|🇱🇸 flag Lesotho|🇱🇹 flag Lithuania|🇱🇺 flag Luxembourg|🇱🇻 flag Latvia|🇱🇾 flag Libya|🇲🇦 flag Morocco|🇲🇨 flag Monaco|🇲🇩 flag Moldova|🇲🇪 flag Montenegro|🇲🇫 flag St. Martin|🇲🇬 flag Madagascar|🇲🇭 flag Marshall Islands|🇲🇰 flag North Macedonia|🇲🇱 flag Mali|🇲🇲 flag Myanmar (Burma)|🇲🇳 flag Mongolia|🇲🇴 flag Macao SAR China|🇲🇵 flag Northern Mariana Islands|🇲🇶 flag Martinique|🇲🇷 flag Mauritania|🇲🇸 flag Montserrat|🇲🇹 flag Malta|🇲🇺 flag Mauritius|🇲🇻 flag Maldives|🇲🇼 flag Malawi|🇲🇽 flag Mexico|🇲🇾 flag Malaysia|🇲🇿 flag Mozambique|🇳🇦 flag Namibia|🇳🇨 flag New Caledonia|🇳🇪 flag Niger|🇳🇫 flag Norfolk Island|🇳🇬 flag Nigeria|🇳🇮 flag Nicaragua|🇳🇱 flag Netherlands|🇳🇴 flag Norway|🇳🇵 flag Nepal|🇳🇷 flag Nauru|🇳🇺 flag Niue|🇳🇿 flag New Zealand|🇴🇲 flag Oman|🇵🇦 flag Panama|🇵🇪 flag Peru|🇵🇫 flag French Polynesia|🇵🇬 flag Papua New Guinea|🇵🇭 flag Philippines|🇵🇰 flag Pakistan|🇵🇱 flag Poland|🇵🇲 flag St. Pierre & Miquelon|🇵🇳 flag Pitcairn Islands|🇵🇷 flag Puerto Rico|🇵🇸 flag Palestinian Territories|🇵🇹 flag Portugal|🇵🇼 flag Palau|🇵🇾 flag Paraguay|🇶🇦 flag Qatar|🇷🇪 flag Réunion|🇷🇴 flag Romania|🇷🇸 flag Serbia|🇷🇺 flag Russia|🇷🇼 flag Rwanda|🇸🇦 flag Saudi Arabia|🇸🇧 flag Solomon Islands|🇸🇨 flag Seychelles|🇸🇩 flag Sudan|🇸🇪 flag Sweden|🇸🇬 flag Singapore|🇸🇭 flag St. Helena|🇸🇮 flag Slovenia|🇸🇯 flag Svalbard & Jan Mayen|🇸🇰 flag Slovakia|🇸🇱 flag Sierra Leone|🇸🇲 flag San Marino|🇸🇳 flag Senegal|🇸🇴 flag Somalia|🇸🇷 flag Suriname|🇸🇸 flag South Sudan|🇸🇹 flag São Tomé & Príncipe|🇸🇻 flag El Salvador|🇸🇽 flag Sint Maarten|🇸🇾 flag Syria|🇸🇿 flag Eswatini|🇹🇦 flag Tristan da Cunha|🇹🇨 flag Turks & Caicos Islands|🇹🇩 flag Chad|🇹🇫 flag French Southern Territories|🇹🇬 flag Togo|🇹🇭 flag Thailand|🇹🇯 flag Tajikistan|🇹🇰 flag Tokelau|🇹🇱 flag Timor-Leste|🇹🇲 flag Turkmenistan|🇹🇳 flag Tunisia|🇹🇴 flag Tonga|🇹🇷 flag Türkiye|🇹🇹 flag Trinidad & Tobago|🇹🇻 flag Tuvalu|🇹🇼 flag Taiwan|🇹🇿 flag Tanzania|🇺🇦 flag Ukraine|🇺🇬 flag Uganda|🇺🇲 flag U.S. Outlying Islands|🇺🇳 flag United Nations|🇺🇸 flag United States|🇺🇾 flag Uruguay|🇺🇿 flag Uzbekistan|🇻🇦 flag Vatican City|🇻🇨 flag St. Vincent & Grenadines|🇻🇪 flag Venezuela|🇻🇬 flag British Virgin Islands|🇻🇮 flag U.S. Virgin Islands|🇻🇳 flag Vietnam|🇻🇺 flag Vanuatu|🇼🇫 flag Wallis & Futuna|🇼🇸 flag Samoa|🇽🇰 flag Kosovo|🇾🇪 flag Yemen|🇾🇹 flag Mayotte|🇿🇦 flag South Africa|🇿🇲 flag Zambia|🇿🇼 flag Zimbabwe|🏴󠁧󠁢󠁥󠁮󠁧󠁿 flag England|🏴󠁧󠁢󠁳󠁣󠁴󠁿 flag Scotland|🏴󠁧󠁢󠁷󠁬󠁳󠁿 flag Wales"]];
+const emo=EMOJI.map(([g,str])=>[g,str.split('|').map(x=>{const i=x.indexOf(' '),h=x.slice(0,i),m=h.match(/[*+]*$/)[0];
+  return {c:h.slice(0,h.length-m.length),n:x.slice(i+1),skin:m.includes('*'),late:m.includes('+')};})]);
+/* Search keys. Names are matched lowercased with accents folded ("cote"
+   finds Côte d’Ivoire), & read as "and", "St." also as "saint", and
+   apostrophes and punctuation ignored, so typing on any keyboard works. A few
+   countries are better known by another name, so those get extra words. */
+const fold=t=>' '+String(t).normalize('NFD').replace(/\p{M}/gu,'').toLowerCase().replace(/&/g,' and ').replace(/[’'‘]/g,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim()+' ';
+const ALSO={'flag United States':'usa us america united states of america','flag United Kingdom':'uk great britain britain','flag United Arab Emirates':'uae',
+  'flag South Korea':'korea','flag Czechia':'czech republic','flag Türkiye':'turkey','flag Côte d’Ivoire':'ivory coast','flag Eswatini':'swaziland',
+  'flag European Union':'eu europe','flag Netherlands':'holland','flag Congo - Kinshasa':'drc democratic republic of the congo','flag Palestinian Territories':'palestine',
+  'flag Timor-Leste':'east timor','flag Vatican City':'holy see','flag Cape Verde':'cabo verde','flag Myanmar (Burma)':'burma'};
+emo.forEach(([,l])=>l.forEach(e=>{e.k=fold(e.n+' '+e.n.replace(/\bSt\. /g,'Saint ')+' '+(ALSO[e.n]||''));}));
+const LATE=new Set(),BASES=new Set();
+emo.forEach(([,l])=>l.forEach(e=>{const s=e.c.replace(/️/g,'');if(e.late)LATE.add(s);if(e.skin&&[...s].length===1)BASES.add(s);}));
+
+/* Skin tones. The modifier goes after every person or hand in a sequence,
+   which is how Unicode builds same-tone sequences (🧑🏽‍🤝‍🧑🏽), except for the
+   handshake in the middle of a couple. Checked against the emojibase data for
+   all 330 emoji that take tones. The choice is remembered per browser. */
+const TONES=[['','Default','#FFC93C'],['\u{1F3FB}','Light','#F7DECE'],['\u{1F3FC}','Medium-light','#E8C29C'],['\u{1F3FD}','Medium','#C69C79'],['\u{1F3FE}','Medium-dark','#A0704C'],['\u{1F3FF}','Dark','#6B4634']];
+let tone=0;try{tone=+localStorage.getItem('brevity.tone')||0;}catch(e){}
+if(!(tone>=0&&tone<TONES.length))tone=0;
+function toned(c,t){if(!t)return c;const cps=[...c],out=[];
+  for(let i=0;i<cps.length;i++){const x=cps[i];out.push(x);
+    if(BASES.has(x)&&!(x==='\u{1F91D}'&&cps.length>1)){out.push(TONES[t][0]);if(cps[i+1]==='️')i++;}}
+  return out.join('');}
+
+/* Can this device draw it? Emoji this computer cannot draw are dimmed in the
+   picker: what you cannot see you cannot check, and a picture made from one
+   would be a picture of a box. Three tests on a small canvas: a character the
+   fonts lack draws the same as a known-missing one (a box, or nothing); a
+   sequence the font does not know falls apart into several glyphs and comes out
+   wider than one emoji; and a flag the system cannot draw comes out as grey
+   letters (Windows), so flags must have colour. If the browser blocks reading
+   the canvas back, everything counts as drawable. */
+const EFONT='"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+const drawn=new Map();let dctx=null,dRef=0,dMiss=null;
+function ink(ch){dctx.clearRect(0,0,40,40);dctx.fillText(ch,20,22);return dctx.getImageData(0,0,40,40).data;}
+function isFlag(c){return /^[\u{1F1E6}-\u{1F1FF}]|^\u{1F3F4}\u{E0067}/u.test(c);}
+function canDraw(c){
+  if(drawn.has(c))return drawn.get(c);
+  let ok=true;
+  try{
+    if(!dctx){const cv=document.createElement('canvas');cv.width=cv.height=40;dctx=cv.getContext('2d',{willReadFrequently:true});
+      dctx.font='32px '+EFONT;dctx.textAlign='center';dctx.textBaseline='middle';dRef=dctx.measureText('\u{1F600}').width;dMiss=ink('\u{10FFFD}');}
+    if(dRef&&dctx.measureText(c).width>dRef*1.4)ok=false;
+    else{const d=ink(c);let any=false,col=false,same=true;
+      for(let i=0;i<d.length;i+=4){if(same&&(d[i]!==dMiss[i]||d[i+3]!==dMiss[i+3]))same=false;
+        if(d[i+3]>64){any=true;if(Math.max(d[i],d[i+1],d[i+2])-Math.min(d[i],d[i+1],d[i+2])>40)col=true;}}
+      if(!any||same||(isFlag(c)&&!col))ok=false;}
+  }catch(e){ok=true;}
+  drawn.set(c,ok);return ok;}
+
+const eCat=$('#emojiCat'),eFind=$('#emojiFind'),eGrid=$('#emojiGrid'),eTone=$('#emojiTone');
+eCat.innerHTML=emo.map(([g],i)=>'<option value="'+i+'">'+esc(g)+'</option>').join('');
+eTone.innerHTML=TONES.map(([,n,col],i)=>'<button type="button" data-tone="'+i+'" aria-pressed="'+(i===tone)+'" aria-label="'+n+' skin tone" title="'+n+' skin tone"><i style="background:'+col+'"></i></button>').join('');
+function showEmoji(){
+  // Words match from their start ("jap" finds Japan); whole-word matches come first, so a country's flag leads.
+  const q=fold(eFind.value).trim();
+  const list=q?emo.flatMap(g=>g[1]).filter(e=>e.k.includes(' '+q)).map((e,i)=>[e.k.includes(' '+q+' ')?0:1,i,e]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]).map(x=>x[2]):emo[+eCat.value][1];
+  eGrid.innerHTML=list.length?list.map(e=>{const c=e.skin?toned(e.c,tone):e.c,ok=canDraw(c);
+    return '<button type="button" data-emoji="'+c+'"'+(ok?'':' class="cant"')+' title="'+esc(e.n+(ok?'':' (this device cannot draw it; some recipients will see a box too)'))+'" aria-label="'+esc(e.n+(ok?'':', not shown on this device'))+'">'+c+'</button>';}).join('')
+    :'<p class="hint">No emoji match that. Try one word, such as star or cake.</p>';
+  eGrid.scrollTop=0;
+}
+eCat.addEventListener('change',()=>{eFind.value='';showEmoji();});
+eFind.addEventListener('input',showEmoji);
+eTone.addEventListener('click',e=>{const b=e.target.closest('[data-tone]');if(!b)return;tone=+b.dataset.tone;
+  try{localStorage.setItem('brevity.tone',tone);}catch(err){}
+  $$('[data-tone]',eTone).forEach(x=>x.setAttribute('aria-pressed',x===b));const top=eGrid.scrollTop;showEmoji();eGrid.scrollTop=top;});
+showEmoji();
+/* Emoji go wherever the writer last had a cursor: a text field on the canvas,
+   or the subject or preview line. That spot is remembered because picking an
+   emoji happens outside the field, and on a phone the canvas is not even on
+   screen at the time. mousedown is swallowed so a mouse click leaves the
+   caret where it was. */
+let emojiAt=null;
+document.addEventListener('selectionchange',()=>{const s=getSelection();if(!s.rangeCount)return;const n=s.anchorNode,el=n&&(n.nodeType===1?n:n.parentElement),f=el&&el.closest&&el.closest('#canvas [data-f]');
+  if(f)emojiAt={el:f,range:s.getRangeAt(0).cloneRange()};});
+['subject','preheader'].forEach(k=>$('#'+k).addEventListener('focus',e=>{emojiAt={el:e.target};}));
+function putEmoji(ch,btn){
+  const t=emojiAt;
+  if(!t||!t.el.isConnected){toast('Click into some text in the email first, then pick an emoji.');return;}
+  const phone=matchMedia('(max-width:920px)').matches;if(phone)setPane('canvas');
+  const el=t.el;el.focus();
+  if(el.tagName==='INPUT'){const a=el.selectionStart??el.value.length,z=el.selectionEnd??a;el.setRangeText(ch,a,z,'end');el.dispatchEvent(new Event('input',{bubbles:true}));}
+  else{const s=getSelection();let r=t.range;
+    if(!r||!el.contains(r.startContainer)){r=document.createRange();r.selectNodeContents(el);r.collapse(false);}
+    s.removeAllRanges();s.addRange(r);document.execCommand('insertText',false,ch);
+    if(s.rangeCount)emojiAt={el,range:s.getRangeAt(0).cloneRange()};}
+  // From the keyboard, hand focus back to the grid so several can be picked in a row.
+  if(btn&&!phone)btn.focus({preventScroll:true});
+}
+eGrid.addEventListener('mousedown',e=>{if(e.target.closest('[data-emoji]'))e.preventDefault();});
+eGrid.addEventListener('click',e=>{const b=e.target.closest('[data-emoji]');if(b)putEmoji(b.dataset.emoji,e.detail===0?b:null);});
+
+/* Emoji as pictures. With the setting on, each emoji in the body is drawn here
+   into a small PNG and embedded like a photo, with the emoji itself as the alt
+   text, so recipients see it the way it looks on this screen whatever their
+   device. This runs over the finished export, text nodes only, so rb() stays
+   the one renderer. Emoji this device cannot draw stay as text: a picture of a
+   box helps nobody. The subject and preview lines are never touched, since an
+   inbox list cannot show images. */
+const EMO_RE=(()=>{try{return new RegExp('\\p{RGI_Emoji}','gv');}catch(e){
+  return /\p{Regional_Indicator}{2}|[#*0-9]️?⃣|\p{Extended_Pictographic}[️\u{1F3FB}-\u{1F3FF}\u{E0020}-\u{E007F}]*(?:‍\p{Extended_Pictographic}[️\u{1F3FB}-\u{1F3FF}]*)*/gu;}})();
+// Bare ©, ®, ™ and friends are text unless they carry the emoji selector.
+const realEmoji=c=>c.length>1||/\p{Emoji_Presentation}/u.test(c);
+function emojiIn(s){return [...String(s).matchAll(EMO_RE)].map(m=>m[0]).filter(realEmoji);}
+function bodyEmoji(){return emojiIn(JSON.stringify(doc.blocks));}
+function lateOrFlag(c){return isFlag(c)||LATE.has(c.replace(/[️\u{1F3FB}-\u{1F3FF}]/gu,''));}
+const picCache=new Map();
+function emojiPic(c,S){const k=c+'|'+S;if(picCache.has(k))return picCache.get(k);
+  const s=Math.min(96,S*2),cv=document.createElement('canvas');cv.width=cv.height=s;const x=cv.getContext('2d');
+  x.font=Math.round(s*.86)+'px '+EFONT;x.textAlign='center';x.textBaseline='alphabetic';
+  const m=x.measureText(c),a=m.actualBoundingBoxAscent||s*.8,d=m.actualBoundingBoxDescent||0;
+  x.fillText(c,s/2,(s-(a+d))/2+a);
+  const u=cv.toDataURL('image/png');picCache.set(k,u);return u;}
+function withEmojiPictures(html){
+  if(!doc.emojiPics)return html;
+  const t=document.createElement('template');t.innerHTML=html;
+  const w=document.createTreeWalker(t.content,NodeFilter.SHOW_TEXT),ns=[];while(w.nextNode())ns.push(w.currentNode);
+  ns.forEach(n=>{const s=n.data;let at=0;const f=document.createDocumentFragment();
+    let px=16;for(let e=n.parentElement;e;e=e.parentElement){const m=/font-size:\s*(\d+(?:\.\d+)?)px/.exec(e.getAttribute('style')||'');if(m){px=+m[1];break;}}
+    if(px<6)return;
+    const S=Math.round(px*1.25);
+    for(const m of s.matchAll(EMO_RE)){const c=m[0];if(!realEmoji(c)||!canDraw(c))continue;
+      if(m.index>at)f.append(s.slice(at,m.index));
+      const im=document.createElement('img');
+      im.setAttribute('src',emojiPic(c,S));im.setAttribute('alt',c);im.setAttribute('width',S);im.setAttribute('height',S);
+      im.setAttribute('style','width:'+S+'px;height:'+S+'px;vertical-align:-'+Math.round(px*.22)+'px;border:0;display:inline;');
+      f.append(im);at=m.index+c.length;}
+    if(!at)return;if(at<s.length)f.append(s.slice(at));n.replaceWith(f);});
+  return t.innerHTML;}
 /* ---------- layouts: built in, saved, and reset ----------
    `mine` holds the user's saved layouts, each a frozen copy of a document plus
    the photos it uses, persisted in IndexedDB beside the draft. `appliedFrom`
@@ -1296,13 +1748,18 @@ $('#tab-style').addEventListener('change',e=>{if(e.target.dataset&&e.target.data
 
 /* ---------- top bar ---------- */
 $('#undo').onclick=()=>travel(-1);$('#redo').onclick=()=>travel(1);
+/* Dark mode preview. Gmail's phone apps flip light emails dark by inverting
+   their colours and then turning hues back, while leaving photos alone; this
+   approximates that with a CSS filter on the canvas only, re-applied to
+   images so they look normal. It changes nothing in the exported email. */
+$('#darkPrev').onclick=()=>{const on=!document.body.classList.contains('darkprev');document.body.classList.toggle('darkprev',on);$('#darkPrev').setAttribute('aria-pressed',on);$('#darkNote').hidden=!on;};
 $$('[data-device]').forEach(b=>b.addEventListener('click',()=>{if(b.tagName!=='BUTTON')return;document.body.dataset.device=b.dataset.device;$$('button[data-device]').forEach(x=>x.setAttribute('aria-pressed',x===b));}));
 function setPane(p){document.body.dataset.pane=p;$$('.mtabs button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.pane===p));}
 $$('.mtabs button').forEach(b=>b.addEventListener('click',()=>setPane(b.dataset.pane)));
 ['subject','preheader'].forEach(k=>$('#'+k).addEventListener('input',e=>{doc[k]=e.target.value;soon();}));
 
 document.addEventListener('keydown',e=>{
-  const mod=e.ctrlKey||e.metaKey,t=e.target,inField=t.tagName==='INPUT'||t.tagName==='TEXTAREA',editing=t.isContentEditable;
+  const mod=e.ctrlKey||e.metaKey,t=e.target,inField=t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT',editing=t.isContentEditable;
   if($('dialog[open]'))return;
   if(mod&&e.key.toLowerCase()==='z'&&!inField){e.preventDefault();travel(e.shiftKey?1:-1);return;}
   if(mod&&e.key.toLowerCase()==='y'&&!inField){e.preventDefault();travel(1);return;}
@@ -1320,7 +1777,7 @@ document.addEventListener('keydown',e=>{
    fullDoc() adds a document shell plus the hidden preheader div, the text that
    appears after the subject line in an inbox list. plainText() is the fallback
    copy for clients that refuse HTML. */
-function buildEmail(){
+function emailTables(){
   const T=theme(),B=doc.blocks,sp='<tr><td height="18" style="height:18px;font-size:0;line-height:0;">&nbsp;</td></tr>';
   let rows=B.length&&!edgeless(B[0])?sp:'';
   B.forEach((b,i)=>{const r=rb(b,T,false,{first:i===0,last:i===B.length-1});
@@ -1329,6 +1786,7 @@ function buildEmail(){
   return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="'+T.bg+'" style="background-color:'+T.bg+';"><tr><td align="center" style="padding:24px 12px;">'+
     '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="'+T.card+'" style="width:600px;max-width:100%;background-color:'+T.card+';border-radius:'+T.cardR+'px;">'+rows+'</table></td></tr></table>';
 }
+function buildEmail(){return withEmojiPictures(emailTables());}
 function fullDoc(){
   const T=theme();
   return '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>'+esc(doc.subject||'Email')+'</title>\n</head>\n<body style="margin:0;padding:0;background-color:'+T.bg+';">\n'+
@@ -1347,9 +1805,13 @@ function plainText(){
     case 'quote':return '“'+b.text+'”'+(b.cite?'\n'+b.cite:'');
     case 'callout':return [b.title,strip(b.html)].filter(Boolean).join('\n');
     case 'divider':return '----------';
+    case 'event':{const ev=evInfo(b);return [b.title,ev.when,b.place,strip(b.notes||'').trim(),b.cal&&ev.ok?'Add to Google Calendar: '+ev.google:''].filter(Boolean).join('\n');}
+    case 'table':return (b.rows||[]).map(r=>r.join(' | ')).join('\n');
+    case 'columns':return [b.layout!=='photo-left'?[b.t1,strip(b.h1)]:[],b.layout!=='photo-right'?[b.t2,strip(b.h2)]:[]].flat().filter(x=>x&&String(x).trim()).join('\n');
+    case 'links':return (b.items||[]).map(x=>{const u=linkHref(x)&&(/^(email|phone)$/.test(x.kind)?String(x.url).trim().replace(/^(mailto|tel):/i,''):linkHref(x));return u?(x.label||LINK_KINDS[x.kind][0])+': '+u:'';}).filter(Boolean).join('\n');
     default:return '';}}).filter(Boolean).join('\n\n');
 }
-function eachPhoto(fn){doc.blocks.forEach(b=>{if('img' in b&&(b.type!=='header'||(b.style!=='monogram'&&b.logo!=='none')))fn(b,b);(b.items||[]).forEach(i=>fn(i,b));});}
+function eachPhoto(fn){doc.blocks.forEach(b=>{if('img' in b&&(b.type!=='header'||(b.style!=='monogram'&&b.logo!=='none')))fn(b,b);if(b.type==='people')b.items.forEach(i=>fn(i,b));if(b.type==='columns'&&b.layout!=='text')fn(b.pic,b);});}
 /* The pre-send checklist: the mistakes that are expensive after you hit send —
    no subject, placeholder photos, missing alt text, unsigned signatures and
    buttons with no link. sizes() reports against Gmail's 102 KB clipping
@@ -1364,10 +1826,57 @@ function checks(){
   if(noAlt)out.push({ok:0,t:noAlt+(noAlt===1?' photo has':' photos have')+' no description for screen readers.'});
   const uns=doc.blocks.filter(b=>b.type==='signature'&&!signed(b)).length;
   if(uns)out.push({ok:0,t:uns===1?'A signature block is not signed yet.':uns+' signature blocks are not signed yet.'});
+  const evs=doc.blocks.filter(b=>b.type==='event').map(evInfo);
+  if(evs.some(v=>!v.ok))out.push({ok:0,t:'An event block has no date yet.'});
+  else if(evs.some(v=>v.past))out.push({ok:0,t:'An event block is dated in the past. Check the date before sending.'});
+  const noHref=doc.blocks.filter(b=>b.type==='links').reduce((n,b)=>n+b.items.filter(x=>!linkHref(x)).length,0);
+  if(noHref)out.push({ok:0,t:noHref+(noHref===1?' icon in a link row has':' icons in link rows have')+' no address yet.'});
   if(doc.blocks.some(b=>b.type==='button'))out.push(btn?{ok:0,t:btn+(btn===1?' button has':' buttons have')+' no link address yet.'}:{ok:1,t:'Every button has a link.'});
+  // Weight: Gmail's hard limit is 25 MB, but phones on a weak signal struggle long before that.
+  const pw=photoWeights().reduce((n,x)=>n+x.kb,0)/1024;
+  if(pw>18)out.push({ok:0,t:'Photos add '+pw.toFixed(1)+' MB, close to Gmail’s 25 MB limit. Use fewer photos, or choose Smaller photos under Size below.'});
+  else if(pw>4)out.push({ok:0,t:'Photos add '+pw.toFixed(1)+' MB, which is slow to open on a phone. Choose Smaller photos under Size below, or use fewer photos.'});
+  out.push(...readability());
+  // Emoji: flags and anything newer than Emoji 15.0 are the ones that arrive as boxes or letters.
+  const top=[...new Set(emojiIn(doc.subject+' '+doc.preheader).filter(lateOrFlag))];
+  if(top.length)out.push({ok:0,t:'The subject or preview line has '+top.join(' ')+'. Some inboxes show flags and emoji newer than 2022 as boxes or letters, and a subject line cannot hold pictures. Consider moving '+(top.length===1?'it':'them')+' into the email.'});
+  const body=[...new Set(bodyEmoji())];
+  if(!doc.emojiPics){const r=body.filter(lateOrFlag);
+    if(r.length)out.push({ok:0,t:'The email has '+r.slice(0,8).join(' ')+(r.length>8?' and more':'')+'. Some devices show flags and emoji newer than 2022 as boxes or letters. Turn on “Send emoji as pictures” below so everyone sees them.'});}
+  else{const no=body.filter(c=>!canDraw(c)).length;
+    if(no)out.push({ok:0,t:no+(no===1?' emoji in the email cannot be drawn on this device, so it goes as text.':' emoji in the email cannot be drawn on this device, so they go as text.')+' Build the email on a device that shows '+(no===1?'it':'them')+', such as a phone, to send '+(no===1?'it':'them')+' as pictures.'});}
+  return out;
+}
+/* Readability rules: coloured words that are hard to read, links that do not
+   say where they go, and paragraphs too long for a phone screen. They look
+   only at text the writer controls, so a default palette never trips them. */
+const contrast=(a,b)=>{const x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);};
+const VAGUE=new Set(['click here','here','click','link','this link','this','read more','more','learn more','go','click this']);
+function readability(){
+  const T=theme(),out=[],t=document.createElement('template');let faint=0,vague=0,longest=0,longIn='';
+  const fields=b=>({text:['html'],profile:['html'],callout:['html'],footer:['html'],event:['notes'],columns:['h1','h2']}[b.type]||[]);
+  doc.blocks.forEach(b=>fields(b).forEach(k=>{
+    const html=String(b[k]||''),pageBg=b.type==='callout'?T.tint:T.card,ink=b.type==='footer'?T.muted:T.text;
+    t.innerHTML=html;
+    t.content.querySelectorAll('span[data-fg],span[data-bg]').forEach(sp=>{
+      const up=sp.parentElement&&sp.parentElement.closest('span[data-bg]'),fg=sp.dataset.fg?wordColor('fg',sp.dataset.fg,T):ink,
+        bg=sp.dataset.bg?wordColor('bg',sp.dataset.bg,T):up?wordColor('bg',up.dataset.bg,T):pageBg;
+      if(fg&&bg&&contrast(fg,bg)<3)faint++;});
+    t.content.querySelectorAll('a').forEach(a=>{if(VAGUE.has(a.textContent.trim().toLowerCase().replace(/[.!…]+$/,'')))vague++;});
+    html.split(/(?:<br>\s*){2,}|<\/?(?:ul|ol|li)>/).forEach(par=>{const n=strip(par).trim().split(/\s+/).filter(Boolean).length;if(n>longest){longest=n;longIn=LABEL[b.type];}});
+  }));
+  vague+=doc.blocks.filter(b=>b.type==='button'&&VAGUE.has(String(b.label||'').trim().toLowerCase())&&!/^read more$/i.test(String(b.label).trim())).length;
+  if(faint)out.push({ok:0,t:(faint===1?'Some coloured words are':faint+' coloured or highlighted passages are')+' hard to read against their background. Pick a darker text colour or a lighter highlight.'});
+  if(contrast(T.accent,T.card)<3&&/<a /.test(JSON.stringify(doc.blocks)))out.push({ok:0,t:'Links in your main colour are hard to read on the page. Choose a darker main colour in the Style tab.'});
+  if(vague)out.push({ok:0,t:(vague===1?'A link says':vague+' links say')+' something like “click here”. Say where it goes instead, such as “Read the field trip form”: screen readers often list links on their own.'});
+  if(longest>120)out.push({ok:0,t:'A paragraph in a '+longIn+' block runs '+longest+' words. Break it up: long paragraphs are hard to read on a phone.'});
   return out;
 }
 function sizes(){const h=buildEmail(),m=h.replace(/src="data:[^"]+"/g,'src=""');return{markup:m.length/1024,photos:(h.length-m.length)*.75/1048576};}
+// The weight of the pictures in each block, heaviest first: what to fix when an email gets heavy.
+function photoWeights(){const T=theme();return doc.blocks.map((b,i)=>{const r=rb(b,T,false,{first:i===0,last:i===doc.blocks.length-1});
+  const kb=(r.html.match(/src="data:[^"]+"/g)||[]).reduce((n,x)=>n+x.length*.75/1024,0);return{b,kb};}).filter(x=>x.kb>=1).sort((a,c)=>c.kb-a.kb);}
+const fmtSize=kb=>kb<1024?Math.round(kb)+' KB':(kb/1024).toFixed(1)+' MB';
 
 /* Clipboard. The async Clipboard API is tried first; where it is blocked, a
    hidden textarea plus a copy-event listener is the fallback. If both fail the
@@ -1396,31 +1905,194 @@ $('#copyGmail').onclick=copyForGmail;
 
 let downloads=null;
 if(window.claude&&window.claude.use)window.claude.use('downloads').then(d=>{downloads=d;}).catch(()=>{});
+function photoPanel(){
+  const w=photoWeights();if(!w.length&&doc.photoQuality!=='light')return '';
+  return '<div class="field"><span class="lab">Photo quality</span><div class="seg" role="group" aria-label="Photo quality"><button data-pq="sharp" aria-pressed="'+(doc.photoQuality!=='light')+'">Sharp</button><button data-pq="light" aria-pressed="'+(doc.photoQuality==='light')+'">Smaller</button></div></div>'+
+    '<p class="hint" style="margin:6px 0 0">Sharp looks crisp on high-resolution phones. Smaller loads faster and is about half the weight.'+(w.length?' Heaviest: '+w.slice(0,3).map(x=>esc(LABEL[x.b.type])+' '+fmtSize(x.kb)).join(', ')+'.':'')+'</p>';
+}
+/* Print or save as PDF: the exported email in a hidden frame, on a white page
+   instead of the coloured surround, with rows kept whole across page breaks. */
+function printEmail(){
+  if(typingTimer)commit();
+  const f=document.createElement('iframe');f.title='Print preview';f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';document.body.appendChild(f);
+  const d=f.contentDocument;d.open();d.write(fullDoc().replace('</head>','<style>@page{margin:12mm}html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}body,body>table,body>table>tbody>tr>td{background:#fff!important}body>table>tbody>tr>td{padding:0!important}tr,img{break-inside:avoid}</style>\n</head>'));d.close();
+  const imgs=[...d.images].map(i=>i.complete?null:new Promise(r=>{i.onload=i.onerror=r;})).filter(Boolean);
+  Promise.all(imgs).then(()=>{try{f.contentWindow.focus();f.contentWindow.print();}catch(e){toast('This browser blocked printing. Download the .html file and print that instead.');}setTimeout(()=>f.remove(),60000);});
+}
 function openExport(){
   if(typingTimer)commit();
   const c=checks(),z=sizes(),pct=Math.min(100,z.markup/102*100),dlg=$('#exportDlg');
   $('#manual').style.display='none';$('#manual').innerHTML='';
   $('#exBody').innerHTML='<ul class="checks">'+c.map(x=>'<li class="'+(x.ok?'':'w')+'">'+x.t+'</li>').join('')+'</ul>'+
     '<h3>Size</h3><div class="meter" aria-hidden="true"><i class="'+(pct>85?'w':'')+'" style="width:'+pct.toFixed(0)+'%"></i></div>'+
-    '<p class="hint" style="margin:0">Message code is '+z.markup.toFixed(0)+' KB. Gmail trims messages over 102 KB behind a “View entire message” link. Photos add about '+(z.photos<1?Math.round(z.photos*1024)+' KB':z.photos.toFixed(1)+' MB')+' and count toward Gmail’s 25 MB limit instead.</p>'+
+    '<p class="hint" style="margin:0">Message code is '+z.markup.toFixed(0)+' KB. Gmail trims messages over 102 KB behind a “View entire message” link. Photos add about '+(z.photos<1?Math.round(z.photos*1024)+' KB':z.photos.toFixed(1)+' MB')+' and count toward Gmail’s 25 MB limit instead.</p>'+photoPanel()+
+    (doc.emojiPics||bodyEmoji().length?'<h3>Emoji</h3><label class="check"><input type="checkbox" id="emojiPics"'+(doc.emojiPics?' checked':'')+'> Send emoji as pictures</label>'+
+      '<p class="hint" style="margin:6px 0 0">Recipients see each emoji the way it looks here, even on older phones and on Windows. Each one becomes a small image that travels with the photos. The subject line stays as text.</p>':'')+
     '<h3>Send it from Gmail</h3><ol class="steps"><li>Select “Copy for Gmail”.</li><li>Open a new message in Gmail and click into the body.</li><li>Paste with Ctrl+V or ⌘V. Photos travel inside the message.</li><li>Send yourself a test before sending to everyone.</li></ol>'+
     '<div class="row" style="margin-top:14px"><button class="btn primary" data-x="gmail">Copy for Gmail</button><a class="btn" target="_blank" rel="noopener" href="https://mail.google.com/mail/?view=cm&fs=1&su='+encodeURIComponent(doc.subject)+'">Open a new Gmail message</a></div>'+
-    '<h3>Other ways out</h3><div class="row"><button class="btn" data-x="code">Copy HTML code</button>'+(downloads?'<button class="btn" data-x="file">Download .html</button>':'')+'<button class="btn" data-x="text">Copy plain text</button></div>'+
+    '<h3>Other ways out</h3><div class="row"><button class="btn" data-x="code">Copy HTML code</button>'+'<button class="btn" data-x="file">Download .html</button>'+'<button class="btn" data-x="text">Copy plain text</button><button class="btn" data-x="print">Print or save as PDF</button></div>'+
     '<p class="hint">The HTML code keeps photos embedded in the file. Newsletter services such as Mailchimp need photos hosted online instead, so upload them there.</p>'+
     '<div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn" data-x="close">Close</button></div>';
   if(!dlg.open)dlg.showModal();
 }
 $('#openExport').onclick=openExport;
+$('#exportDlg').addEventListener('change',e=>{if(e.target.id!=='emojiPics')return;doc.emojiPics=e.target.checked;commit();openExport();$('#emojiPics').focus();});
 $('#exportDlg').addEventListener('click',async e=>{
   if(e.target===e.currentTarget){e.currentTarget.close();return;}
+  const pq=e.target.closest('[data-pq]');if(pq){doc.photoQuality=pq.dataset.pq;cache.clear();renderCanvas();commit();openExport();const fb=$('[data-pq="'+pq.dataset.pq+'"]');if(fb)fb.focus();return;}
   const b=e.target.closest('[data-x]');if(!b)return;const x=b.dataset.x;
   if(x==='close')$('#exportDlg').close();
   else if(x==='gmail')copyForGmail();
   else if(x==='code')toast(await copyText(fullDoc())?'HTML code copied.':'This browser blocked copying. Use Download instead.');
   else if(x==='text')toast(await copyText(plainText())?'Plain text copied.':'This browser blocked copying.');
-  else if(x==='file'&&downloads){const name=(doc.subject.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'email')+'.html';
-    try{await downloads.save({filename:name,data:fullDoc()});toast('Downloaded '+name+'.');}catch(err){if(!err||err.code!=='declined')toast('The download did not go through. Copy the HTML code instead.');}}
+  else if(x==='print')printEmail();
+  else if(x==='file'){const name=fileSlug()+'.html';toast(await saveFile(name,fullDoc(),'text/html')?'Downloaded '+name+'.':'The download did not go through. Copy the HTML code instead.');}
 });
+
+/* ---------- drafts, files and sections ---------- */
+async function loadImages(map,remap){
+  for(const id in (map||{})){const nid=remap?remap.get(id)||id:id;if(images[nid])continue;
+    try{const el=new Image();el.src=map[id];await el.decode();images[nid]={src:map[id],el};}catch(e){}}}
+// Replace the open email with stored data: photos first, then the document, then a fresh undo history.
+async function loadDraftData(d){
+  await loadImages(d.images);
+  doc=Object.assign(freshDoc(),JSON.parse(JSON.stringify(d.doc)));appliedFrom=null;sel={id:null,sub:''};cache.clear();
+  renderAll();renderStarts();hist=[JSON.stringify(doc)];hi=0;syncTop();ensureSigFonts();
+}
+async function openDraft(id){
+  if(id===draftId)return;saveNow();
+  const d=await idb.get('d:'+id);
+  if(!d||!d.doc){drafts=drafts.filter(x=>x.id!==id);idb.set('drafts',drafts);renderDrafts();toast('That email could not be found in this browser.');return;}
+  draftId=id;idb.set('current',id);await loadDraftData(d);renderDrafts();toast('Opened “'+draftName()+'”.');
+}
+function newDraft(){
+  saveNow();const keep={};['theme','accent','accent2','bg','corners','buttons','density','photoQuality'].forEach(k=>keep[k]=doc[k]);
+  draftId=uid('d');doc=Object.assign(freshDoc(),keep);appliedFrom=null;sel={id:null,sub:''};
+  renderAll();renderStarts();hist=[JSON.stringify(doc)];hi=0;syncTop();saveNow();renderDrafts();
+  toast('New email started in the same colours. Add blocks, or pick a layout on the left.');
+}
+async function dupDraft(id){
+  saveNow();const d=id===draftId?draftData():await idb.get('d:'+id);if(!d)return;
+  const nid=uid('d');d.doc.subject=((d.doc.subject||'').trim()||'Untitled email')+' (copy)';
+  idb.set('d:'+nid,d);drafts.push({id:nid,name:d.doc.subject,when:Date.now()});idb.set('drafts',drafts);renderDrafts();toast('Made a copy: “'+d.doc.subject+'”.');
+}
+async function delDraft(id){
+  const gone=drafts.find(x=>x.id===id);idb.del('d:'+id);drafts=drafts.filter(x=>x.id!==id);idb.set('drafts',drafts);
+  if(id===draftId){draftId=null;const next=[...drafts].sort((a,b)=>b.when-a.when)[0];if(next)await openDraft(next.id);else newDraft();}
+  renderDrafts();toast('Deleted “'+(gone?gone.name:'the email')+'”.');
+}
+const ago=t=>{const m=Math.round((Date.now()-t)/6e4),d=new Date(t);if(m<1)return 'just now';if(m<60)return m+' min ago';
+  return new Date().toDateString()===d.toDateString()?'today at '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}):d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:d.getFullYear()===new Date().getFullYear()?undefined:'numeric'});};
+let pendingDel=null;
+function renderDrafts(){
+  const list=[...drafts].sort((a,b)=>b.when-a.when);if(draftId&&!list.some(x=>x.id===draftId))list.unshift({id:draftId,name:draftName(),when:Date.now()});
+  $('#drBody').innerHTML='<div class="row" style="margin-top:10px"><button class="btn primary" data-dr="new">New email</button><button class="btn" data-dr="save">Save as a file</button><button class="btn" data-dr="open">Open a file</button></div>'+
+    '<ul class="drafts">'+list.map(d=>{const cur=d.id===draftId;return '<li'+(cur?' class="cur"':'')+'><div><b>'+esc(cur?draftName():d.name)+'</b><span>'+(cur?'Open now · edited '+ago(Date.now()):'Edited '+ago(d.when))+'</span></div><div class="row">'+
+      (cur?'':'<button class="btn" data-dr="go" data-id="'+d.id+'">Open</button>')+'<button class="btn" data-dr="dup" data-id="'+d.id+'">Duplicate</button>'+
+      (pendingDel===d.id?'<button class="btn danger" data-dr="delok" data-id="'+d.id+'">Delete for good</button>':'<button class="btn" data-dr="del" data-id="'+d.id+'" aria-label="Delete '+esc(d.name)+'">Delete</button>')+'</div></li>';}).join('')+'</ul>'+
+    '<p class="hint">Emails are kept in this browser and save as you type. To move one to another computer or share it with a colleague, save it as a file and open it there. Photos travel inside the file.</p>'+
+    '<div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn" data-dr="close">Close</button></div>';
+}
+$('#openDrafts').onclick=()=>{if(typingTimer)commit();saveNow();pendingDel=null;renderDrafts();$('#draftsDlg').showModal();};
+$('#draftsDlg').addEventListener('click',async e=>{
+  if(e.target===e.currentTarget){e.currentTarget.close();return;}
+  const b=e.target.closest('[data-dr]');if(!b)return;const a=b.dataset.dr,id=b.dataset.id;
+  if(a!=='del')pendingDel=null;
+  if(a==='close')$('#draftsDlg').close();
+  else if(a==='new'){newDraft();$('#draftsDlg').close();}
+  else if(a==='go'){await openDraft(id);$('#draftsDlg').close();}
+  else if(a==='dup')dupDraft(id);
+  else if(a==='del'){pendingDel=id;renderDrafts();const ok=$('[data-dr="delok"]');if(ok)ok.focus();}
+  else if(a==='delok')delDraft(id);
+  else if(a==='save')saveBrevity();
+  else if(a==='open')$('#openFile').click();
+});
+
+/* Saving a file. The page's download helper is used where it exists;
+   otherwise an ordinary download link does the job. */
+async function saveFile(name,data,type){
+  if(downloads){try{await downloads.save({filename:name,data});return true;}catch(err){if(err&&err.code==='declined')return false;}}
+  try{const u=URL.createObjectURL(new Blob([data],{type})),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);return true;}catch(e){return false;}
+}
+const fileSlug=()=>doc.subject.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60)||'email';
+async function saveBrevity(){
+  if(typingTimer)commit();const d=draftData(),name=fileSlug()+'.brevity';
+  const ok=await saveFile(name,JSON.stringify({format:'brevity',version:1,saved:new Date().toISOString(),doc:d.doc,images:d.images}),'application/json');
+  toast(ok?'Saved '+name+'. Open it with “Open a file” on any computer.':'The file could not be saved from this browser.');
+}
+
+/* Opening a file never trusts it. Every field is checked against the block's
+   own defaults: numbers must be numbers, choices must look like choices, links
+   must be web, email or phone links, rich text goes through clean(), and
+   photos must be image data. Unknown block types and fields are dropped, and
+   every id is replaced, so a file cannot carry script or clash with what is
+   already open. */
+const RICHF=new Set(['html','notes','h1','h2']),FREEF=new Set(['brand','tagline','text','caption','name','role','label','cite','place','title','alt','typed','t1','t2','url']);
+function cleanStr(h){const t=document.createElement('template');t.innerHTML=String(h).slice(0,60000);return clean(t.content,{T:theme(),base:'',keep:true});}
+function sanVal(def,v,k){
+  if(k==='img')return typeof v==='string'&&/^[\w-]{1,40}$/.test(v)?v:null;
+  if(Array.isArray(def)){if(!Array.isArray(v))return JSON.parse(JSON.stringify(def));
+    if(k==='strokes')return v.filter(Array.isArray).slice(0,400).map(st=>st.filter(pt=>Array.isArray(pt)&&pt.length>=2&&pt.slice(0,3).every(Number.isFinite)).slice(0,5000).map(pt=>pt.slice(0,3)));
+    if(k==='rows')return v.filter(Array.isArray).slice(0,40).map(r=>r.slice(0,6).map(c=>typeof c==='string'?c.slice(0,500):''));
+    const tpl=def[0];return tpl&&typeof tpl==='object'?v.slice(0,12).map(x=>sanObj(tpl,x)):[];}
+  if(def&&typeof def==='object')return sanObj(def,v);
+  if(typeof def==='number')return Number.isFinite(+v)&&v!==''&&v!==null?+v:def;
+  if(typeof def==='boolean')return typeof v==='boolean'?v:def;
+  if(typeof def==='string'){if(typeof v!=='string')return def;
+    if(RICHF.has(k))return cleanStr(v);
+    if(k==='url')return /^[a-z][\w+.-]*:/i.test(v.trim())&&!/^(https?:|mailto:|tel:|sms:)/i.test(v.trim())?'':v.slice(0,2000);
+    if(FREEF.has(k))return v.slice(0,2000);
+    return /^[\w.#:\/+ -]{0,60}$/.test(v)?v:def;}
+  return def;
+}
+function sanObj(def,v){const o={};if(!v||typeof v!=='object'||Array.isArray(v))v={};for(const k in def)o[k]=sanVal(def[k],v[k],k);return o;}
+function sanBlock(raw,remap){
+  if(!raw||!LABEL[raw.type])return null;const o=sanObj(make(raw.type),raw);o.id=uid('b');o.type=raw.type;
+  const fix=h=>{if(h&&typeof h==='object'&&'img' in h)h.img=h.img&&remap.has(h.img)?remap.get(h.img):null;};
+  fix(o);if(o.pic)fix(o.pic);(o.items||[]).forEach(fix);return o;
+}
+const okImage=s=>typeof s==='string'&&s.length<30e6&&/^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(s);
+function sanImages(map){const remap=new Map(),out={};for(const id in (map&&typeof map==='object'?map:{})){if(!okImage(map[id]))continue;const n=uid('i');remap.set(id,n);out[n]=map[id];}return{remap,out};}
+function sanDoc(dd,remap){
+  const D=freshDoc(),pick=(v,ok,dflt)=>ok.includes(v)?v:dflt;dd=dd&&typeof dd==='object'?dd:{};
+  return{subject:typeof dd.subject==='string'?dd.subject.slice(0,300):'',preheader:typeof dd.preheader==='string'?dd.preheader.slice(0,300):'',
+    theme:Object.prototype.hasOwnProperty.call(THEMES,dd.theme)?dd.theme:D.theme,
+    accent:/^#[0-9a-f]{6}$/i.test(dd.accent||'')?dd.accent:null,accent2:/^#[0-9a-f]{6}$/i.test(dd.accent2||'')?dd.accent2:null,bg:/^#[0-9a-f]{6}$/i.test(dd.bg||'')?dd.bg:null,
+    corners:pick(dd.corners,['round','square'],D.corners),buttons:pick(dd.buttons,['pill','round','square'],D.buttons),density:pick(dd.density,['roomy','cozy'],D.density),
+    emojiPics:dd.emojiPics===true,photoQuality:pick(dd.photoQuality,['sharp','light'],D.photoQuality),
+    blocks:(Array.isArray(dd.blocks)?dd.blocks:[]).slice(0,200).map(b=>sanBlock(b,remap)).filter(Boolean)};
+}
+async function openBrevity(file){
+  if(file.size>80e6){toast('That file is too large to be a Brevity email.');return;}
+  let j;try{j=JSON.parse(await file.text());}catch(e){j=null;}
+  if(!j||j.format!=='brevity'||!j.doc||!Array.isArray(j.doc.blocks)){toast('That file is not a Brevity email. Look for a file ending in .brevity.');return;}
+  const{remap,out}=sanImages(j.images),d=sanDoc(j.doc,remap);
+  saveNow();draftId=uid('d');await loadDraftData({doc:d,images:out});saveNow();renderDrafts();
+  if($('#draftsDlg').open)$('#draftsDlg').close();
+  toast('Opened “'+draftName()+'” as a new email. Your other emails are in Drafts.');
+}
+$('#openFile').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(f)openBrevity(f);});
+
+/* Sections: one block saved for reuse, such as a school footer or a sign-off,
+   with its photos. Inserting one adds a fresh copy below the selected block. */
+function renderSections(){
+  $('#sectionsWrap').hidden=!sections.length;
+  $('#sections').innerHTML=sections.map(x=>'<div class="item"><button data-sec="'+x.id+'">'+ico(x.block.type)+'<span>'+esc(x.name)+'</span></button><button class="del" data-secdel="'+x.id+'" aria-label="Delete the section '+esc(x.name)+'" title="Delete this section">&times;</button></div>').join('');
+}
+$('#sections').addEventListener('click',async e=>{
+  const del=e.target.closest('[data-secdel]');
+  if(del){const x=sections.find(y=>y.id===del.dataset.secdel);sections=sections.filter(y=>y.id!==del.dataset.secdel);if(idb.db)idb.set('sections',sections);renderSections();if(x)toast('Deleted the section “'+x.name+'”.');return;}
+  const b=e.target.closest('[data-sec]');if(!b)return;const x=sections.find(y=>y.id===b.dataset.sec);if(!x)return;
+  await loadImages(x.images);const c=JSON.parse(JSON.stringify(x.block));c.id=uid('b');insert(c);
+  if(matchMedia('(max-width:920px)').matches)setPane('canvas');
+});
+function saveSection(b,name){
+  name=String(name||'').trim();if(!name){toast('Name the section first, so you can find it later.');return false;}
+  const im={};blockImages(b).forEach(id=>{if(images[id])im[id]=images[id].src;});
+  const old=sections.find(x=>x.name.toLowerCase()===name.toLowerCase()),rec={name,block:JSON.parse(JSON.stringify(b)),images:im};
+  if(old)Object.assign(old,rec);else sections.unshift(Object.assign({id:uid('s')},rec));
+  if(idb.db)idb.set('sections',sections);renderSections();toast((old?'Replaced':'Saved')+' the section “'+name+'”. It’s under Blocks on the left.');return true;
+}
 
 /* ---------- misc ---------- */
 let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),3600);}
@@ -1435,12 +2107,15 @@ function renderAll(){renderCanvas();renderInspector();renderStyle();$('#subject'
   renderAll();renderStarts();
   if(await idb.open()){
     const L=await idb.get('layouts');if(Array.isArray(L)){mine=L;renderStarts();}
-    const d=await idb.get('draft');
-    if(d&&d.doc&&Array.isArray(d.doc.blocks)){
-      for(const id in (d.images||{})){try{const el=new Image();el.src=d.images[id];await el.decode();images[id]={src:d.images[id],el};}catch(e){}}
-      doc=Object.assign(doc,d.doc);appliedFrom=null;cache.clear();renderAll();renderStarts();
-    }
+    const S=await idb.get('sections');if(Array.isArray(S)){sections=S;renderSections();}
+    let list=await idb.get('drafts');
+    if(!Array.isArray(list)){list=[];const old=await idb.get('draft');  // a 1.0 browser had one draft: it becomes the first in the list
+      if(old&&old.doc&&Array.isArray(old.doc.blocks)){const id=uid('d');idb.set('d:'+id,old);list.push({id,name:String(old.doc.subject||'').trim()||'Untitled email',when:Date.now()});idb.set('drafts',list);idb.set('current',id);}}
+    drafts=list;
+    const cur=await idb.get('current'),pick=drafts.find(x=>x.id===cur)||[...drafts].sort((a,b)=>b.when-a.when)[0];
+    if(pick){const d=await idb.get('d:'+pick.id);if(d&&d.doc&&Array.isArray(d.doc.blocks)){draftId=pick.id;await loadDraftData(d);}}
   }
+  if(!draftId)draftId=uid('d');
   hist=[JSON.stringify(doc)];hi=0;syncTop();ensureSigFonts();
 })();
 })();
