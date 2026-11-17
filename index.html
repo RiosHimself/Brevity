@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Brevity — Less clutter. Better newsletters.</title>
+<!-- Installing as an app. These files sit beside index.html when it is hosted
+     (GitHub Pages or any static host); opened from disk the app works the same. -->
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -15,7 +17,7 @@
    from disk, a browser refuses to fetch it and logs an error for nothing. */
 if(/^https?:$/.test(location.protocol)){const m=document.createElement('link');m.rel='manifest';m.href='manifest.webmanifest';document.head.appendChild(m);}
 </script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&family=Caveat:wght@500&family=Dancing+Script:wght@500&family=Sacramento&family=Mrs+Saint+Delafield&display=swap">
+<link rel="stylesheet" crossorigin="anonymous" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&family=Caveat:wght@500&family=Dancing+Script:wght@500&family=Sacramento&family=Mrs+Saint+Delafield&display=swap">
 <style>
 /* ---------------------------------------------------------------------------
    APP CHROME ONLY. Nothing in this stylesheet reaches the exported email:
@@ -176,6 +178,12 @@ input[type=color]{width:38px;height:32px;padding:2px;border:1px solid var(--line
 /* Lists on the canvas match the inline styles the export gives them. */
 #canvas [data-rich] ul,#canvas [data-rich] ol{margin:6px 0;padding:0 0 0 24px}
 #canvas [data-rich] li{margin:0 0 4px}
+#canvas [data-rich] li ul,#canvas [data-rich] li ol{margin:4px 0 0}
+#canvas [data-rich] li ul{list-style-type:circle}#canvas [data-rich] li li ul{list-style-type:square}
+#canvas [data-rich] li ol{list-style-type:lower-alpha}#canvas [data-rich] li li ol{list-style-type:lower-roman}
+#canvas [data-rich] h2,#canvas [data-rich] h3{margin:12px 0 4px;font-family:var(--email-hf,inherit);font-weight:bold}
+#canvas [data-rich] h2{font-size:22px;line-height:28px}#canvas [data-rich] h3{font-size:18px;line-height:24px}
+#canvas [data-rich] h2:first-child,#canvas [data-rich] h3:first-child{margin-top:0}
 
 /* stage */
 .stage{overflow:auto;min-height:0;background:var(--stage);padding:20px 16px 60px;position:relative}
@@ -245,6 +253,9 @@ body.darkprev #canvas{filter:invert(1) hue-rotate(180deg)}
 body.darkprev #canvas img{filter:invert(1) hue-rotate(180deg)}
 .darknote{margin:0;padding:8px 12px;font-size:13px;color:var(--ink);background:var(--accent-soft);border-bottom:1px solid var(--line)}
 #darkPrev[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+#installBar{position:fixed;left:12px;right:12px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:45;max-width:600px;margin:0 auto;display:flex;gap:10px;align-items:center;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(10,14,20,.18);padding:10px 12px;font-size:14px}
+#installBar[hidden]{display:none}#installBar span{flex:1;min-width:0}#installBar .btn{flex:none}
+@media (max-width:920px){#installBar{bottom:calc(60px + env(safe-area-inset-bottom,0px))}}
 #manual{display:none;margin-top:12px;border:1px solid var(--line);border-radius:8px;max-height:220px;overflow:auto;background:#fff}
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#14161B;color:#fff;padding:11px 17px;border-radius:11px;box-shadow:0 10px 30px rgba(10,14,20,.3);font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;max-width:calc(100vw - 32px)}
 #toast.on{opacity:1}
@@ -372,6 +383,7 @@ body.darkprev #canvas img{filter:invert(1) hue-rotate(180deg)}
 <input type="file" id="file" accept="image/*" multiple hidden>
 <input type="file" id="openFile" accept=".brevity,application/json" hidden>
 <div id="toast" role="status" aria-live="polite"></div>
+<div id="installBar" role="region" aria-label="Install Brevity" hidden></div>
 
 <script>
 /* ============================================================================
@@ -466,6 +478,11 @@ function theme(){
    text and dark behind light text, so dark palettes stay readable. Red and
    green get lighter versions on dark cards for the same reason. A custom
    colour is stored as its #hex and left alone. */
+/* List bullets by level, written inline because email cannot use CSS
+   selectors: disc, circle, square for bullets; 1, a, i for numbers. */
+const LIST_MARKS={ul:['disc','circle','square'],ol:['decimal','lower-alpha','lower-roman']};
+function listTag(){let d=0;return (m,close,t)=>{if(close){d=Math.max(0,d-1);return m;}
+  const o='<'+t+' style="margin:'+(d?'4px 0 0':'6px 0')+';padding:0 0 0 24px;list-style-type:'+LIST_MARKS[t][Math.min(d,2)]+';">';d++;return o;};}
 const isDark=T=>lum(T.card)<.4;
 const WORD_FG={accent:['Main colour',T=>T.accent],accent2:['Second colour',T=>T.accent2],muted:['Soft grey',T=>T.muted],
   red:['Red',T=>isDark(T)?'#FF8A80':'#C0392B'],green:['Green',T=>isDark(T)?'#7CD992':'#1E8449']};
@@ -819,6 +836,15 @@ function pic(b,path,T,ed){
    an element that was already there. A colour that still matches its stored
    name keeps the name; one the browser changed becomes a #hex; one equal to
    the field's own colour is dropped, which is how "Default" removes colour. */
+/* A list with its sub-lists in the one shape every mail app agrees on: each
+   sub-list inside the item above it. Browsers sometimes put a sub-list straight
+   inside the outer list instead; it is moved into the previous item here. */
+function cleanList(n,ctx){const tag=n.tagName.toLowerCase(),items=[];
+  n.childNodes.forEach(c=>{if(c.nodeType!==1)return;
+    if(c.tagName==='LI'){items.push('<li>'+clean(c,ctx).replace(/(<br>)+(?=<(ul|ol)>)/g,'').replace(/(<br>)+$/,'')+'</li>');}
+    else if(c.tagName==='UL'||c.tagName==='OL'){const sub=cleanList(c,ctx);if(!sub)return;if(items.length)items[items.length-1]=items[items.length-1].replace(/<\/li>$/,sub+'</li>');else items.push('<li>'+sub+'</li>');}
+    else{const x=clean(c,ctx);if(x)items.push('<li>'+x+'</li>');}});
+  return items.length?'<'+tag+'>'+items.join('')+'</'+tag+'>':'';}
 function clean(node,ctx){
   if(!ctx){const T=theme();ctx={T,base:toHex(getComputedStyle(node).color)};}
   let out='';
@@ -832,9 +858,10 @@ function clean(node,ctx){
     else if(t==='U')h='<u>'+inner+'</u>';
     else if(t==='S'||t==='STRIKE'||t==='DEL')h='<s>'+inner+'</s>';
     else if(t==='A'){const href=n.getAttribute('href')||'';h=/^(https?:|mailto:)/i.test(href)?'<a href="'+esc(href)+'">'+inner+'</a>':inner;}
-    else if(t==='UL'||t==='OL'){out=out.replace(/<br>$/,'');h=inner.includes('<li>')?'<'+t.toLowerCase()+'>'+inner+'</'+t.toLowerCase()+'>':inner;}
-    else if(t==='LI')h='<li>'+inner.replace(/(<br>)+$/,'')+'</li>';
-    else if(t==='DIV'||t==='P'){h=(out&&!/(<br>|<\/[uo]l>)$/.test(out)?'<br>':'')+inner;}
+    else if(t==='UL'||t==='OL'){out=out.replace(/<br>$/,'');h=cleanList(n,ctx);}
+    else if(/^H[1-6]$/.test(t)){out=out.replace(/<br>$/,'');const lv=t==='H1'||t==='H2'?'h2':'h3',txt=inner.replace(/(<br>)+$/,'');h=txt?'<'+lv+'>'+txt+'</'+lv+'>':'';}
+    else if(t==='LI')h=(out&&!/<br>$/.test(out)?'<br>':'')+inner.replace(/(<br>)+$/,'');
+    else if(t==='DIV'||t==='P'){h=(out&&!/(<br>|<\/[uo]l>|<\/h[23]>)$/.test(out)?'<br>':'')+inner;}
     else h=inner;
     // colour, from the element's own style (or <font color>), checked against its stored name
     const st=n.style||{},pick=(kind,raw)=>{const want=n.dataset&&n.dataset[kind]||'',hex=toHex(raw);
@@ -850,8 +877,12 @@ function clean(node,ctx){
 }
 const strip=h=>{const d=document.createElement('div');d.innerHTML=String(h||'').replace(/<br>/g,'\n');
   // Lists become one line per item in the plain-text copy: "• " or "1. ".
-  d.querySelectorAll('li').forEach(li=>{const ol=li.parentElement&&li.parentElement.tagName==='OL';li.prepend(ol?([...li.parentElement.children].indexOf(li)+1)+'. ':'• ');li.append('\n');});
-  d.querySelectorAll('ul,ol').forEach(l=>{l.before('\n');});
+  // Each item on its own line, indented two spaces per level; headings on lines of their own.
+  d.querySelectorAll('li').forEach(li=>{const ol=li.parentElement&&li.parentElement.tagName==='OL',lv=li.parentElement.closest('li')?(li.parentElement.closest('li').parentElement.closest('li')?2:1):0;
+    const i=[...li.parentElement.children].filter(x=>x.tagName==='LI').indexOf(li)+1;
+    li.prepend('\n'+'  '.repeat(lv)+(ol?(lv===1?String.fromCharCode(96+Math.min(i,26)):lv===2?['i','ii','iii','iv','v','vi','vii','viii','ix','x'][i-1]||i:i)+'. ':'• '));});
+  d.querySelectorAll('ul,ol').forEach(l=>{if(!l.parentElement.closest('li'))l.after('\n');});
+  d.querySelectorAll('h2,h3').forEach(x=>{x.before('\n');x.after('\n');});
   return d.textContent.replace(/\n{3,}/g,'\n\n');};
 
 /* ---------- signature: smoothed pen strokes with speed-based width, baked to an image ---------- */
@@ -981,7 +1012,8 @@ function rb(b,T,ed,pos){
     .replace(/<span((?: data-(?:fg|bg)="[^"]*")+)>/g,(m,at)=>{const fg=/data-fg="([^"]*)"/.exec(at),bg=/data-bg="([^"]*)"/.exec(at);
       const st=(fg&&wordColor('fg',fg[1],T)?'color:'+wordColor('fg',fg[1],T)+';':'')+(bg&&wordColor('bg',bg[1],T)?'background-color:'+wordColor('bg',bg[1],T)+';':'');
       return '<span'+(ed?at:'')+(st?' style="'+st+'"':'')+'>';})
-    .replace(/<(ul|ol)>/g,'<$1 style="margin:6px 0;padding:0 0 0 24px;">').replace(/<li>/g,'<li style="margin:0 0 4px;">')
+    .replace(/^<h([23])>/,'<h$1 data-first>').replace(/<h([23])( data-first)?>/g,(m,l,first)=>'<h'+l+' style="margin:'+(first?0:l==='2'?14:10)+'px 0 4px;font-family:'+T.hf+';font-size:'+(l==='2'?22:18)+'px;line-height:'+(l==='2'?28:24)+'px;font-weight:bold;">')
+    .replace(/<(\/?)(ul|ol)>/g,listTag()).replace(/<li>/g,'<li style="margin:0 0 4px;">')
     .replace(/<s>/g,'<s style="text-decoration:line-through;">');
   const f=(fam,size,lh,color,x)=>'margin:0;font-family:'+fam+';font-size:'+size+'px;line-height:'+lh+'px;color:'+color+';'+(x||'');
   let pad=T.vp+'px '+T.pad+'px',bg='',html='',radius='';
@@ -1143,6 +1175,7 @@ function renderCanvas(){
   const T=theme(),B=doc.blocks;imgOpts.clear();
   // Preview only (an email cannot carry fonts). Single quotes: these font lists end up inside double-quoted style attributes.
   if(flagFont){const ff="'Twemoji Country Flags',";T.bf=ff+T.bf;T.hf=ff+T.hf;}
+  canvas.style.setProperty('--email-hf',T.hf);  // headings typed into text use the palette's heading font straight away
   canvas.style.background=T.bg;
   let h='<div class="card" style="background:'+T.card+';border-radius:'+T.cardR+'px;"><div id="dropline"></div>';
   if(!B.length)h+='<div class="empty"><b>Nothing here yet</b>Add a block from the left, or drop photos anywhere on this page to frame them.</div>';
@@ -1197,18 +1230,22 @@ const idb={db:null,
     r.onsuccess=()=>{idb.db=r.result;clearTimeout(t);res(true);};r.onerror=()=>{clearTimeout(t);res(false);};}catch(e){clearTimeout(t);res(false);}});},
   get(k){return new Promise(res=>{try{const q=idb.db.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(null);}catch(e){res(null);}});},
   set(k,v){try{idb.db.transaction('kv','readwrite').objectStore('kv').put(v,k);}catch(e){}},
-  del(k){try{idb.db.transaction('kv','readwrite').objectStore('kv').delete(k);}catch(e){}}};
+  del(k){try{idb.db.transaction('kv','readwrite').objectStore('kv').delete(k);}catch(e){}},
+  /* Several keys in one transaction, committed at once rather than when the
+     browser gets round to it, so a save made as the page closes is not lost. */
+  setMany(o){try{const tx=idb.db.transaction('kv','readwrite'),st=tx.objectStore('kv');for(const k in o)st.put(o[k],k);if(tx.commit)tx.commit();}catch(e){}}};
 function blockImages(b,ids){ids=ids||new Set();if(b.img)ids.add(b.img);if(b.pic&&b.pic.img)ids.add(b.pic.img);(b.items||[]).forEach(i=>i.img&&ids.add(i.img));return ids;}
 function usedImages(){const ids=new Set();doc.blocks.forEach(b=>blockImages(b,ids));return ids;}
-function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,600);}
+let dirty=false;  // a change is waiting to be saved
+function scheduleSave(){dirty=true;clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,600);}
 /* Drafts. Several emails can be in progress at once: each is stored under its
    own key ("d:<id>") with the photos it uses, "drafts" is the list shown in the
    Drafts dialog, and "current" remembers which one was open. */
 const draftName=()=>doc.subject.trim()||'Untitled email';
 function draftData(){const im={};usedImages().forEach(id=>{if(images[id])im[id]=images[id].src;});return{doc:JSON.parse(JSON.stringify(doc)),images:im};}
-function saveNow(){clearTimeout(saveTimer);if(!idb.db||!draftId)return;idb.set('d:'+draftId,draftData());
+function saveNow(){clearTimeout(saveTimer);if(!idb.db||!draftId)return;dirty=false;
   let e=drafts.find(x=>x.id===draftId);if(!e){e={id:draftId};drafts.push(e);}e.name=draftName();e.when=Date.now();
-  idb.set('drafts',drafts);idb.set('current',draftId);}
+  idb.setMany({['d:'+draftId]:draftData(),drafts,current:draftId});}
 
 /* ---------- mutations ---------- */
 function insert(b,at){if(at==null){const i=doc.blocks.findIndex(x=>x.id===sel.id);at=i<0?doc.blocks.length:i+1;}doc.blocks.splice(at,0,b);sel={id:b.id,sub:''};renderAll();commit();
@@ -1291,10 +1328,15 @@ canvas.addEventListener('input',e=>{
   if(b.type==='header'&&b.style==='monogram'&&!b.img){const im=$('img[data-img]',el.closest('.blk')),T=theme();if(im)im.src=bake(b,picOpts(b,T),T);}
 });
 canvas.addEventListener('keydown',e=>{
-  const el=e.target.closest('[data-f]');if(!el||e.key!=='Enter')return;
+  const el=e.target.closest('[data-f]');
+  // Tab moves a list item in or out a level. Outside a list, Tab keeps moving focus, so keyboard users are never trapped.
+  if(el&&e.key==='Tab'&&el.dataset.rich&&!e.altKey&&!e.ctrlKey&&!e.metaKey&&curLi()){e.preventDefault();listLevel(el,e.shiftKey?-1:1);return;}
+  if(!el||e.key!=='Enter')return;
   // In a list, let the browser make the next item (or leave the list on an empty one).
-  const s=getSelection(),n=s.anchorNode,li=n&&(n.nodeType===1?n:n.parentElement).closest('li');
+  // In a heading, let it start a new ordinary line after the heading, rather than a line break inside it.
+  const s=getSelection(),n=s.anchorNode,at=n&&(n.nodeType===1?n:n.parentElement),li=at&&at.closest('li'),hd=at&&at.closest('h2,h3');
   if(li&&el.contains(li))return;
+  if(hd&&el.contains(hd)&&!e.shiftKey)return;
   e.preventDefault();if(el.dataset.rich)document.execCommand('insertLineBreak');else el.blur();
 });
 document.addEventListener('selectionchange',()=>{const s=getSelection();if(!s.rangeCount)return;const n=s.anchorNode,el=n&&(n.nodeType===1?n:n.parentElement);
@@ -1399,7 +1441,10 @@ function renderInspector(){
       (p.img?'<p class="hint">Drag the photo on the canvas to reposition it.</p>':'');};
   const T=theme(),sw=(kind,v,label,c)=>'<button class="sw-b" data-paint="'+kind+':'+v+'" aria-label="'+label+'" title="'+label+'"><i style="background:'+c+'"></i></button>';
   const rich='<div class="field"><span class="lab">Selected words</span><div class="row rt"><button class="btn" data-cmd="bold" aria-label="Bold" title="Bold">B</button><button class="btn" data-cmd="italic" aria-label="Italic" title="Italic" style="font-style:italic">I</button><button class="btn" data-cmd="underline" aria-label="Underline" title="Underline" style="text-decoration:underline">U</button><button class="btn" data-cmd="strikeThrough" aria-label="Strikethrough" title="Strikethrough" style="text-decoration:line-through">S</button><button class="btn" data-cmd="removeFormat" style="font-weight:500" title="Remove bold, italic, colours and highlights from the selected words">Clear</button></div>'+
-    '<div class="row rt" style="margin-top:6px"><button class="btn" data-cmd="insertUnorderedList" style="font-weight:500">• List</button><button class="btn" data-cmd="insertOrderedList" style="font-weight:500">1. List</button><button class="btn" data-cmd="unlink" style="font-weight:500">Remove link</button></div>'+
+    '<span class="lab" style="margin-top:10px">Line</span><div class="row rt"><button class="btn" data-cmd="fmt-div" style="font-weight:500" title="Make the line under the cursor ordinary text">Text</button><button class="btn" data-cmd="fmt-h2" title="Make the line under the cursor a heading">Heading</button><button class="btn" data-cmd="fmt-h3" style="font-weight:600;font-size:13px" title="Make the line under the cursor a subheading">Subheading</button></div>'+
+    '<div class="row rt" style="margin-top:6px"><button class="btn" data-cmd="insertUnorderedList" style="font-weight:500">• List</button><button class="btn" data-cmd="insertOrderedList" style="font-weight:500">1. List</button>'+
+      '<button class="btn" data-cmd="listOut" aria-label="Move list item out a level" title="Move out a level (Shift+Tab)"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M7 4h7M7 8h7M7 12h7M5 6 2 8l3 2"/></svg></button>'+
+      '<button class="btn" data-cmd="listIn" aria-label="Move list item in a level" title="Move in a level (Tab)"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M7 4h7M7 8h7M7 12h7M2 6l3 2-3 2"/></svg></button></div>'+
     '<span class="lab" style="margin-top:10px">Text colour</span><div class="paint" role="group" aria-label="Text colour">'+
       '<button class="sw-b none" data-paint="fg:" aria-label="Default text colour" title="Default"><i></i></button>'+
       Object.entries(WORD_FG).filter(([k])=>!(k==='accent2'&&T.accent2===T.accent)).map(([k,[n]])=>sw('fg',k,n,wordColor('fg',k,T))).join('')+
@@ -1408,7 +1453,7 @@ function renderInspector(){
       '<button class="sw-b none" data-paint="bg:" aria-label="No highlight" title="None"><i></i></button>'+
       Object.entries(WORD_BG).filter(([k])=>!(k==='accent2'&&T.accent2===T.accent)).map(([k,[n]])=>sw('bg',k,n+' highlight',wordColor('bg',k,T))).join('')+
       '<input type="color" data-paint-custom="bg" aria-label="Custom highlight colour" title="Custom colour" value="#fff3a0"></div>'+
-    '<div class="row" style="margin-top:6px"><input type="url" id="linkUrl" placeholder="https://" aria-label="Link address" style="flex:1;min-width:0"><button class="btn" data-do="link">Add link</button></div></div>';
+    '<div class="row" style="margin-top:6px"><input type="url" id="linkUrl" placeholder="https://" aria-label="Link address" style="flex:1;min-width:0"><button class="btn" data-do="link">Add link</button><button class="btn" data-cmd="unlink" title="Remove the link from the selected words">Remove</button></div></div>';
   switch(b.type){
     case 'header':h+=segF('style','Look',[['band','Color band'],['tint','Soft band'],['plain','Underline'],['masthead','Masthead'],['split','Split'],['monogram','Badge']],b.style)+
       (b.style==='masthead'||b.style==='split'?'':segF('align','Align',ALIGN,b.align))+
@@ -1495,13 +1540,49 @@ insp.addEventListener('change',e=>{const c=e.target.closest('[data-paint-custom]
    is captured on selectionchange and restored before execCommand runs. */
 function restoreRange(){if(!savedRange||!canvas.contains(savedRange.commonAncestorContainer))return null;const s=getSelection();s.removeAllRanges();s.addRange(savedRange);
   const n=savedRange.commonAncestorContainer;return (n.nodeType===1?n:n.parentElement).closest('[data-rich]');}
+/* List levels. Tab and Shift+Tab inside a list item, or the two arrow buttons,
+   move the item in or out a level, three levels at most. This is done by hand
+   rather than with execCommand('indent'), which nests a list directly inside
+   another list; mail apps disagree about that shape, while a sub-list inside
+   the item above it renders the same everywhere. Moving out from the outer
+   level turns the item back into an ordinary line. */
+function curLi(){const s=getSelection();if(!s.rangeCount)return null;const n=s.anchorNode,e=n&&(n.nodeType===1?n:n.parentElement),li=e&&e.closest('li');return li&&li.closest('#canvas [data-rich]')?li:null;}
+const liDepth=li=>{let d=0,p=li.parentElement.closest('li');while(p){d++;p=p.parentElement.closest('li');}return d;};
+// The caret, as a path of child positions inside the item, so it survives the item being moved.
+function caretIn(li){const s=getSelection();if(!s.rangeCount)return null;const r=s.getRangeAt(0);if(!li.contains(r.startContainer)||!li.contains(r.endContainer))return null;
+  const path=n=>{const p=[];while(n!==li){p.unshift([...n.parentNode.childNodes].indexOf(n));n=n.parentNode;}return p;};return{s:path(r.startContainer),so:r.startOffset,e:path(r.endContainer),eo:r.endOffset};}
+function caretBack(li,c){if(!c)return;const at=p=>p.reduce((n,i)=>n&&n.childNodes[i],li),a=at(c.s),b=at(c.e);if(!a||!b)return;
+  const r=document.createRange();try{r.setStart(a,c.so);r.setEnd(b,c.eo);}catch(e){return;}const s=getSelection();s.removeAllRanges();s.addRange(r);}
+function listLevel(el,dir){
+  const li=curLi();if(!li||!el.contains(li)){toast('Put the cursor in a list item first.');return;}
+  const list=li.parentElement,c=caretIn(li);
+  if(dir>0){
+    const prev=li.previousElementSibling;
+    if(!prev||prev.tagName!=='LI'){toast('The first item in a list can’t move in. Move the item below it instead.');return;}
+    if(liDepth(li)>=2){toast('Lists go three levels deep at most.');return;}
+    let sub=prev.lastElementChild&&/^(UL|OL)$/.test(prev.lastElementChild.tagName)?prev.lastElementChild:null;
+    if(!sub){sub=document.createElement(list.tagName.toLowerCase());prev.appendChild(sub);}
+    sub.appendChild(li);
+  }else{
+    const parentLi=list.parentElement&&list.parentElement.tagName==='LI'?list.parentElement:null;
+    if(!parentLi){document.execCommand(list.tagName==='OL'?'insertOrderedList':'insertUnorderedList');syncRich(el);return;}
+    // Items after this one in the same sub-list stay below it, so they become its own sub-items.
+    const after=[];for(let x=li.nextElementSibling;x;x=x.nextElementSibling)after.push(x);
+    if(after.length){let sub=li.lastElementChild&&li.lastElementChild.tagName===list.tagName?li.lastElementChild:null;if(!sub){sub=document.createElement(list.tagName.toLowerCase());li.appendChild(sub);}after.forEach(a=>sub.appendChild(a));}
+    parentLi.after(li);if(!list.children.length)list.remove();
+  }
+  caretBack(li,c);syncRich(el);
+}
 function syncRich(el){if(!el)return;const b=byId(el.closest('.blk').dataset.id);if(b){setPath(b,el.dataset.f,clean(el));soon();}}
 insp.addEventListener('click',e=>{
   const b=selBlock();if(!b)return;
   const pt=e.target.closest('[data-paint]');
   if(pt){const [k,v]=pt.dataset.paint.split(':');paint(k,v);return;}
   const cmd=e.target.closest('[data-cmd]');
-  if(cmd){const el=restoreRange();if(!el){toast('Select some words in the email first.');return;}document.execCommand(cmd.dataset.cmd);syncRich(el);return;}
+  if(cmd){const el=restoreRange();if(!el){toast('Click into the text in the email first.');return;}const c=cmd.dataset.cmd;
+    if(c==='listIn'||c==='listOut'){listLevel(el,c==='listIn'?1:-1);return;}
+    if(c.startsWith('fmt-')){document.execCommand('formatBlock',false,c.slice(4));syncRich(el);return;}
+    document.execCommand(c);syncRich(el);return;}
   const seg=e.target.closest('button[data-k]');
   if(seg){setPath(b,seg.dataset.k,seg.dataset.v);renderCanvas();renderInspector();commit();return;}
   const d=e.target.closest('[data-do]');if(!d)return;
@@ -1899,7 +1980,7 @@ function readability(){
         bg=sp.dataset.bg?wordColor('bg',sp.dataset.bg,T):up?wordColor('bg',up.dataset.bg,T):pageBg;
       if(fg&&bg&&contrast(fg,bg)<3)faint++;});
     t.content.querySelectorAll('a').forEach(a=>{if(VAGUE.has(a.textContent.trim().toLowerCase().replace(/[.!…]+$/,'')))vague++;});
-    html.split(/(?:<br>\s*){2,}|<\/?(?:ul|ol|li)>/).forEach(par=>{const n=strip(par).trim().split(/\s+/).filter(Boolean).length;if(n>longest){longest=n;longIn=LABEL[b.type];}});
+    html.split(/(?:<br>\s*){2,}|<\/?(?:ul|ol|li|h2|h3)>/).forEach(par=>{const n=strip(par).trim().split(/\s+/).filter(Boolean).length;if(n>longest){longest=n;longIn=LABEL[b.type];}});
   }));
   vague+=doc.blocks.filter(b=>b.type==='button'&&VAGUE.has(String(b.label||'').trim().toLowerCase())&&!/^read more$/i.test(String(b.label).trim())).length;
   if(faint)out.push({ok:0,t:(faint===1?'Some coloured words are':faint+' coloured or highlighted passages are')+' hard to read against their background. Pick a darker text colour or a lighter highlight.'});
@@ -2130,26 +2211,44 @@ function saveSection(b,name){
   if(idb.db)idb.set('sections',sections);renderSections();toast((old?'Replaced':'Saved')+' the section “'+name+'”. It’s under Blocks on the left.');return true;
 }
 
-/* ---------- install as an app ---------- */
-/* Only for the hosted copy: service workers do not run from disk. Chrome,
-   Edge and Android announce that the app can be installed; the Install button
-   appears then and hands over to the browser's own dialog. Safari never
-   announces it (Share, then Add to Home Screen), so the button stays hidden. */
-if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
-  addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
-  let deferred=null;const ib=$('#installApp');
-  addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;ib.hidden=false;});
-  ib.addEventListener('click',async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice.catch(()=>{});deferred=null;ib.hidden=true;});
-  addEventListener('appinstalled',()=>{deferred=null;ib.hidden=true;toast('Brevity is installed. Open it from your apps like any other program.');});
-}
-
 /* ---------- misc ---------- */
 let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),3600);}
 function renderAll(){renderCanvas();renderInspector();renderStyle();$('#subject').value=doc.subject;$('#preheader').value=doc.preheader;syncTop();}
 
+/* ---------- installing as an app ----------
+   Hosted on a website, Brevity can be installed to a phone's home screen or
+   a computer's app list. The offline helper (sw.js) is only registered over
+   http(s), so the single file opened from disk is unaffected. Chrome, Edge
+   and Android announce that the app can be installed; the Install button in
+   the top bar appears then and hands over to the browser's own dialog.
+   Safari never announces it, so iPhone users get the two steps in a bar.
+   Installing matters most on iPhone: Safari may clear a site's stored data
+   after a week unused, but not an app on the home screen. */
+const hosted=/^https?:$/.test(location.protocol),standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+if(hosted&&'serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+// Save at once when the page is hidden or closed: phones suspend apps without warning, and typing is otherwise saved after a short pause.
+const flush=()=>{if(typingTimer)commit();if(dirty)saveNow();};
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flush();});
+window.addEventListener('pagehide',flush);
+if(standalone&&navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+let installEvt=null;
+const hintOff=()=>{try{return Date.now()-(+localStorage.getItem('brevity.installHint')||0)<30*864e5;}catch(e){return false;}};  // "Not now" lasts 30 days
+function iosSteps(){
+  if(standalone||hintOff())return;const bar=$('#installBar');
+  bar.innerHTML='<span><b>Keep Brevity on your iPhone.</b> Tap the Share button, then “Add to Home Screen”. As an app, your drafts are kept; in a browser tab Safari may clear them after a week unused.</span><button class="btn" data-ib="close">Not now</button>';
+  bar.hidden=false;
+}
+const ib=$('#installApp');
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;ib.hidden=false;});
+ib.addEventListener('click',async()=>{if(!installEvt)return;installEvt.prompt();try{await installEvt.userChoice;}catch(_){}installEvt=null;ib.hidden=true;});
+window.addEventListener('appinstalled',()=>{installEvt=null;ib.hidden=true;toast('Brevity is installed. Open it from your home screen or app list.');});
+if(hosted&&isIOS&&!standalone)setTimeout(iosSteps,2000);
+$('#installBar').addEventListener('click',e=>{if(!e.target.closest('[data-ib]'))return;try{localStorage.setItem('brevity.installHint',String(Date.now()));}catch(_){}$('#installBar').hidden=true;});
+
 /* Boot: load a sample newsletter, then overlay a saved draft if one exists,
    then seed the undo history so the first undo cannot empty the editor. */
-(async function init(){
+const booted=(async function init(){
   initPad();
   Object.assign(doc,STARTS.newsletter.build());
   appliedFrom={kind:'start',key:'newsletter'};
@@ -2167,6 +2266,8 @@ function renderAll(){renderCanvas();renderInspector();renderStyle();$('#subject'
   if(!draftId)draftId=uid('d');
   hist=[JSON.stringify(doc)];hi=0;syncTop();ensureSigFonts();
 })();
+// Installed on a computer, Brevity can be the app that opens .brevity files (see file_handlers in the manifest).
+if('launchQueue' in window)window.launchQueue.setConsumer(async p=>{await booted;for(const h of (p.files||[])){try{const f=await h.getFile();if(/\.brevity$/i.test(f.name))await openBrevity(f);}catch(e){}}});
 })();
 </script>
 </body>

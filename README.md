@@ -28,7 +28,7 @@ Brevity works inside those limits instead of around them:
 - **Event** blocks show a date badge with Add to calendar links for Google Calendar and Outlook
 - **Tables** for menus and schedules: paste cells straight from a spreadsheet
 - **Two columns** sit side by side on a computer and stack on a phone
-- Edit text directly on the canvas, with bold, italic, underline, strikethrough, links, bulleted and numbered lists, and text colour and highlight that follow the palette
+- Edit text directly on the canvas, with bold, italic, underline, strikethrough, links, headings and subheadings, bulleted and numbered lists up to three levels deep (Tab and Shift+Tab), and text colour and highlight that follow the palette
 - Drag blocks to reorder, or use the keyboard (`Alt+↑` / `Alt+↓`, `Ctrl+D` to duplicate, `Delete` to remove)
 - Undo and redo across everything, including palette changes and photo moves
 - Emoji from the Unicode list, browsed by category from a dropdown or searched by name, in any skin tone, dropped in at the cursor
@@ -92,10 +92,12 @@ The hosted copy can be installed, so it opens in its own window and works withou
 
 - **Chrome or Edge on a computer:** select **Install** in Brevity's top bar, or the install icon at the right of the address bar.
 - **Android:** **Install** in the top bar, or the browser menu, then **Install app**.
-- **iPhone and iPad:** in Safari, **Share**, then **Add to Home Screen**.
+- **iPhone and iPad:** in Safari, **Share**, then **Add to Home Screen**. Brevity shows these steps the first time. Installing matters here: Safari may clear a website's saved data after a week unused, but not an app on the home screen.
 - **Firefox on a computer** does not install web apps; use it in a tab.
 
-This needs `manifest.webmanifest`, `sw.js` and the `icons/` folder beside `index.html`. Opened from disk, none of it is used and the app works as before.
+This needs `manifest.webmanifest`, `sw.js` and the `icons/` folder beside `index.html`. Opened from disk, none of it is used and the app works as before. Installed on a computer, Brevity can also open `.brevity` files directly.
+
+Before relying on a phone, check that pasting into the Gmail app keeps your formatting: build a small email, tap **Copy for Gmail**, and paste it into a new message.
 
 ## Privacy
 

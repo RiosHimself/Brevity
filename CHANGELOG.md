@@ -7,8 +7,13 @@ All notable changes to this project are recorded here. Dates are the day the cha
 ### Added
 - Install as an app from the hosted copy: an Install button in the top bar on Chrome, Edge and Android, and Add to Home Screen on iPhone and iPad. Installed, Brevity opens in its own window and works offline. Opened from disk, nothing changes
 - App icon and favicon, from the mark in the top bar
+- On iPhone and iPad, a bar with the Add to Home Screen steps, since Safari offers no install button; installed, Safari no longer clears saved drafts after a week unused
+- Installed on a computer, Brevity opens `.brevity` files
+- List levels: Tab and Shift+Tab inside a list item, or the two arrow buttons, move it in or out, up to three levels, with bullets and numbering that change by level (1, a, i)
+- Heading and Subheading lines inside text, callout, footer, event and column text, set from the new Line row in the toolbar
 
 ### Fixed
+- Edits made in the second or so before closing or reloading the page could be lost. Brevity now saves as soon as the page is hidden or closed
 - Country flags showed as two letters on Windows, which has no flag emoji. Where a computer cannot draw flags, Brevity now uses a bundled flag font in the picker, the canvas and the subject line, and emoji sent as pictures carry real flags to every reader
 
 ## [1.1.0] — 2026-11-17
