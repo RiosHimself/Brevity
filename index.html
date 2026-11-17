@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brevity — Less clutter. Better newsletters.</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&family=Caveat:wght@500&family=Dancing+Script:wght@500&family=Sacramento&family=Mrs+Saint+Delafield&display=swap">
+<style>
+/* ---------------------------------------------------------------------------
+   APP CHROME ONLY. Nothing in this stylesheet reaches the exported email:
+   the email's styling is written inline by rb() in the script below, because
+   Gmail drops <style> blocks. Tokens are defined once on :root and redefined
+   for dark mode, so the interface follows the viewer's system setting while
+   the email keeps the colors the user picked for it.
+   --------------------------------------------------------------------------- */
+:root{
+  --bg:#EDEEF1; --panel:#FFFFFF; --ink:#14161B; --muted:#646B78; --line:#E3E5EA; --hair:#EDEFF3;
+  --accent:#1E90FF; --accent-strong:#0B6AD1; --accent-soft:#E8F3FF; --accent-ink:#FFFFFF; --red:#BE3B35; --field:#F5F6F8; --stage:#E4E6EB; --ok:#1E7A4A; --warn:#A35A00;
+  --shadow:0 1px 2px rgba(18,22,30,.05),0 8px 24px rgba(18,22,30,.07);
+  --display:"Instrument Serif",Georgia,serif;
+  --ui:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0D1013; --panel:#161A1F; --ink:#E8EBEF; --muted:#9BA4B0; --line:#262C34; --hair:#1E242B;
+    --accent:#1E90FF; --accent-strong:#1E90FF; --accent-soft:#102839; --accent-ink:#06223B; --red:#F2706A; --field:#11161A; --stage:#090B0E; --ok:#6FD19C; --warn:#F2B25C;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0D1013; --panel:#161A1F; --ink:#E8EBEF; --muted:#9BA4B0; --line:#262C34; --hair:#1E242B;
+  --accent:#1E90FF; --accent-strong:#1E90FF; --accent-soft:#102839; --accent-ink:#06223B; --red:#F2706A; --field:#11161A; --stage:#090B0E; --ok:#6FD19C; --warn:#F2B25C;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.45);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 var(--ui);display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:8px;padding:12px 18px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.mark{display:flex;align-items:baseline;gap:10px;margin-right:auto;font:400 25px/1 var(--display);letter-spacing:-.01em}
+.mark svg{width:28px;height:28px;align-self:center}
+.mark em{font:400 13px/1.3 var(--ui);font-style:normal;color:var(--muted);letter-spacing:0}
+@media (max-width:1180px){.mark em{display:none}}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:9px;padding:7px 13px;font-weight:500;min-height:36px;display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--ink);transition:background .12s,border-color .12s}
+.btn:hover{background:var(--field);border-color:var(--line)}
+.btn:disabled{opacity:.38;cursor:default}
+.btn.primary{background:var(--accent-strong);border-color:var(--accent-strong);color:var(--accent-ink);font-weight:600}
+.btn.primary:hover{background:var(--accent-strong);filter:brightness(1.08)}
+.btn.icon{padding:7px 9px}
+.btn svg{width:16px;height:16px}
+.seg{display:inline-flex;border-radius:9px;background:var(--field);padding:3px;gap:2px;border:1px solid var(--line)}
+.seg button{border:0;background:transparent;padding:5px 11px;min-height:30px;border-radius:7px;font-weight:500;color:var(--muted)}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(18,22,30,.1)}
+.badge{background:var(--red);color:#fff;border-radius:99px;font-size:11px;font-weight:600;padding:1px 6px;line-height:1.4}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}}
+
+/* layout */
+/* Left panel is 304px on a roomy window and eases back to 260px on a narrow
+   one, so the 600px email canvas keeps its space. */
+main{display:grid;grid-template-columns:clamp(260px,24vw,304px) minmax(0,1fr) 292px;min-height:0}
+/* Side panels scroll vertically only. Grid children get min-width:0 so a long
+   label wraps or truncates instead of pushing the panel sideways. */
+.side{background:var(--panel);overflow-x:hidden;overflow-y:auto;min-height:0;min-width:0;padding:16px}
+.side .palette>*,.side .starts>*,.side .themes>*,.side #fontPick>*{min-width:0}
+.side .starts b,.side .starts span,.side .palette button{overflow-wrap:anywhere}
+.side.left{border-right:1px solid var(--line)}
+.side.right{border-left:1px solid var(--line)}
+.side h2{font:600 13px/1.2 var(--ui);letter-spacing:.01em;margin:0 0 10px;color:var(--muted)}
+.side h2:not(:first-child){margin-top:24px}
+.hint{color:var(--muted);font-size:13px;margin:6px 0 0}
+.tabs{display:flex;gap:3px;margin-bottom:16px;background:var(--field);border:1px solid var(--line);border-radius:9px;padding:3px}
+.tabs button{flex:1;border:0;background:none;border-radius:7px;padding:7px 4px;font-weight:500;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(18,22,30,.1)}
+
+.palette{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.palette button{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:9px;text-align:left;font-weight:500;min-height:42px}
+.palette button:hover{border-color:var(--accent);background:var(--accent-soft)}
+.palette svg{width:22px;height:22px;flex:none;color:var(--accent)}
+.starts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.starts button{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:10px;text-align:left}
+.starts button:hover{border-color:var(--accent);background:var(--accent-soft)}
+.starts b{display:block;font-weight:600}
+.starts span{color:var(--muted);font-size:12px;line-height:1.3;display:block}
+.starts h3{grid-column:1 / -1;margin:10px 0 0;font:600 12px/1.2 var(--ui);color:var(--muted)}
+.starts h3:first-child{margin-top:0}
+.starts .item{position:relative;display:grid}
+.starts .item button[data-start]{width:100%}
+.starts .del{position:absolute;top:4px;right:4px;border:0;background:none;color:var(--muted);border-radius:6px;width:24px;height:24px;line-height:1;font-size:15px;padding:0;display:none}
+.starts .item:hover .del,.starts .del:focus-visible{display:block}
+.starts .del:hover{background:var(--field);color:var(--red)}
+.saverow{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.saverow label{display:block;font-weight:500;font-size:13px;margin-bottom:6px}
+.saverow input{flex:1;min-width:0;border:1px solid var(--line);background:var(--field);border-radius:8px;padding:8px 10px}
+.saverow .hint{line-height:1.8}
+.saverow .hint .btn{padding:3px 9px;min-height:26px;font-size:13px}
+.well{display:flex;align-items:center;gap:10px;margin-top:8px}
+.well div{flex:1;min-width:0;line-height:1.25}
+.well b{display:block;font-weight:600;font-size:13px}
+.well span{color:var(--muted);font-size:12px}
+.well .btn{padding:4px 8px;min-height:28px;font-size:12px}
+.padwrap{position:relative}
+#typeName{width:100%;border:1px solid var(--line);background:var(--field);border-radius:7px;padding:9px 10px}
+#fontPick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#fontPick button{border:1px solid var(--line);background:var(--field);border-radius:10px;padding:10px 8px;font-size:30px;line-height:1.3;min-height:68px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#fontPick button[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+#pad{display:block;width:100%;height:200px;background:var(--field);border:1px solid var(--line);border-radius:12px;touch-action:none;cursor:crosshair}
+#padHint{position:absolute;left:0;right:0;top:calc(72% + 8px);text-align:center;color:var(--muted);font-size:13px;pointer-events:none}
+.sign-ph span{display:inline-block;border:1.5px dashed currentColor;opacity:.6;border-radius:8px;padding:22px 34px;font:500 14px var(--ui);cursor:pointer}
+#canvas img[data-sign]{cursor:pointer}
+
+.themes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.themes button{border:1px solid var(--line);background:var(--panel);border-radius:11px;padding:5px 5px 6px;font-size:12px;font-weight:500}
+.themes button[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.sw{display:block;height:46px;border-radius:6px;position:relative;margin-bottom:4px}
+.sw i{position:absolute;inset:8px 10px 0;border-radius:5px 5px 0 0}
+.sw u{position:absolute;left:50%;top:15px;width:20px;height:20px;margin-left:-10px;border-radius:50%;border:2px solid}
+
+.field{margin-top:12px}
+.field>label,.field>.lab{display:block;font-weight:500;font-size:13px;margin-bottom:5px}
+.field input[type=text],.field input[type=url]{width:100%;border:1px solid var(--line);background:var(--field);border-radius:8px;padding:8px 10px}
+.field input[type=range]{width:100%;accent-color:var(--accent)}
+.field .seg{display:flex;flex-wrap:wrap}
+.field .seg button{flex:1;white-space:nowrap}
+.field .seg.grid3{display:grid;grid-template-columns:repeat(3,1fr)}
+.field .seg.grid3 button{padding:6px 4px}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.check{display:flex;align-items:center;gap:8px;font-weight:500;font-size:13px}
+.check input{width:16px;height:16px;accent-color:var(--accent)}
+input[type=color]{width:38px;height:32px;padding:2px;border:1px solid var(--line);border-radius:7px;background:var(--field)}
+.rt button{font-weight:700;min-width:34px;justify-content:center}
+
+/* stage */
+.stage{overflow:auto;min-height:0;background:var(--stage);padding:20px 16px 60px;position:relative}
+.envelope{max-width:660px;margin:0 auto;transition:max-width .2s}
+body[data-device="phone"] .envelope{max-width:399px}
+@media (prefers-reduced-motion:reduce){.envelope{transition:none}}
+.meta{background:var(--panel);border:1px solid var(--line);border-bottom:0;border-radius:14px 14px 0 0;padding:4px 16px;box-shadow:var(--shadow)}
+.meta label{display:flex;align-items:baseline;gap:10px;padding:7px 0}
+.meta label+label{border-top:1px solid var(--hair)}
+.meta span{color:var(--muted);flex:none;width:92px;font-size:13px}
+.meta input{flex:1;min-width:0;border:0;background:none;padding:2px 0;font-weight:500}
+.meta input:focus{outline:none}
+.meta label:focus-within span{color:var(--accent)}
+#canvas{padding:24px 12px;border:1px solid var(--line);border-radius:0 0 14px 14px;position:relative;box-shadow:var(--shadow)}
+/* .card is the on-screen stand-in for the email body: the same 600px width
+   the exported table uses, so the canvas is a true preview, not an approximation. */
+.card{margin:0 auto;width:600px;max-width:100%;position:relative;overflow:hidden}
+.blk{position:relative}
+.blk:hover{outline:1px dashed color-mix(in srgb,var(--accent) 60%,transparent);outline-offset:-1px}
+.blk.sel{outline:2px solid #1E90FF;outline-offset:-2px}
+.tools{position:absolute;top:5px;right:5px;display:none;background:#14161B;border-radius:9px;padding:3px;z-index:3;gap:1px;box-shadow:0 4px 14px rgba(18,22,30,.25)}
+.blk.sel>.tools,.blk:hover>.tools{display:flex}
+.tools button{border:0;background:none;color:#fff;width:28px;height:28px;border-radius:5px;display:grid;place-items:center;padding:0}
+.tools button:hover{background:#0B6AD1}
+.tools svg{width:15px;height:15px}
+.tools .grip{cursor:grab}
+#canvas [contenteditable]{outline:none;cursor:text;min-width:1ch}
+#canvas [contenteditable]:focus{box-shadow:0 0 0 2px rgba(30,144,255,.28);border-radius:2px}
+#canvas [contenteditable]:empty::before{content:attr(data-ph);opacity:.45}
+#canvas img[data-img]{cursor:grab}
+#canvas .blk.sel img[data-img]{touch-action:none}
+#canvas img.picked{outline:2px solid #1E90FF;outline-offset:3px;border-radius:50%}
+#canvas img.picked.rect{border-radius:0}
+#canvas img.over{outline:3px dashed #BE3B35;outline-offset:3px}
+.spacer-ed{background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(128,128,128,.14) 6px 12px)}
+#dropline{position:absolute;left:0;right:0;height:4px;margin-top:-2px;background:#1E90FF;border-radius:2px;display:none;z-index:4;pointer-events:none}
+.empty{padding:56px 24px;text-align:center;color:#5A6676;font-size:15px}
+.empty b{display:block;font:400 24px var(--display);color:#14161B;margin-bottom:6px}
+body.filedrag .stage::after{content:"Drop photos between blocks to add them, or on a photo to replace it.";position:sticky;bottom:0;display:block;margin:16px auto 0;max-width:420px;text-align:center;font-weight:600;padding:12px 16px;border-radius:12px;color:var(--ink);background:var(--panel);border:2px dashed var(--accent);box-shadow:var(--shadow)}
+
+/* dialogs: export checklist and the signature pad */
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--panel);color:var(--ink);padding:0;width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 40px);box-shadow:0 24px 60px rgba(10,14,20,.28)}
+dialog::backdrop{background:rgba(12,16,20,.5);backdrop-filter:blur(3px)}
+.dlg{padding:20px 22px 22px}
+.dlg h2{font:400 26px/1.2 var(--display);margin:0 0 4px}
+.dlg h3{font:600 13px var(--ui);color:var(--muted);margin:22px 0 8px}
+.checks{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:6px}
+.checks li{display:flex;gap:9px;align-items:flex-start}
+.checks li::before{content:"";flex:none;width:10px;height:10px;border-radius:50%;margin-top:5px;background:var(--ok)}
+.checks li.w::before{background:var(--warn)}
+.meter{height:8px;border-radius:99px;background:var(--field);overflow:hidden;border:1px solid var(--line);margin:6px 0 4px}
+.meter i{display:block;height:100%;background:var(--ok)}
+.meter i.w{background:var(--warn)}
+.steps{margin:0;padding-left:20px;color:var(--muted)}
+.steps li{margin:3px 0}
+#manual{display:none;margin-top:12px;border:1px solid var(--line);border-radius:8px;max-height:220px;overflow:auto;background:#fff}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#14161B;color:#fff;padding:11px 17px;border-radius:11px;box-shadow:0 10px 30px rgba(10,14,20,.3);font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;max-width:calc(100vw - 32px)}
+#toast.on{opacity:1}
+
+/* Below 920px the three columns collapse to one pane at a time, switched by
+   the bottom tab bar. */
+.mtabs{display:none}
+@media (max-width:920px){
+  main{grid-template-columns:minmax(0,1fr)}
+  .side{display:none;border:0!important}
+  body[data-pane="add"] .side.left,body[data-pane="edit"] .side.right{display:block}
+  body[data-pane="add"] .stage,body[data-pane="edit"] .stage{display:none}
+  .mtabs{display:flex;background:var(--panel);border-top:1px solid var(--line)}
+  .mtabs button{flex:1;border:0;background:none;padding:12px 4px;font-weight:600;color:var(--muted)}
+  .mtabs button[aria-pressed="true"]{color:var(--accent)}
+  .top .wide{display:none}
+  .stage{padding:12px 8px 40px}
+}
+</style>
+</head>
+<body data-pane="canvas" data-device="desktop">
+<header class="top">
+  <div class="mark">
+    <svg viewBox="0 0 28 28" aria-hidden="true"><rect x="0" y="0" width="28" height="28" rx="9" fill="var(--accent)"/><g stroke="var(--accent-ink)" stroke-width="2.2" stroke-linecap="round"><path d="M8 10h12"/><path d="M8 14.5h8.5"/><path d="M8 19h4"/></g></svg>
+    Brevity
+    <em>Less clutter. Better newsletters.</em>
+  </div>
+  <button class="btn icon" id="undo" aria-label="Undo" title="Undo (Ctrl+Z)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3 2 6l3 3"/><path d="M2 6h7a4 4 0 0 1 0 8H6"/></svg></button>
+  <button class="btn icon" id="redo" aria-label="Redo" title="Redo (Ctrl+Shift+Z)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m11 3 3 3-3 3"/><path d="M14 6H7a4 4 0 0 0 0 8h3"/></svg></button>
+  <div class="seg wide" role="group" aria-label="Preview width">
+    <button data-device="desktop" aria-pressed="true">Desktop</button>
+    <button data-device="phone" aria-pressed="false">Phone</button>
+  </div>
+  <button class="btn" id="openExport">Check and export <span class="badge" id="badge" hidden></span></button>
+  <button class="btn primary" id="copyGmail">Copy for Gmail</button>
+</header>
+
+<main>
+  <aside class="side left" aria-label="Add blocks and style">
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="add">Add</button>
+      <button role="tab" aria-selected="false" data-tab="style">Style</button>
+    </div>
+    <div id="tab-add">
+      <h2>Blocks</h2>
+      <div class="palette" id="palette"></div>
+      <p class="hint">Click to add below the selected block, or drag into place.</p>
+      <h2>Start from a layout</h2>
+      <div class="starts" id="starts"></div>
+      <div class="saverow">
+        <label for="layoutName">Save this email as a layout</label>
+        <div class="row"><input id="layoutName" type="text" placeholder="Name it, e.g. Weekly update"><button class="btn" id="saveLayout">Save</button></div>
+        <p class="hint" id="resetWrap" hidden>Edited a layout and want to start over? <button class="btn" id="resetLayout">Reset to the original</button></p>
+      </div>
+    </div>
+    <div id="tab-style" hidden></div>
+  </aside>
+
+  <section class="stage" id="stage" aria-label="Email canvas">
+    <div class="envelope">
+      <div class="meta">
+        <label><span>Subject</span><input id="subject" type="text" placeholder="What is this email about?"></label>
+        <label><span>Preview text</span><input id="preheader" type="text" placeholder="The line shown after the subject in the inbox"></label>
+      </div>
+      <div id="canvas"></div>
+    </div>
+  </section>
+
+  <aside class="side right" id="inspector" aria-label="Edit selected block"></aside>
+</main>
+
+<nav class="mtabs" aria-label="Panels">
+  <button data-pane="add" aria-pressed="false">Add and style</button>
+  <button data-pane="canvas" aria-pressed="true">Email</button>
+  <button data-pane="edit" aria-pressed="false">Edit block</button>
+</nav>
+
+<dialog id="exportDlg" aria-labelledby="exTitle">
+  <div class="dlg">
+    <h2 id="exTitle">Check and export</h2>
+    <div id="exBody"></div>
+    <div id="manual"></div>
+  </div>
+</dialog>
+
+<dialog id="signDlg" aria-labelledby="sgTitle">
+  <div class="dlg">
+    <h2 id="sgTitle">Sign here</h2>
+    <div class="seg" role="group" aria-label="How to sign" style="margin:8px 0 12px"><button data-mode="draw" aria-pressed="true">Draw</button><button data-mode="type" aria-pressed="false">Type</button></div>
+    <div id="drawPane"><p class="hint" style="margin:0 0 10px">Use a mouse, finger or stylus. Your strokes are steadied as you write, and the line thins when you move fast, the way ink does.</p>
+    <div class="padwrap"><canvas id="pad"></canvas><span id="padHint">Write your signature on the line</span></div>
+    <div class="row" style="margin-top:10px;justify-content:space-between">
+      <div class="row"><span style="font-weight:500;font-size:13px">Steady hand</span>
+        <div class="seg" role="group" aria-label="Steady hand"><button data-smooth="0" aria-pressed="false">Off</button><button data-smooth="0.45" aria-pressed="true">Light</button><button data-smooth="0.7" aria-pressed="false">Strong</button></div></div>
+      <div class="row"><button class="btn" data-s="undo">Undo stroke</button><button class="btn" data-s="clear">Clear</button></div>
+    </div>
+    </div>
+    <div id="typePane" hidden><label for="typeName" style="display:block;font-weight:500;font-size:13px;margin-bottom:5px">Your name</label><input id="typeName" type="text" autocomplete="name" placeholder="Type your name"><p class="hint" style="margin:12px 0 6px">Pick a handwriting style.</p><div id="fontPick"></div><p class="hint">A typed signature is saved as an image, so every reader sees the same handwriting.</p></div>
+    <div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn" data-s="cancel">Cancel</button><button class="btn primary" data-s="use">Use this signature</button></div>
+  </div>
+</dialog>
+
+<input type="file" id="file" accept="image/*" multiple hidden>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================================
+   Brevity — an HTML email builder whose output is meant to survive Gmail.
+   One file, no build step, no dependencies beyond the webfonts in <head>.
+
+   HOW IT FITS TOGETHER
+   1. `doc` is the whole email: subject, preheader, theme choices, and an
+      ordered array of blocks. Every block is a plain object with a `type`
+      and its own settings. Nothing else is state; the DOM is always a
+      rendering of `doc` and is thrown away and rebuilt on change.
+   2. `rb()` turns one block into email HTML. The SAME function renders the
+      editing canvas and the exported email — the only difference is the `ed`
+      flag, which adds contenteditable hooks and data attributes. That is why
+      what you see on screen is what Gmail receives: there is no second
+      "export renderer" to drift out of sync.
+   3. Images are BAKED. Circles, frames and crops are drawn into a canvas and
+      embedded as data URIs, because Gmail strips border-radius and most CSS
+      that would otherwise do the job. See bake().
+   4. Export copies rich HTML to the clipboard; the user pastes into Gmail.
+
+   EMAIL HTML RULES OBSERVED THROUGHOUT
+   - Tables for layout, inline styles only, no <style> block, no flex/grid.
+   - Web-safe font stacks only (see THEMES).
+   - Fixed 600px body width with max-width:100% so phones scale it down.
+   - Background colors are set twice: bgcolor attribute AND inline style.
+   ========================================================================= */
+(function(){
+"use strict";
+
+/* ---------- tiny helpers ---------- */
+/* getPath/setPath read and write nested block fields by a dotted string, e.g.
+   "items.2.name". The inspector and the contenteditable handlers both address
+   fields this way, so one generic handler can edit any block. */
+const $=(s,r)=>(r||document).querySelector(s);
+const $$=(s,r)=>[...(r||document).querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=p=>p+Math.random().toString(36).slice(2,9);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const getPath=(o,p)=>p?p.split('.').reduce((a,k)=>a==null?a:a[k],o):o;
+function setPath(o,p,v){const ks=p.split('.');const last=ks.pop();const t=ks.reduce((a,k)=>a[k],o);t[last]=v;}
+
+/* ---------- colour ---------- */
+/* mix() blends two hex colors; lum() is WCAG relative luminance, used to
+   decide whether text on an accent color should be black or white. */
+const hex=h=>{h=h.replace('#','');return[0,2,4].map(i=>parseInt(h.substr(i,2),16));};
+const mix=(a,b,t)=>{const A=hex(a),B=hex(b);return'#'+A.map((v,i)=>Math.round(v*(1-t)+B[i]*t).toString(16).padStart(2,'0')).join('');};
+const lum=h=>{const[r,g,b]=hex(h).map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);});return .2126*r+.7152*g+.0722*b;};
+
+/* ---------- themes: web-safe fonts only, so Gmail shows what you see ---------- */
+const SANS="Helvetica,Arial,sans-serif", SERIF="Georgia,'Times New Roman',serif", TREB="'Trebuchet MS',Helvetica,Arial,sans-serif", VERD="Verdana,Geneva,sans-serif", MONO="'Courier New',Courier,monospace";
+/* Each theme supplies page background, card, text, muted text, an accent and
+   its font stacks. Themes whose name ends in "duo" also carry accent2, a
+   deliberately contrasting second color. hf = heading font, bf = body font. */
+const THEMES={
+  harbor:{name:'Harbor',bg:'#E6EDF6',card:'#FFFFFF',text:'#1B2A3B',muted:'#5C6C80',accent:'#1F5FBF',hf:SANS,bf:SANS},
+  fern:{name:'Fern',bg:'#E7F0E8',card:'#FFFFFF',text:'#1E2C23',muted:'#56685C',accent:'#2B7A4B',hf:SERIF,bf:SANS},
+  marigold:{name:'Marigold',bg:'#FFF1CC',card:'#FFFDF7',text:'#2C2410',muted:'#6E6246',accent:'#A85F00',hf:TREB,bf:TREB},
+  plum:{name:'Plum',bg:'#F1E8F3',card:'#FFFFFF',text:'#2A1B30',muted:'#6A5A70',accent:'#7A2E8E',hf:SERIF,bf:SERIF},
+  coral:{name:'Coral',bg:'#FFE9E4',card:'#FFFFFF',text:'#2E1C1A',muted:'#735854',accent:'#C93A32',hf:VERD,bf:VERD},
+  graphite:{name:'Graphite',bg:'#E8E8E8',card:'#FFFFFF',text:'#161616',muted:'#5F5F5F',accent:'#161616',hf:MONO,bf:SANS},
+  midnight:{name:'Midnight',bg:'#0E1A2C',card:'#16273F',text:'#E9EFF8',muted:'#A3B4CC',accent:'#6CC5FF',hf:SANS,bf:SANS},
+  seafoam:{name:'Seafoam',bg:'#DDF2EE',card:'#FFFFFF',text:'#12302C',muted:'#4E6C67',accent:'#0D7C70',hf:TREB,bf:SANS},
+  ink:{name:'Ink',bg:'#F2F0EC',card:'#FFFFFF',text:'#1A1D29',muted:'#5D6170',accent:'#3B3FBF',hf:SERIF,bf:SANS},
+  sky:{name:'Sky',bg:'#DDEEFB',card:'#FFFFFF',text:'#14283A',muted:'#55697C',accent:'#0B6FB8',hf:SANS,bf:SANS},
+  blossom:{name:'Blossom',bg:'#FCE4EC',card:'#FFFFFF',text:'#331823',muted:'#7A5564',accent:'#C2185B',hf:SERIF,bf:SANS},
+  olive:{name:'Olive',bg:'#ECEBD9',card:'#FFFEF8',text:'#2A2A18',muted:'#66664A',accent:'#5E6B1E',hf:TREB,bf:TREB},
+  denim:{name:'Denim',bg:'#DCE3EE',card:'#FFFFFF',text:'#18233A',muted:'#58647C',accent:'#2F4A8A',hf:SERIF,bf:SANS},
+  paper:{name:'Paper',bg:'#F4F4F4',card:'#FFFFFF',text:'#111111',muted:'#666666',accent:'#D0021B',hf:SANS,bf:SANS},
+  sunset:{name:'Sunset duo',bg:'#FFE8D9',card:'#FFFFFF',text:'#2E1A12',muted:'#7A5B4C',accent:'#C2410C',accent2:'#B0246B',hf:SANS,bf:SANS},
+  tide:{name:'Tide duo',bg:'#E0F0F2',card:'#FFFFFF',text:'#10282C',muted:'#4F6B70',accent:'#0E7490',accent2:'#D9622B',hf:TREB,bf:SANS},
+  orchard:{name:'Orchard duo',bg:'#EEF3E2',card:'#FFFFFF',text:'#1F2A16',muted:'#5D6B50',accent:'#3F7D20',accent2:'#C2410C',hf:SERIF,bf:SANS},
+  ember:{name:'Ember',bg:'#1C1412',card:'#2A1E1A',text:'#F6ECE6',muted:'#C2A99C',accent:'#FF9A62',hf:SANS,bf:SANS},
+  pine:{name:'Pine',bg:'#0F1F1A',card:'#17302A',text:'#E6F2EC',muted:'#9DBDB0',accent:'#6FE0B0',hf:TREB,bf:SANS},
+  aubergine:{name:'Aubergine',bg:'#1B1224',card:'#2A1C38',text:'#F0E8F7',muted:'#B9A6CC',accent:'#D69BFF',hf:SERIF,bf:SANS}
+};
+/* theme() resolves the ACTIVE palette: the chosen preset, with any per-document
+   overrides (accent, accent2, background) layered on, plus derived values —
+   `on` (readable text color on the accent), `tint` (callout background),
+   `line` (hairline rule) and the paddings implied by the density setting. */
+function theme(){
+  const t=THEMES[doc.theme]||THEMES.harbor, accent=doc.accent||t.accent, accent2=doc.accent2||t.accent2||accent, roomy=doc.density!=='cozy';
+  return Object.assign({},t,{accent,accent2,bg:doc.bg||t.bg,on:lum(accent)>.4?'#111111':'#FFFFFF',tint:mix(accent2,t.card,.9),line:mix(t.text,t.card,.86),
+    cardR:doc.corners==='square'?0:14,btnR:{square:0,round:8,pill:999}[doc.buttons]||999,pad:roomy?40:28,vp:roomy?14:10});
+}
+
+/* ---------- state ---------- */
+let doc={subject:'',preheader:'',theme:'harbor',accent:null,accent2:null,bg:null,corners:'round',buttons:'pill',density:'roomy',blocks:[]};
+let sel={id:null,sub:''};
+const images={};            // id -> {src, el}
+const imgOpts=new Map();    // "blockId/path" -> bake options
+let hist=[],hi=-1,typingTimer=null,saveTimer=null,savedRange=null;
+
+const P0=()=>({img:null,zoom:1,ox:0,oy:0,alt:''});
+/* make() returns a new block of the given type with sensible defaults.
+   Every photo-bearing field starts from P0(): img id, zoom, and ox/oy, which
+   are the -1..1 pan offsets used when the photo is dragged inside its frame. */
+function make(type){
+  const b={id:uid('b'),type};
+  const d={
+    header:Object.assign(P0(),{brand:'Your name or team',tagline:'',style:'band',align:'center',frame:'plain',logo:'none',logoShape:'free',logoSize:'m'}),
+    heading:{text:'A clear headline',size:'l',align:'left'},
+    text:{html:'Write your message here. Select words to make them bold, italic, or a link.',size:'m',align:'left'},
+    photo:Object.assign(P0(),{frame:'ring',size:'l',align:'center',caption:''}),
+    people:{frame:'plain',items:[1,2,3].map(()=>Object.assign(P0(),{name:'Name',role:'Role'}))},
+    profile:Object.assign(P0(),{frame:'plain',side:'left',name:'Your name',role:'Your role',html:'A sentence or two about you, or a sign-off.'}),
+    signature:{strokes:[],typed:'',font:'dancing',sv:'',ink:'text',weight:1,size:'m',align:'left',rule:false,name:'Your name',role:''},
+    banner:Object.assign(P0(),{ratio:'2',bleed:false,rounded:true}),
+    button:{label:'Read more',url:'',style:'solid',align:'center',full:false},
+    quote:{text:'A short line worth pulling out of the message.',cite:''},
+    callout:{title:'Worth knowing',html:'Dates, reminders, or the one thing readers should not miss.'},
+    divider:{style:'line'},
+    spacer:{h:24},
+    footer:{html:'You’re receiving this because you asked to hear from us.',align:'center'}
+  }[type];
+  return Object.assign(b,JSON.parse(JSON.stringify(d)));
+}
+const LABEL={header:'Header',heading:'Heading',text:'Text',photo:'Round photo',people:'Photo row',profile:'Photo and text',signature:'Signature',banner:'Wide photo',button:'Button',quote:'Quote',callout:'Callout',divider:'Divider',spacer:'Space',footer:'Footer'};
+const ICON={
+  header:'<rect x="3" y="4" width="18" height="7" rx="1.5" fill="currentColor"/><path d="M5 15h14M5 19h9"/>',
+  heading:'<path d="M6 5v14M18 5v14M6 12h12" stroke-width="2.4"/>',
+  text:'<path d="M4 6h16M4 10h16M4 14h16M4 18h10"/>',
+  photo:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5" fill="currentColor" stroke="none"/>',
+  people:'<circle cx="5.5" cy="12" r="3.3"/><circle cx="12" cy="12" r="3.3"/><circle cx="18.5" cy="12" r="3.3"/>',
+  profile:'<circle cx="7" cy="12" r="4"/><path d="M14 9h7M14 13h7M14 17h4"/>',
+  signature:'<path d="M3 15c3-7 5-9 6-7s-2 8 0 8 3-5 5-5 1 4 3 4 2-1 4-2"/><path d="M4 20h16" opacity=".4"/>',
+  banner:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="m3 16 5-4 4 3 3-2 6 4"/>',
+  button:'<rect x="3" y="8" width="18" height="8" rx="4" fill="currentColor"/>',
+  quote:'<path d="M5 6v12" stroke-width="2.6"/><path d="M10 9h10M10 13h10M10 17h5"/>',
+  callout:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 10h10M7 14h6"/>',
+  divider:'<path d="M3 12h18"/>',
+  spacer:'<path d="M12 4v16M8 8l4-4 4 4M8 16l4 4 4-4"/>',
+  footer:'<path d="M5 6h14" opacity=".35"/><path d="M5 15h14M8 19h8"/>'
+};
+const ico=t=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[t]+'</svg>';
+
+/* ---------- starter layouts ---------- */
+/* Starter layouts. Each build() returns {subject, preheader, blocks}; `group`
+   decides which heading it is listed under in the left panel. mk() and ppl()
+   below are shorthand for "a block with these fields overridden". */
+const STARTS={
+  newsletter:{name:'Newsletter',desc:'Header, lead story, people, dates',build(){
+    const b=[make('header'),make('banner'),make('heading'),make('text'),make('people'),make('callout'),make('button'),make('footer')];
+    Object.assign(b[0],{brand:'Northside Notes',tagline:'What’s happening this week'});
+    b[2].text='Three things worth your time this week';
+    b[3].html='The spring showcase is set, sign-ups for the Saturday workshop are open, and we have two new faces to introduce. Details are below, and replies to this email come straight to us.';
+    ['Amara Osei','Luis Ortega','Priya Nair'].forEach((n,i)=>{b[4].items[i].name=n;b[4].items[i].role=['Showcase lead','Workshop host','New this month'][i];});
+    Object.assign(b[5],{title:'Dates to remember',html:'<b>Thursday</b> showcase rehearsal, 3:30 pm<br><b>Saturday</b> workshop, 10 am to noon<br><b>Next Friday</b> sign-up deadline'});
+    b[6].label='See the full calendar';
+    b[7].html='You’re receiving this because you signed up for Northside Notes.';
+    return {subject:'Northside Notes: showcase, workshop, and two hellos',preheader:'Three things worth your time this week.',blocks:b};
+  }},
+  intro:{name:'Introduction',desc:'One framed photo and a short hello',build(){
+    const b=[make('spacer'),make('photo'),make('heading'),make('text'),make('button'),make('footer')];
+    b[0].h=12; b[1].caption='';
+    Object.assign(b[2],{text:'Hello, I’m Jordan',align:'center',size:'xl'});
+    Object.assign(b[3],{html:'I’m joining the team this month and wanted to say hi before we meet. I’ll be your main contact for scheduling and questions, and I answer email fastest in the mornings.',align:'center'});
+    b[4].label='Pick a time to meet';
+    b[5].html='Reply any time. This inbox is read by a person.';
+    return {subject:'A quick hello from Jordan',preheader:'Putting a face to the name before we meet.',blocks:b};
+  }},
+  announce:{name:'Announcement',desc:'Big headline, details, signature',build(){
+    const b=[make('header'),make('heading'),make('text'),make('callout'),make('button'),make('divider'),make('profile'),make('footer')];
+    Object.assign(b[0],{brand:'Riverbend Studio',style:'plain',align:'left'});
+    Object.assign(b[1],{text:'We’re moving to a bigger space in March',size:'xl'});
+    b[2].html='After six years on Mill Street, we’ve outgrown the room. The new studio is four blocks away, has twice the floor space, and finally has parking.';
+    Object.assign(b[3],{title:'What changes for you',html:'Your schedule and membership stay the same. Only the address is new: <b>48 Canal Row</b>, starting March 3.'});
+    b[4].label='Get directions';
+    Object.assign(b[6],{name:'Dana Whitfield',role:'Studio director',html:'Thank you for growing with us. Come see the new place.'});
+    b[7].html='Riverbend Studio, 48 Canal Row';
+    return {subject:'We’re moving in March',preheader:'Same schedule, bigger room, four blocks away.',blocks:b};
+  }},
+  invite:{name:'Invitation',desc:'Badge header, when and where',build(){return {subject:'You’re invited: Maple Street block party',preheader:'Saturday, June 14, from 4 pm.',blocks:[
+    mk('header',{brand:'Maple Street Block Party',style:'monogram'}),mk('banner'),
+    mk('heading',{text:'You’re invited to the block party',size:'xl',align:'center'}),
+    mk('text',{html:'Food, music and lawn games for the whole street. Bring a chair, and a dish to share if you can.',align:'center'}),
+    mk('callout',{title:'When and where',html:'<b>Saturday, June 14</b>, 4 to 8 pm<br>Maple Street, between 3rd and 5th'}),
+    mk('button',{label:'Tell us you’re coming'}),mk('footer',{html:'Questions? Reply to this email.'})]};}},
+  thanks:{name:'Thank-you note',desc:'Short note with a signature',build(){return {subject:'Thank you for Tuesday',preheader:'A quick note of thanks.',blocks:[
+    mk('spacer',{h:12}),mk('heading',{text:'Thank you',size:'xl'}),
+    mk('text',{html:'I wanted to say how much I appreciated your time on Tuesday. Your questions made the plan better, and I left with a clear list of next steps.<br><br>I’ll send the revised draft by Friday.'}),
+    mk('signature',{name:'Sam Rivera',role:''})]};}},
+  letter:{name:'Letter',desc:'Letterhead, long text, signature',build(){return {subject:'A note from Morgan Ellis',preheader:'An update, and what comes next.',blocks:[
+    mk('header',{brand:'Morgan Ellis',tagline:'Ellis & Co. Architects',style:'masthead'}),
+    mk('text',{size:'l',html:'Dear neighbors,<br><br>Work on the corner lot begins next month. I’m writing so you hear the plan from us first, and so you know who to call if anything about the site concerns you.<br><br>Crews will be on site on weekdays between 8 am and 4 pm. The sidewalk stays open throughout.'}),
+    mk('text',{html:'With thanks for your patience,'}),
+    mk('signature',{name:'Morgan Ellis',role:'Principal',rule:true})]};}},
+  team:{name:'Meet the team',desc:'Two rows of framed faces',build(){return {subject:'Meet the team at Harlow & Finch',preheader:'The people you’ll be working with.',blocks:[
+    mk('header',{brand:'Harlow & Finch',tagline:'Meet the team',style:'split'}),
+    mk('heading',{text:'The people you’ll be working with',size:'l'}),
+    mk('text',{html:'Seven of us will be on your project from kickoff to handover. Here’s who does what.'}),
+    ppl([['Noor Haddad','Project lead'],['Ben Carver','Design'],['Mei Tanaka','Engineering'],['Ada Lowe','Research']],'ring'),
+    ppl([['Tomás Vidal','Writing'],['Ifeoma Eze','Quality'],['Jules Brandt','Support']],'ring'),
+    mk('button',{label:'Read everyone’s bio'}),mk('footer',{html:'Harlow & Finch, 12 Quay Lane'})]};}},
+  digest:{name:'Digest',desc:'Masthead and three short items',build(){return {subject:'The Friday Five, issue 12',preheader:'Three reads and one thing to try.',blocks:[
+    mk('header',{brand:'The Friday Five',tagline:'Issue 12',style:'masthead'}),
+    mk('heading',{text:'A better way to run a Monday meeting',size:'m'}),mk('text',{html:'Start with decisions, not updates. Send the updates in writing the day before.'}),mk('divider',{style:'short'}),
+    mk('heading',{text:'The spreadsheet that replaced our status report',size:'m'}),mk('text',{html:'One tab, four columns, updated by whoever touched the work last.'}),mk('divider',{style:'short'}),
+    mk('heading',{text:'Why we stopped scheduling Friday launches',size:'m'}),mk('text',{html:'Nobody wants to fix things on a Saturday. Tuesday is the new Friday.'}),
+    mk('callout',{title:'One thing to try',html:'Block the first 30 minutes of tomorrow for the task you’ve been avoiding.'}),
+    mk('footer',{html:'You’re receiving The Friday Five because you subscribed.'})]};}},
+  welcome:{name:'Welcome',desc:'Soft band, first steps, coach',build(){return {subject:'Welcome to Tidewater Rowing Club',preheader:'Here’s what your first week looks like.',blocks:[
+    mk('header',{brand:'Tidewater Rowing Club',style:'tint'}),mk('photo',{frame:'halo',size:'m'}),
+    mk('heading',{text:'Welcome aboard',size:'xl',align:'center'}),
+    mk('text',{html:'We’re glad you joined. You don’t need any gear or experience to start, only shoes that can get wet.',align:'center'}),
+    mk('callout',{title:'Your first week',html:'<b>1.</b> Book an intro session below<br><b>2.</b> Arrive 15 minutes early for a boathouse tour<br><b>3.</b> Row with a coach in a training boat'}),
+    mk('button',{label:'Book your intro session'}),
+    mk('profile',{name:'Coach Renata Silva',role:'Head of new members',html:'I’ll meet you at the dock. Reply here with any questions.'}),
+    mk('footer',{html:'Tidewater Rowing Club, Pier 4'})]};}},
+  spotlight:{name:'Spotlight',desc:'Edge-to-edge photo and a quote',build(){return {subject:'New this month: the reading room',preheader:'Quiet tables, long hours, good light.',blocks:[
+    mk('banner',{bleed:true,ratio:'1.78'}),mk('heading',{text:'The reading room is open',size:'xl'}),
+    mk('text',{html:'Forty seats, power at every table, and windows on three sides. It’s open until 10 pm on weeknights.'}),
+    mk('quote',{text:'I got more done in two hours here than in a week at my kitchen table.',cite:'Early visitor'}),
+    mk('button',{label:'Reserve a table',align:'left'}),mk('footer',{html:'You’re receiving this because you’re a member.',align:'left'})]};}},
+  reminder:{name:'Reminder',desc:'One fact and one button',build(){return {subject:'Reminder: your books are due Friday',preheader:'Renew online in a minute.',blocks:[
+    mk('header',{brand:'Riverside Library',style:'band'}),mk('heading',{text:'Your books are due Friday',size:'l'}),
+    mk('callout',{title:'Three items',html:'Renew them online to keep them for three more weeks, or drop them at any branch.'}),
+    mk('button',{label:'Renew online',full:true}),mk('footer',{html:'Riverside Library sends reminders three days before a due date.'})]};}},
+  classWeek:{group:'For school',name:'Week ahead',desc:'What families should know this week',build(){return {subject:'Week ahead: Nov 17 to 21',preheader:'Two due dates and a short reading at home.',blocks:[
+    mk('header',{brand:'Room 214',tagline:'Week of November 17',style:'split'}),
+    mk('heading',{text:'What we’re working on',size:'l'}),
+    mk('text',{html:'We start our unit on how networks move data. Students will build a small model of a network in class, so the work stays here and nothing extra goes home this week.'}),
+    mk('callout',{title:'Due dates',html:'<b>Wednesday</b> vocabulary check<br><b>Friday</b> project proposal, one paragraph'}),
+    mk('heading',{text:'How to help at home',size:'m'}),
+    mk('text',{html:'Ask your student to explain one thing they built this week. Explaining it out loud is the fastest way to find the gap.'}),
+    mk('button',{label:'Open our Google Classroom'}),
+    mk('footer',{html:'Reply in whatever language is easiest for you. Questions are always welcome.'})]};}},
+  courseWelcome:{group:'For school',name:'Course welcome',desc:'First-day note to students and families',build(){return {subject:'Welcome to Computer Science Principles',preheader:'What we do, what you need, and how to reach me.',blocks:[
+    mk('header',{brand:'Computer Science Principles',tagline:'Fall semester',style:'masthead'}),
+    mk('text',{size:'l',html:'Welcome. This course is about how computers and the internet actually work, and about building things that run. No experience is needed, and no one is behind on day one.'}),
+    mk('callout',{title:'What you need',html:'A school account and a charged laptop. Everything else lives in Google Classroom, and paper copies are available any time you ask.'}),
+    mk('heading',{text:'How the week runs',size:'m'}),
+    mk('text',{html:'Monday through Thursday we build. Friday we review and catch up, so a missed day is never a lost week. Extra help is available before school by appointment.'}),
+    mk('button',{label:'Join the Google Classroom'}),
+    mk('profile',{name:'Your teacher',role:'Computer Science',html:'Email is the fastest way to reach me, and I answer in the mornings.'}),
+    mk('footer',{html:'Families: reply here any time, in any language.'})]};}},
+  familyNote:{group:'For school',name:'Family check-in',desc:'Progress note home, with next steps',build(){return {subject:'A quick check-in about your student',preheader:'Where things stand and what happens next.',blocks:[
+    mk('heading',{text:'A quick check-in',size:'l'}),
+    mk('text',{html:'I wanted to share where things stand before the quarter closes, while there’s still time to act on it.'}),
+    mk('callout',{title:'Where things stand',html:'<b>Going well:</b> taking part in class and working steadily with a partner<br><b>Needs attention:</b> two assignments not turned in'}),
+    mk('heading',{text:'What happens next',size:'m'}),
+    mk('text',{html:'Both assignments can be turned in late for full credit through Friday. I’ve set aside time before school on Tuesday and Thursday to work on them together.'}),
+    mk('button',{label:'See the missing work'}),
+    mk('signature',{name:'Your teacher',role:'Computer Science',rule:true}),
+    mk('footer',{html:'Reply any time, in any language. A phone call also works if that’s easier.'})]};}},
+  fieldTrip:{group:'For school',name:'Field trip',desc:'Where, when, what to bring, forms',build(){return {subject:'Field trip to the cybersecurity lab, Dec 5',preheader:'Forms due Nov 26. No cost to families.',blocks:[
+    mk('header',{brand:'Field Trip',tagline:'Friday, December 5',style:'band'}),
+    mk('heading',{text:'We’re visiting a working security lab',size:'l'}),
+    mk('text',{html:'Students will see how a real team watches a network, and will talk with people who do this work for a living.'}),
+    mk('callout',{title:'The details',html:'<b>Leave</b> 8:15 am from the main entrance<br><b>Return</b> 2:30 pm, in time for buses<br><b>Bring</b> a lunch or $8; school lunches can be ordered<br><b>Cost</b> none'}),
+    mk('button',{label:'Sign the permission form'}),
+    mk('text',{html:'Forms are due <b>Wednesday, November 26</b>. Paper copies are in the classroom if signing online is hard.'}),
+    mk('footer',{html:'Questions? Reply to this email.'})]};}},
+  clubCall:{group:'For school',name:'Club or team',desc:'Invite students to join, with faces',build(){return {subject:'Cyber club starts Thursday, come try it',preheader:'No experience needed. Snacks provided.',blocks:[
+    mk('header',{brand:'Cyber Club',style:'monogram'}),
+    mk('heading',{text:'Come break something safely',size:'xl',align:'center'}),
+    mk('text',{html:'We practice defending a small network, and we compete as a team in the spring. Beginners are the point, not a problem.',align:'center'}),
+    mk('callout',{title:'When and where',html:'<b>Thursdays</b>, 2:45 to 4 pm, Room 214<br>Late bus available. Snacks provided.'}),
+    ppl([['Officer','President'],['Officer','Vice president'],['Advisor','Teacher']],'ring'),
+    mk('button',{label:'Add your name to the list'}),
+    mk('footer',{html:'Open to every grade. Drop in once and see.'})]};}},
+  conferences:{group:'For school',name:'Conferences',desc:'Sign-up times and what to expect',build(){return {subject:'Sign up for a conference time',preheader:'Ten minutes, in person or by phone.',blocks:[
+    mk('header',{brand:'Parent and Teacher Conferences',tagline:'November 20 and 21',style:'tint'}),
+    mk('heading',{text:'Pick a time that works for you',size:'l'}),
+    mk('text',{html:'Conferences are ten minutes each. We’ll look at recent work together, and you’ll leave with one specific thing to try at home.'}),
+    mk('callout',{title:'Your options',html:'<b>Thursday</b> 3 to 7 pm, in person<br><b>Friday</b> 8 am to noon, in person or by phone<br>Interpreters are available on request.'}),
+    mk('button',{label:'Choose your time'}),
+    mk('text',{html:'If none of these work, reply and we’ll find another time, including early mornings.'}),
+    mk('footer',{html:'Can’t make it? A short written update is always an option.'})]};}},
+  studentNews:{group:'For school',name:'Student newsletter',desc:'Deadlines, opportunities, shout-outs',build(){return {subject:'Room 214 Weekly: deadlines, an internship, and a shout-out',preheader:'Two deadlines this week and a paid summer opening.',blocks:[
+    mk('header',{brand:'Room 214 Weekly',tagline:'Issue 9',style:'masthead'}),
+    mk('heading',{text:'This week',size:'l'}),
+    mk('text',{html:'We finish the networking unit and start planning your first project. Come to class with a rough idea of what you want to build, even a bad one.'}),
+    mk('callout',{title:'Deadlines',html:'<b>Wednesday</b> vocabulary check, in class<br><b>Friday</b> project proposal, one paragraph in Classroom<br>Late work is accepted through Sunday for full credit.'}),
+    mk('divider',{style:'short'}),
+    mk('heading',{text:'Worth your time',size:'m'}),
+    mk('text',{html:'A local company is taking <b>paid summer interns</b> in IT support, open to seniors, no experience required. Applications close in two weeks, and I will help you with yours during lunch.'}),
+    mk('button',{label:'See the internship details'}),
+    mk('divider',{style:'short'}),
+    mk('heading',{text:'Shout-outs',size:'m'}),
+    mk('text',{html:'Three of you stayed after on Thursday to help a classmate get their code running. That is the whole job, and you did it without being asked.'}),
+    mk('footer',{html:'Questions, ideas, or something to put in the next issue? Reply here.'})]};}},
+  staffNews:{group:'For school',name:'Staff newsletter',desc:'Week at a glance, reminders, asks',build(){return {subject:'Staff notes: week of November 17',preheader:'Early release Wednesday, two reminders, one ask.',blocks:[
+    mk('header',{brand:'Staff Notes',tagline:'Week of November 17',style:'split'}),
+    mk('callout',{title:'This week at a glance',html:'<b>Monday</b> department meetings, 2:45<br><b>Wednesday</b> early release, students out at 12:10<br><b>Thursday</b> conferences, 3 to 7 pm<br><b>Friday</b> no duty-free lunch coverage needed'}),
+    mk('heading',{text:'Two reminders',size:'m'}),
+    mk('text',{html:'Quarter grades close Friday at 4 pm, and the gradebook locks on its own. If you need an extension, email before Thursday rather than after.<br><br>Hall passes moved to the new form this week. The old one still opens but no longer records anything.'}),
+    mk('divider',{style:'short'}),
+    mk('heading',{text:'One ask',size:'m'}),
+    mk('text',{html:'We need four staff volunteers for Thursday’s conference check-in table, one hour each. It is the difference between families finding their room and wandering the halls.'}),
+    mk('button',{label:'Take an hour at the table',align:'left'}),
+    mk('divider',{style:'line'}),
+    mk('heading',{text:'Worth stealing',size:'m'}),
+    mk('quote',{text:'I stopped collecting the warm-up and started walking the room during it. I learn more in four minutes than the paper ever told me.',cite:'From a colleague down the hall'}),
+    mk('footer',{html:'Send anything for next week’s notes by Friday.'})]};}},
+  principalNews:{group:'For school',name:'Principal newsletter',desc:'Message home, dates, school news',build(){return {subject:'From the principal: November update',preheader:'Conferences, early release, and what we’re proud of.',blocks:[
+    mk('header',{brand:'Lincoln High School',tagline:'A note from the principal',style:'band'}),
+    mk('heading',{text:'Dear families,',size:'l'}),
+    mk('text',{size:'l',html:'November is a short month with a lot in it. Below are the dates you need, what we’re working on as a school, and how to reach us if something isn’t going well for your student.'}),
+    mk('callout',{title:'Dates to know',html:'<b>Nov 20 and 21</b> parent and teacher conferences<br><b>Nov 26</b> early release, students out at 12:10<br><b>Nov 27 and 28</b> no school'}),
+    mk('divider',{style:'short'}),
+    mk('heading',{text:'What we’re working on',size:'m'}),
+    mk('text',{html:'Our focus this year is attendance, because the students who are here every day are the students who pass. Since September, daily attendance is up and the number of students missing ten days or more has fallen.'}),
+    mk('heading',{text:'Something to celebrate',size:'m'}),
+    mk('text',{html:'Our cybersecurity team placed in the state qualifier, and the fall concert filled the auditorium for the first time in years. Come to the next one.'}),
+    mk('button',{label:'See the school calendar'}),
+    mk('divider',{style:'line'}),
+    mk('heading',{text:'If something isn’t working',size:'m'}),
+    mk('text',{html:'Start with your student’s teacher, then the counselor, then this office. If you’ve already tried all three, reply to this email and I will follow up personally.'}),
+    mk('profile',{name:'Your principal',role:'Lincoln High School',html:'Thank you for trusting us with your student.'}),
+    mk('footer',{html:'Interpretation is available for every meeting. Reply in any language, or call the main office.'})]};}},
+  blank:{name:'Blank',desc:'An empty page',build(){return {subject:'',preheader:'',blocks:[]};}}
+};
+function mk(t,o){return Object.assign(make(t),o||{});}
+function ppl(list,frame){const b=make('people');b.frame=frame||'plain';b.items=list.map(x=>Object.assign(P0(),{name:x[0],role:x[1]}));return b;}
+
+/* ---------- photo framing: the circle is baked into the image so Gmail cannot square it off ---------- */
+const cache=new Map();
+/* bake() draws a photo into a canvas and returns a data URI.
+   This exists because Gmail removes border-radius, so a CSS circle would
+   arrive as a square. Drawing the circle, the ring and the crop into the
+   pixels themselves is the only reliable way.
+   h = the field holding {img, zoom, ox, oy}; o = options from picOpts();
+   T = the active theme; live = skip the cache while a drag is in flight.
+   Rendered at 2x for retina. Circles export as PNG (they need transparent
+   corners); rectangles export as JPEG unless o.png asks otherwise. */
+function bake(h,o,T,live){
+  const key=[h.img||'ph',h.zoom,h.ox,h.oy,o.shape,o.w,o.h,o.frame,o.radius,T.accent,T.card,T.accent2,o.mono,T.on,o.mono!=null?T.hf:'',o.fill,o.png].join('|');
+  if(!live&&cache.has(key))return cache.get(key);
+  const s=2,W=Math.round(o.w*s),H=Math.round(o.h*s),c=document.createElement('canvas');c.width=W;c.height=H;
+  const g=c.getContext('2d'),im=h.img&&images[h.img]&&images[h.img].el;
+  const draw=(x,y,w,hh)=>{
+    if(im){const k=Math.max(w/im.naturalWidth,hh/im.naturalHeight)*(h.zoom||1),dw=im.naturalWidth*k,dh=im.naturalHeight*k;
+      g.imageSmoothingQuality='high';
+      g.drawImage(im,x+(w-dw)/2+(h.ox||0)*(dw-w)/2,y+(hh-dh)/2+(h.oy||0)*(dh-hh)/2,dw,dh);}
+    else if(o.mono!=null){g.fillStyle=T.accent;g.fillRect(x,y,w,hh);g.fillStyle=T.on;g.font='bold '+Math.round(hh*.4)+'px '+T.hf;g.textAlign='center';g.textBaseline='middle';g.fillText(o.mono,x+w/2,y+hh*.53);}
+    else{g.fillStyle=mix(T.accent2,T.card,.8);g.fillRect(x,y,w,hh);g.fillStyle=mix(T.accent2,T.card,.55);
+      if(o.shape==='circle'){g.beginPath();g.arc(x+w/2,y+hh*.4,hh*.17,0,7);g.fill();g.beginPath();g.ellipse(x+w/2,y+hh*1.02,hh*.36,hh*.34,0,0,7);g.fill();}
+      else{g.beginPath();g.arc(x+w*.78,y+hh*.3,hh*.12,0,7);g.fill();g.beginPath();g.moveTo(x,y+hh);g.lineTo(x+w*.3,y+hh*.5);g.lineTo(x+w*.52,y+hh*.78);g.lineTo(x+w*.68,y+hh*.6);g.lineTo(x+w,y+hh*.95);g.lineTo(x+w,y+hh);g.fill();}}
+  };
+  let out;
+  if(o.shape==='circle'){
+    const R=W/2;let inset=0;
+    if(o.frame==='ring'){const rw=Math.max(3*s,W*.028);g.lineWidth=rw;g.strokeStyle=T.accent2;g.beginPath();g.arc(R,R,R-rw/2,0,7);g.stroke();inset=rw*2;}
+    else if(o.frame==='double'){const rw=Math.max(1.5*s,W*.012);g.lineWidth=rw;g.strokeStyle=T.accent2;[rw/2,rw*2.7].forEach(d=>{g.beginPath();g.arc(R,R,R-d,0,7);g.stroke();});inset=rw*4.6;}
+    else if(o.frame==='halo'){g.globalAlpha=.24;g.fillStyle=T.accent2;g.beginPath();g.arc(R,R,R,0,7);g.fill();g.globalAlpha=1;inset=W*.065;}
+    g.save();g.beginPath();g.arc(R,R,R-inset,0,7);g.clip();draw(inset,inset,W-inset*2,H-inset*2);g.restore();
+    out=c.toDataURL('image/png');
+  }else{
+    const r=(o.radius||0)*s;if(o.fill!==null){g.fillStyle=o.fill||T.card;g.fillRect(0,0,W,H);}g.save();g.beginPath();
+    if(r&&g.roundRect)g.roundRect(0,0,W,H,r);else g.rect(0,0,W,H);
+    g.clip();draw(0,0,W,H);g.restore();
+    out=o.png?c.toDataURL('image/png'):c.toDataURL('image/jpeg',.88);
+  }
+  if(!live){if(cache.size>300)cache.clear();cache.set(key,out);}
+  return out;
+}
+/* picOpts() decides the pixel size, shape and framing for a block's photo.
+   Returned options are also stashed in imgOpts so the drag-to-reposition code
+   knows how much overflow there is to pan within. */
+function picOpts(b,T){
+  if(b.type==='header'){
+    if(b.style==='monogram')return{shape:'circle',w:64,h:64,frame:b.frame||'plain',mono:String(b.brand||'').trim().split(/\s+/).filter(w=>/[A-Za-z0-9\u00C0-\uFFFF]/.test(w[0]||'')).slice(0,2).map(w=>w[0].toUpperCase()).join('')};
+    const sz={s:32,m:46,l:64}[b.logoSize]||46;
+    if(b.logoShape==='circle')return{shape:'circle',w:sz,h:sz,frame:b.frame||'plain'};
+    const el=b.img&&images[b.img]&&images[b.img].el,ar=el?el.naturalWidth/el.naturalHeight:2.6;
+    return{shape:'rect',w:Math.round(clamp(sz*ar,sz,420)),h:sz,radius:0,fill:null,png:true};
+  }
+  if(b.type==='photo')return{shape:'circle',w:{s:96,m:140,l:200,xl:280}[b.size]||200,h:{s:96,m:140,l:200,xl:280}[b.size]||200,frame:b.frame};
+  if(b.type==='people'){const n={2:140,3:120,4:96}[b.items.length]||96;return{shape:'circle',w:n,h:n,frame:b.frame};}
+  if(b.type==='profile')return{shape:'circle',w:96,h:96,frame:b.frame};
+  const w=b.bleed?600:600-T.pad*2;return{shape:'rect',w,h:Math.round(w/parseFloat(b.ratio||2)),radius:(!b.bleed&&b.rounded)?14:0,fluid:true};
+}
+/* pic() = picOpts + bake + the <img> tag, sized in both attributes and CSS
+   because some clients ignore one or the other. */
+function pic(b,path,T,ed){
+  const h=getPath(b,path),o=picOpts(b,T),src=bake(h,o,T);
+  if(ed)imgOpts.set(b.id+'/'+path,o);
+  const alt=esc(h.alt||h.name||h.caption||(b.type==='header'?b.brand:'')||'');
+  return '<img src="'+src+'" width="'+o.w+'" height="'+o.h+'" alt="'+alt+'"'+(ed?' data-img="'+path+'" draggable="false" class="'+(o.shape==='rect'?'rect':'')+'"':'')+
+    ' style="display:'+(o.fluid?'block':'inline-block')+';border:0;outline:none;width:'+(o.fluid?'100%':o.w+'px')+';max-width:'+(o.fluid?o.w+'px':'100%')+';height:auto;">';
+}
+
+/* ---------- rich text ---------- */
+/* clean() whitelists the HTML that contenteditable produces. Browsers emit
+   <div>, <span style=...> and pasted markup; email needs a tiny, predictable
+   subset. Anything not b/i/u/a/br is flattened to its text. */
+function clean(node){
+  let out='';
+  node.childNodes.forEach(n=>{
+    if(n.nodeType===3){out+=esc(n.nodeValue);return;}
+    if(n.nodeType!==1)return;
+    const t=n.tagName,inner=clean(n);
+    if(t==='BR')out+='<br>';
+    else if(t==='B'||t==='STRONG')out+='<b>'+inner+'</b>';
+    else if(t==='I'||t==='EM')out+='<i>'+inner+'</i>';
+    else if(t==='U')out+='<u>'+inner+'</u>';
+    else if(t==='A'){const href=n.getAttribute('href')||'';out+=/^(https?:|mailto:)/i.test(href)?'<a href="'+esc(href)+'">'+inner+'</a>':inner;}
+    else if(t==='DIV'||t==='P'){if(out&&!/<br>$/.test(out))out+='<br>';out+=inner;}
+    else out+=inner;
+  });
+  return out;
+}
+const strip=h=>{const d=document.createElement('div');d.innerHTML=String(h||'').replace(/<br>/g,'\n');return d.textContent;};
+
+/* ---------- signature: smoothed pen strokes with speed-based width, baked to an image ---------- */
+/* Signature rendering. A stroke is an array of [x, y, width] points. Points
+   are joined with quadratic curves through their midpoints, and each curve is
+   stepped so the line width can taper between points — that taper is what
+   makes it read as ink rather than as a constant-width marker line. */
+function drawStrokes(g,strokes,base,color){
+  g.strokeStyle=g.fillStyle=color;g.lineCap='round';g.lineJoin='round';
+  const seg=(ax,ay,aw,bx,by,bw,cx,cy)=>{const n=Math.max(2,Math.ceil((Math.hypot(cx-ax,cy-ay)+Math.hypot(bx-cx,by-cy))/1.5));let px=ax,py=ay;
+    for(let i=1;i<=n;i++){const t=i/n,u=1-t,x=u*u*ax+2*u*t*cx+t*t*bx,y=u*u*ay+2*u*t*cy+t*t*by;
+      g.lineWidth=Math.max(.3,base*(aw+(bw-aw)*(t-.5/n)));g.beginPath();g.moveTo(px,py);g.lineTo(x,y);g.stroke();px=x;py=y;}};
+  strokes.forEach(s=>{
+    if(!s.length)return;
+    if(s.length===1){g.beginPath();g.arc(s[0][0],s[0][1],base*.6,0,7);g.fill();return;}
+    let ax=s[0][0],ay=s[0][1],aw=s[0][2];
+    for(let i=1;i<s.length-1;i++){const p=s[i],q=s[i+1],bx=(p[0]+q[0])/2,by=(p[1]+q[1])/2,bw=(p[2]+q[2])/2;seg(ax,ay,aw,bx,by,bw,p[0],p[1]);ax=bx;ay=by;aw=bw;}
+    const L=s[s.length-1];seg(ax,ay,aw,L[0],L[1],L[2],(ax+L[0])/2,(ay+L[1])/2);
+  });
+}
+function strokeBox(strokes){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;strokes.forEach(s=>s.forEach(p=>{x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);}));return[x0,y0,x1,y1];}
+const SIGTAIL=",'Snell Roundhand','Segoe Script','Brush Script MT',cursive";
+const SIGFONT={dancing:['Dancing Script','500',"'Dancing Script'"+SIGTAIL],caveat:['Caveat','500',"'Caveat'"+SIGTAIL],sacramento:['Sacramento','400',"'Sacramento'"+SIGTAIL],delafield:['Mrs Saint Delafield','400',"'Mrs Saint Delafield'"+SIGTAIL]};
+let signMode='draw',signFont='dancing',fontGen=0;
+const signed=b=>!!(b.typed||(b.strokes&&b.strokes.length));
+function ensureSigFonts(){
+  if(!document.fonts||!document.fonts.load)return;const used=doc.blocks.filter(b=>b.type==='signature'&&b.typed);if(!used.length)return;
+  Promise.all(used.map(b=>{const f=SIGFONT[b.font]||SIGFONT.dancing;return document.fonts.load(f[1]+" 40px '"+f[0]+"'",b.typed);})).then(()=>{fontGen++;renderCanvas();}).catch(()=>{});
+}
+function syncSign(){
+  const t=signMode==='type',name=$('#typeName').value.trim();$('#drawPane').hidden=t;$('#typePane').hidden=!t;
+  $$('[data-mode]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.mode===signMode));
+  $('#fontPick').innerHTML=Object.keys(SIGFONT).map(k=>'<button data-font="'+k+'" aria-pressed="'+(k===signFont)+'" aria-label="'+SIGFONT[k][0]+' style" style="font-family:'+SIGFONT[k][2]+';font-weight:'+SIGFONT[k][1]+'">'+esc(name||'Your name')+'</button>').join('');
+  drawPad();if(t)$('[data-s=use]').disabled=!name;
+}
+/* sigBake() turns a signature (drawn strokes OR typed name) into an image.
+   Typed signatures are rasterized too, so the recipient does not need the
+   handwriting font installed. fontGen busts the cache once webfonts load. */
+function sigBake(b,T){
+  if(!signed(b))return null;
+  const color={text:T.text,accent:T.accent,blue:'#1F3FA8',black:'#111111'}[b.ink]||T.text,key=['sig',b.id,b.sv,color,b.weight,b.size,b.typed,b.font,fontGen].join('|');
+  if(cache.has(key))return cache.get(key);
+  if(b.typed){const fs={s:34,m:46,l:60}[b.size]||46,F=SIGFONT[b.font]||SIGFONT.dancing,font=F[1]+' '+(fs*3)+'px '+F[2],c=document.createElement('canvas'),g=c.getContext('2d');
+    g.font=font;const m=g.measureText(b.typed),l=(m.actualBoundingBoxLeft||0)+fs*.6,asc=(m.actualBoundingBoxAscent||fs*2.4)+fs*.5,desc=(m.actualBoundingBoxDescent||fs*.9)+fs*.5;
+    c.width=Math.ceil(l+Math.max(m.width,m.actualBoundingBoxRight||0)+fs*.6);c.height=Math.ceil(asc+desc);
+    g.font=font;g.fillStyle=color;g.textBaseline='alphabetic';g.fillText(b.typed,l,asc);
+    let W=c.width/3,H=c.height/3;if(W>500){H=H*500/W;W=500;}
+    const out={src:c.toDataURL('image/png'),w:Math.round(W),h:Math.round(H)};cache.set(key,out);return out;}
+  const base=2.6*(b.weight||1),m=base*1.3;let[x0,y0,x1,y1]=strokeBox(b.strokes);x0-=m;y0-=m;x1+=m;y1+=m;
+  const bw=x1-x0,bh=y1-y0;let W=Math.min({s:150,m:210,l:290}[b.size]||210,bw*1.5),H=W*bh/bw;if(H>120){W=W*120/H;H=120;}
+  W=Math.max(8,Math.round(W));H=Math.max(8,Math.round(H));
+  const c=document.createElement('canvas'),k=3*W/bw;c.width=W*3;c.height=H*3;const g=c.getContext('2d');g.setTransform(k,0,0,k,-x0*k,-y0*k);drawStrokes(g,b.strokes,base,color);
+  const out={src:c.toDataURL('image/png'),w:W,h:H};cache.set(key,out);return out;
+}
+let pad,padG,padW=0,padH=0,padStrokes=[],cur=null,padSmooth=.45,signId=null;
+const r1=v=>Math.round(v*10)/10,r2=v=>Math.round(v*100)/100;
+function drawPad(){
+  const cs=getComputedStyle(document.documentElement);padG.clearRect(0,0,padW,padH);
+  padG.save();padG.strokeStyle=cs.getPropertyValue('--line').trim()||'#ccc';padG.lineWidth=1.5;padG.setLineDash([5,6]);padG.beginPath();padG.moveTo(20,padH*.72);padG.lineTo(padW-20,padH*.72);padG.stroke();padG.restore();
+  drawStrokes(padG,cur?padStrokes.concat([cur.pts]):padStrokes,2.6,cs.getPropertyValue('--ink').trim()||'#111');
+  $('#padHint').hidden=!!(padStrokes.length||cur);
+  $('[data-s=undo]').disabled=$('[data-s=clear]').disabled=$('[data-s=use]').disabled=!padStrokes.length;
+}
+function openSign(id){
+  const b=byId(id);if(!b)return;signId=id;padStrokes=JSON.parse(JSON.stringify(b.strokes||[]));cur=null;
+  $('#drawPane').hidden=false;$('#typePane').hidden=true;$('#signDlg').showModal();
+  const r=pad.getBoundingClientRect(),d=window.devicePixelRatio||1;padW=r.width;padH=r.height;pad.width=Math.round(padW*d);pad.height=Math.round(padH*d);padG=pad.getContext('2d');padG.setTransform(d,0,0,d,0,0);
+  if(padStrokes.length){const[x0,y0,x1,y1]=strokeBox(padStrokes);
+    if(x0<6||y0<6||x1>padW-6||y1>padH-6){const k=Math.min(1,(padW-32)/Math.max(1,x1-x0),(padH-32)/Math.max(1,y1-y0)),ox=(padW-(x1-x0)*k)/2,oy=(padH-(y1-y0)*k)/2;
+      padStrokes.forEach(s=>s.forEach(p=>{p[0]=r1((p[0]-x0)*k+ox);p[1]=r1((p[1]-y0)*k+oy);}));}}
+  signMode=b.typed?'type':'draw';signFont=SIGFONT[b.font]?b.font:'dancing';$('#typeName').value=b.typed||(b.name&&b.name!=='Your name'?b.name:'');syncSign();
+}
+/* padAdvance() is the smoothing. Rather than recording the pointer position,
+   it records a point chased toward the pointer (lerp by 1-padSmooth), which
+   removes hand tremor. Width comes from speed: distance over elapsed time,
+   inverted, so fast strokes thin out. A stylus overrides this with real
+   pressure. On pen-up the stroke gets a few settling passes (see initPad). */
+function padAdvance(ts,pressure){
+  const k=1-padSmooth,nx=cur.px+(cur.tx-cur.px)*k,ny=cur.py+(cur.ty-cur.py)*k,last=cur.pts[cur.pts.length-1],d=Math.hypot(nx-last[0],ny-last[1]);
+  cur.px=nx;cur.py=ny;if(d<1.2)return;
+  const dt=Math.max(1,ts-cur.t);cur.t=ts;const target=pressure!=null?.35+pressure*1.1:clamp(1.25-(d/dt)*.5,.42,1.25);
+  cur.w=cur.w*.72+target*.28;cur.pts.push([r1(nx),r1(ny),r2(cur.w)]);
+}
+function initPad(){
+  pad=$('#pad');$('#typeName').addEventListener('input',syncSign);
+  const pos=e=>{const r=pad.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};};
+  pad.addEventListener('pointerdown',e=>{if(e.button>0)return;e.preventDefault();try{pad.setPointerCapture(e.pointerId);}catch(_){}
+    const p=pos(e);cur={pts:[[r1(p.x),r1(p.y),.55]],px:p.x,py:p.y,tx:p.x,ty:p.y,w:.55,t:e.timeStamp};drawPad();});
+  pad.addEventListener('pointermove',e=>{if(!cur)return;const evs=e.getCoalescedEvents?e.getCoalescedEvents():[];
+    (evs.length?evs:[e]).forEach(ev=>{const p=pos(ev);cur.tx=p.x;cur.ty=p.y;padAdvance(ev.timeStamp||e.timeStamp,ev.pointerType==='pen'&&ev.pressure>0?ev.pressure:null);});drawPad();});
+  const end=()=>{if(!cur)return;
+    for(let i=0;i<16&&Math.hypot(cur.tx-cur.px,cur.ty-cur.py)>.6;i++)padAdvance(cur.t+12,null);
+    const P=cur.pts;
+    for(let n=padSmooth>.6?5:padSmooth>0?3:0;n>0&&P.length>4;n--){let a=P[0].slice();for(let i=1;i<P.length-1;i++){const c=P[i].slice(),d=P[i+1];P[i]=[r1((a[0]+2*c[0]+d[0])/4),r1((a[1]+2*c[1]+d[1])/4),r2((a[2]+2*c[2]+d[2])/4)];a=c;}}
+    if(P.length>3)P[P.length-1][2]=r2(P[P.length-1][2]*.5);padStrokes.push(P);cur=null;drawPad();};
+  pad.addEventListener('pointerup',end);pad.addEventListener('pointercancel',end);
+  $('#signDlg').addEventListener('click',e=>{
+    if(e.target===e.currentTarget){e.currentTarget.close();return;}
+    const sm=e.target.closest('[data-smooth]');
+    if(sm){padSmooth=parseFloat(sm.dataset.smooth);$$('[data-smooth]').forEach(x=>x.setAttribute('aria-pressed',x===sm));return;}
+    const md=e.target.closest('[data-mode]');if(md){signMode=md.dataset.mode;syncSign();if(signMode==='type')$('#typeName').focus();return;}
+    const ft=e.target.closest('[data-font]');if(ft){signFont=ft.dataset.font;syncSign();return;}
+    const b=e.target.closest('[data-s]');if(!b)return;const a=b.dataset.s;
+    if(a==='undo'){padStrokes.pop();drawPad();}
+    else if(a==='clear'){padStrokes=[];drawPad();}
+    else if(a==='cancel')$('#signDlg').close();
+    else if(a==='use'){const blk=byId(signId);if(blk){if(signMode==='type'){blk.typed=$('#typeName').value.trim();blk.font=signFont;blk.strokes=[];if(!blk.name||blk.name==='Your name')blk.name=blk.typed;}else{blk.strokes=padStrokes;blk.typed='';}
+      blk.sv=uid('s');sel={id:blk.id,sub:''};renderAll();commit();ensureSigFonts();toast('Signature added.');}$('#signDlg').close();}
+  });
+}
+
+/* ---------- block renderer: one function feeds both the canvas and the exported email ----------
+   rb() returns {pad, bg, html, radius} for one block. `ed` adds editing hooks:
+   A() emits contenteditable + data-f="fieldPath" so the input handler can write
+   the edit straight back into the block. `pos` tells the block whether it is
+   first or last, which matters for rounding the top corners of a full-bleed
+   header or banner. Keep this function free of DOM reads — it must produce the
+   same string whether it is painting the canvas or building the export. */
+function rb(b,T,ed,pos){
+  const A=(f,rich,ph)=>ed?' contenteditable="true" spellcheck="true" data-f="'+f+'"'+(rich?' data-rich="1"':'')+' data-ph="'+esc(ph||'')+'"':'';
+  const has=v=>ed||!!strip(v).trim();
+  const links=(h,c)=>String(h||'').replace(/<a /g,'<a style="color:'+(c||T.accent)+';text-decoration:underline;" ');
+  const f=(fam,size,lh,color,x)=>'margin:0;font-family:'+fam+';font-size:'+size+'px;line-height:'+lh+'px;color:'+color+';'+(x||'');
+  let pad=T.vp+'px '+T.pad+'px',bg='',html='',radius='';
+  switch(b.type){
+    case 'header':{
+      const brand=(size,lh,color,x)=>'<div'+A('brand',0,'Name')+' style="'+f(T.hf,size,lh,color,'font-weight:bold;'+(x||''))+'">'+esc(b.brand)+'</div>';
+      const tag=(color,x)=>has(b.tagline)?'<div'+A('tagline',0,'Add a tagline')+' style="'+f(T.bf,13,19,color,x||'')+'">'+esc(b.tagline)+'</div>':'';
+      const lg=b.logo!=='none'&&b.style!=='monogram';
+      const wrap=(inner,alignTo)=>{
+        if(!lg)return inner;
+        const img=pic(b,'',T,ed),o=picOpts(b,T);
+        if(b.logo==='left')return '<table role="presentation" cellpadding="0" cellspacing="0" border="0"'+(alignTo==='center'?' align="center" style="margin:0 auto;"':'')+'><tr>'+
+          '<td valign="middle" width="'+o.w+'" style="width:'+o.w+'px;font-size:0;line-height:0;">'+img+'</td>'+
+          '<td width="14" style="width:14px;font-size:0;">&nbsp;</td><td valign="middle">'+inner+'</td></tr></table>';
+        return '<div style="text-align:'+(alignTo||b.align)+';font-size:0;line-height:0;padding-bottom:10px;">'+img+'</div>'+inner;
+      };
+      if(b.style==='band'||b.style==='tint'){const band=b.style==='band';bg=band?T.accent:mix(T.accent,T.card,.88);pad='26px '+T.pad+'px';if(pos.first&&T.cardR)radius=T.cardR+'px '+T.cardR+'px 0 0';
+        html=wrap(brand(22,28,band?T.on:T.accent,'text-align:'+(b.logo==='left'?'left':b.align)+';')+tag(band?mix(T.on,T.accent,.2):T.muted,'font-size:14px;line-height:20px;text-align:'+(b.logo==='left'?'left':b.align)+';padding-top:4px;'),b.align);}
+      else if(b.style==='masthead'){pad=(T.vp+4)+'px '+T.pad+'px '+T.vp+'px';
+        html='<div style="border-top:3px solid '+T.text+';border-bottom:1px solid '+T.text+';padding:16px 0 14px;text-align:center;">'+wrap(brand(30,36,T.text,'letter-spacing:-0.5px;')+tag(T.muted,'padding-top:6px;letter-spacing:1px;'),'center')+'</div>';}
+      else if(b.style==='split'){pad=(T.vp+4)+'px '+T.pad+'px '+T.vp+'px';
+        html='<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px solid '+T.line+';"><tr><td valign="bottom" style="padding-bottom:12px;text-align:left;">'+wrap(brand(20,26,T.accent),'left')+'</td>'+
+          '<td valign="bottom" align="right" style="padding-bottom:13px;text-align:right;">'+tag(T.muted)+'</td></tr></table>';}
+      else if(b.style==='monogram'){pad=(T.vp+8)+'px '+T.pad+'px '+T.vp+'px';
+        html='<div style="text-align:'+b.align+';font-size:0;line-height:0;">'+pic(b,'',T,ed)+'</div>'+brand(20,26,T.text,'text-align:'+b.align+';padding-top:10px;')+tag(T.muted,'text-align:'+b.align+';padding-top:2px;');}
+      else{pad=(T.vp+4)+'px '+T.pad+'px '+T.vp+'px';
+        html='<div style="border-bottom:2px solid '+T.accent+';padding-bottom:12px;text-align:'+(b.logo==='left'?'left':b.align)+';">'+wrap(brand(20,26,T.accent)+tag(T.muted,'padding-top:2px;'),b.align)+'</div>';}
+      break;}
+    case 'heading':{const z={xl:[32,38],l:[24,31],m:[18,25]}[b.size]||[24,31],tag=b.size==='xl'?'h1':b.size==='l'?'h2':'h3';
+      html='<'+tag+A('text',0,'Heading')+' style="'+f(T.hf,z[0],z[1],T.text,'font-weight:bold;text-align:'+b.align+';')+'">'+esc(b.text)+'</'+tag+'>';break;}
+    case 'text':{const z=b.size==='l'?[18,29]:[16,26];
+      html='<div'+A('html',1,'Write something')+' style="'+f(T.bf,z[0],z[1],T.text,'text-align:'+b.align+';')+'">'+links(b.html)+'</div>';break;}
+    case 'photo':
+      html='<div style="text-align:'+b.align+';font-size:0;line-height:0;">'+pic(b,'',T,ed)+'</div>'+
+        (has(b.caption)?'<div'+A('caption',0,'Add a caption')+' style="'+f(T.bf,13,19,T.muted,'text-align:'+b.align+';padding-top:10px;')+'">'+esc(b.caption)+'</div>':'');
+      break;
+    case 'people':{const w=(100/b.items.length).toFixed(2);
+      html='<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'+b.items.map((it,i)=>
+        '<td width="'+w+'%" align="center" valign="top" style="padding:0 6px;text-align:center;"><div style="font-size:0;line-height:0;">'+pic(b,'items.'+i,T,ed)+'</div>'+
+        (has(it.name)?'<div'+A('items.'+i+'.name',0,'Name')+' style="'+f(T.hf,15,21,T.text,'font-weight:bold;padding-top:10px;')+'">'+esc(it.name)+'</div>':'')+
+        (has(it.role)?'<div'+A('items.'+i+'.role',0,'Role')+' style="'+f(T.bf,13,18,T.muted,'padding-top:2px;')+'">'+esc(it.role)+'</div>':'')+'</td>').join('')+'</tr></table>';break;}
+    case 'profile':{const p='<td width="96" valign="top" style="width:96px;font-size:0;line-height:0;">'+pic(b,'',T,ed)+'</td>',gap='<td width="18" style="width:18px;font-size:0;">&nbsp;</td>',
+        t='<td valign="middle" style="text-align:'+(b.side==='right'?'right':'left')+';"><div'+A('name',0,'Name')+' style="'+f(T.hf,17,23,T.text,'font-weight:bold;')+'">'+esc(b.name)+'</div>'+
+        (has(b.role)?'<div'+A('role',0,'Role')+' style="'+f(T.bf,13,19,T.muted)+'">'+esc(b.role)+'</div>':'')+
+        (has(b.html)?'<div'+A('html',1,'A line or two')+' style="'+f(T.bf,15,23,T.text,'padding-top:6px;')+'">'+links(b.html)+'</div>':'')+'</td>';
+      html='<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'+(b.side==='right'?t+gap+p:p+gap+t)+'</tr></table>';break;}
+    case 'banner':
+      if(b.bleed){pad='0';if(pos.first&&T.cardR)radius=T.cardR+'px '+T.cardR+'px 0 0';}
+      html='<div style="font-size:0;line-height:0;">'+pic(b,'',T,ed)+'</div>';break;
+    case 'button':{const solid=b.style!=='outline',href=esc(b.url||'#'),
+        cell='<td align="center" bgcolor="'+(solid?T.accent:T.card)+'" style="background-color:'+(solid?T.accent:T.card)+';border:2px solid '+T.accent+';border-radius:'+T.btnR+'px;padding:12px 26px;">'+
+        '<a href="'+href+'" target="_blank" style="font-family:'+T.bf+';font-size:16px;line-height:20px;font-weight:bold;color:'+(solid?T.on:T.accent)+';text-decoration:none;display:inline-block;"><span'+A('label',0,'Button label')+'>'+esc(b.label)+'</span></a></td>';
+      html='<table role="presentation" cellpadding="0" cellspacing="0" border="0"'+(b.full?' width="100%"':' align="'+b.align+'"')+' style="'+(b.full?'width:100%;':'margin:'+({left:'0 auto 0 0',center:'0 auto',right:'0 0 0 auto'}[b.align])+';')+'"><tr>'+cell+'</tr></table>';
+      pad=(T.vp+2)+'px '+T.pad+'px';break;}
+    case 'quote':
+      html='<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td width="4" bgcolor="'+T.accent2+'" style="width:4px;background-color:'+T.accent2+';font-size:0;">&nbsp;</td><td style="padding:4px 0 4px 18px;">'+
+        '<div'+A('text',0,'Quote')+' style="'+f(T.hf,20,30,T.text,'font-style:italic;')+'">'+esc(b.text)+'</div>'+
+        (has(b.cite)?'<div'+A('cite',0,'Who said it')+' style="'+f(T.bf,13,19,T.muted,'padding-top:8px;')+'">'+esc(b.cite)+'</div>':'')+'</td></tr></table>';break;
+    case 'callout':
+      html='<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="'+T.tint+'" style="background-color:'+T.tint+';border-radius:10px;"><tr><td style="padding:18px 22px;">'+
+        (has(b.title)?'<div'+A('title',0,'Title')+' style="'+f(T.hf,16,22,T.text,'font-weight:bold;padding-bottom:6px;')+'">'+esc(b.title)+'</div>':'')+
+        '<div'+A('html',1,'Details')+' style="'+f(T.bf,15,24,T.text)+'">'+links(b.html)+'</div></td></tr></table>';break;
+    case 'divider':
+      html=b.style==='short'?'<table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;"><tr><td width="48" height="3" bgcolor="'+T.accent2+'" style="width:48px;height:3px;background-color:'+T.accent2+';font-size:0;line-height:0;">&nbsp;</td></tr></table>'
+        :b.style==='dots'?'<div style="'+f(T.bf,18,18,T.muted,'text-align:center;letter-spacing:10px;')+'">&bull;&bull;&bull;</div>'
+        :'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td height="1" bgcolor="'+T.line+'" style="height:1px;background-color:'+T.line+';font-size:0;line-height:0;">&nbsp;</td></tr></table>';break;
+    case 'spacer':pad='0';html='<div'+(ed?' class="spacer-ed"':'')+' style="height:'+b.h+'px;line-height:'+b.h+'px;font-size:0;">&nbsp;</div>';break;
+    case 'signature':{const sg=sigBake(b,T);
+      html=(sg?'<div style="text-align:'+b.align+';font-size:0;line-height:0;"><img src="'+sg.src+'" width="'+sg.w+'" height="'+sg.h+'" alt="'+esc(b.name?'Signature of '+b.name:'Signature')+'"'+(ed?' data-sign="1" draggable="false" title="Double-click to change the signature"':'')+' style="display:inline-block;border:0;outline:none;width:'+sg.w+'px;max-width:100%;height:auto;"></div>'
+          :ed?'<div data-sign="1" class="sign-ph" style="color:'+T.muted+';text-align:'+b.align+';"><span>Click here to sign</span></div>':'')+
+        (b.rule?'<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="'+b.align+'" style="margin:'+({left:'6px auto 0 0',center:'6px auto 0',right:'6px 0 0 auto'}[b.align])+';"><tr><td width="220" height="1" bgcolor="'+T.muted+'" style="width:220px;height:1px;background-color:'+T.muted+';font-size:0;line-height:0;">&nbsp;</td></tr></table>':'')+
+        (has(b.name)?'<div'+A('name',0,'Your name')+' style="'+f(T.hf,16,22,T.text,'font-weight:bold;text-align:'+b.align+';padding-top:8px;clear:both;')+'">'+esc(b.name)+'</div>':'')+
+        (has(b.role)?'<div'+A('role',0,'Add a title')+' style="'+f(T.bf,13,19,T.muted,'text-align:'+b.align+';')+'">'+esc(b.role)+'</div>':'');break;}
+    case 'footer':pad=T.vp+'px '+T.pad+'px '+(T.vp+2)+'px';
+      html='<div style="border-top:1px solid '+T.line+';padding-top:16px;"><div'+A('html',1,'Footer text')+' style="'+f(T.bf,13,20,T.muted,'text-align:'+b.align+';')+'">'+links(b.html,T.muted)+'</div></div>';break;
+  }
+  return{pad,bg,html,radius};
+}
+const edgeless=(b)=>b&&((b.type==='header'&&(b.style==='band'||b.style==='tint'))||(b.type==='banner'&&b.bleed));
+
+/* ---------- canvas ---------- */
+const canvas=$('#canvas');
+const TOOL={up:'<path d="m4 10 4-4 4 4"/>',down:'<path d="m4 6 4 4 4-4"/>',dup:'<rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 2.5h-6a2 2 0 0 0-2 2v6"/>',del:'<path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.5h5.8l.6-8.5"/>'};
+const tsvg=p=>'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';
+/* renderCanvas() rebuilds the whole canvas from `doc`. Wholesale replacement
+   is fast enough here and removes a class of bugs where the DOM and the model
+   disagree. Note the consequence: anything transient (focus, a drag) must be
+   restored afterwards, which is why drag moves re-render only on pointerup. */
+function renderCanvas(){
+  const T=theme(),B=doc.blocks;imgOpts.clear();
+  canvas.style.background=T.bg;
+  let h='<div class="card" style="background:'+T.card+';border-radius:'+T.cardR+'px;"><div id="dropline"></div>';
+  if(!B.length)h+='<div class="empty"><b>Nothing here yet</b>Add a block from the left, or drop photos anywhere on this page to frame them.</div>';
+  else{
+    if(!edgeless(B[0]))h+='<div style="height:18px"></div>';
+    B.forEach((b,i)=>{const r=rb(b,T,true,{first:i===0,last:i===B.length-1});
+      h+='<div class="blk'+(sel.id===b.id?' sel':'')+'" data-id="'+b.id+'"><div class="tools">'+
+        '<button class="grip" draggable="true" aria-label="Drag to move" title="Drag to move"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="4" r="1.3"/><circle cx="10.5" cy="4" r="1.3"/><circle cx="5.5" cy="8" r="1.3"/><circle cx="10.5" cy="8" r="1.3"/><circle cx="5.5" cy="12" r="1.3"/><circle cx="10.5" cy="12" r="1.3"/></svg></button>'+
+        '<button data-act="up" aria-label="Move up" title="Move up">'+tsvg(TOOL.up)+'</button><button data-act="down" aria-label="Move down" title="Move down">'+tsvg(TOOL.down)+'</button>'+
+        '<button data-act="dup" aria-label="Duplicate" title="Duplicate">'+tsvg(TOOL.dup)+'</button><button data-act="del" aria-label="Delete" title="Delete">'+tsvg(TOOL.del)+'</button></div>'+
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding:'+r.pad+';'+(r.bg?'background:'+r.bg+';':'')+'">'+r.html+'</td></tr></table></div>';});
+    h+='<div style="height:18px"></div>';
+  }
+  canvas.innerHTML=h+'</div>';
+  markPicked();
+}
+function markPicked(){
+  $$('.blk',canvas).forEach(el=>el.classList.toggle('sel',el.dataset.id===sel.id));
+  $$('img[data-img]',canvas).forEach(im=>{const blk=im.closest('.blk'),b=byId(blk.dataset.id);
+    im.classList.toggle('picked',blk.dataset.id===sel.id&&b&&b.type==='people'&&im.dataset.img===sel.sub);});
+}
+const byId=id=>doc.blocks.find(b=>b.id===id);
+const selBlock=()=>byId(sel.id);
+function select(id,sub){sel={id:id||null,sub:sub||''};markPicked();renderInspector();}
+
+/* ---------- history and saving ---------- */
+/* Undo history. Each entry is a JSON snapshot of `doc`. Typing does not push
+   a snapshot per keystroke — soon() debounces into one commit per pause, so
+   undo steps match what a person would call "a change". */
+function commit(){
+  clearTimeout(typingTimer);typingTimer=null;
+  const snap=JSON.stringify(doc);
+  if(hist[hi]!==snap){hist=hist.slice(0,hi+1);hist.push(snap);if(hist.length>120)hist.shift();hi=hist.length-1;}
+  syncTop();scheduleSave();
+}
+function soon(){clearTimeout(typingTimer);typingTimer=setTimeout(commit,700);syncTop();}
+function travel(d){
+  if(typingTimer)commit();
+  if(hi+d<0||hi+d>=hist.length)return;
+  hi+=d;doc=JSON.parse(hist[hi]);if(!byId(sel.id))sel={id:null,sub:''};
+  renderAll();scheduleSave();
+}
+function syncTop(){
+  $('#undo').disabled=hi<=0&&!typingTimer;$('#redo').disabled=hi>=hist.length-1;
+  const n=checks().filter(c=>!c.ok).length,bd=$('#badge');bd.hidden=!n;bd.textContent=n;
+}
+/* Autosave into IndexedDB: the document plus the data URIs of photos actually
+   in use. Every call degrades to a no-op if storage is unavailable or slow,
+   since a draft that cannot be saved should not block editing. */
+const idb={db:null,
+  open(){return new Promise(res=>{const t=setTimeout(()=>res(false),2500);try{const r=indexedDB.open('roundel',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');
+    r.onsuccess=()=>{idb.db=r.result;clearTimeout(t);res(true);};r.onerror=()=>{clearTimeout(t);res(false);};}catch(e){clearTimeout(t);res(false);}});},
+  get(k){return new Promise(res=>{try{const q=idb.db.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(null);}catch(e){res(null);}});},
+  set(k,v){try{idb.db.transaction('kv','readwrite').objectStore('kv').put(v,k);}catch(e){}}};
+function usedImages(){const ids=new Set();doc.blocks.forEach(b=>{if(b.img)ids.add(b.img);(b.items||[]).forEach(i=>i.img&&ids.add(i.img));});return ids;}
+function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{if(!idb.db)return;const im={};usedImages().forEach(id=>{if(images[id])im[id]=images[id].src;});idb.set('draft',{doc,images:im});},600);}
+
+/* ---------- mutations ---------- */
+function insert(b,at){if(at==null){const i=doc.blocks.findIndex(x=>x.id===sel.id);at=i<0?doc.blocks.length:i+1;}doc.blocks.splice(at,0,b);sel={id:b.id,sub:''};renderAll();commit();
+  const el=$('.blk[data-id="'+b.id+'"]',canvas);if(el&&el.scrollIntoView)el.scrollIntoView({block:'nearest'});}
+function act(id,a){
+  const i=doc.blocks.findIndex(b=>b.id===id);if(i<0)return;const B=doc.blocks;
+  if(a==='up'&&i>0)[B[i-1],B[i]]=[B[i],B[i-1]];
+  else if(a==='down'&&i<B.length-1)[B[i+1],B[i]]=[B[i],B[i+1]];
+  else if(a==='dup'){const c=JSON.parse(JSON.stringify(B[i]));c.id=uid('b');B.splice(i+1,0,c);sel={id:c.id,sub:''};}
+  else if(a==='del'){B.splice(i,1);if(sel.id===id)sel={id:null,sub:''};}
+  else return;
+  renderAll();commit();
+}
+
+/* ---------- photos in ---------- */
+/* addImage() downsizes an upload to 1400px on its long edge and keeps it as a
+   source image; the framed versions are produced later by bake(). Formats that
+   can carry transparency stay PNG so logos keep their cutout; photos become
+   JPEG to keep the message small. */
+async function addImage(file){
+  const url=URL.createObjectURL(file);
+  try{const im=new Image();im.src=url;await im.decode();
+    const k=Math.min(1,1400/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas'),alpha=/png|webp|gif|svg/i.test(file.type);
+    c.width=Math.round(im.naturalWidth*k);c.height=Math.round(im.naturalHeight*k);const g=c.getContext('2d');
+    if(!alpha){g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);}
+    g.drawImage(im,0,0,c.width,c.height);
+    const src=alpha?c.toDataURL('image/png'):c.toDataURL('image/jpeg',.9),el=new Image();el.src=src;await el.decode();const id=uid('i');images[id]={src,el};return id;
+  }finally{URL.revokeObjectURL(url);}
+}
+/* takeFiles() is the one entry point for photos arriving from anywhere: file
+   picker, drag and drop, or paste. If a specific photo slot was targeted it
+   replaces that one; otherwise one image becomes a round photo block, two to
+   four become a row, and more are split into rows of three. */
+async function takeFiles(files,target){
+  files=[...files].filter(f=>/^image\//.test(f.type));
+  if(!files.length){toast('Only image files can be framed. Try a JPG, PNG, WebP or GIF.');return;}
+  const ids=[];
+  for(const f of files){try{ids.push(await addImage(f));}catch(e){toast('“'+f.name+'” could not be read. Try saving it as a JPG or PNG first.');}}
+  if(!ids.length)return;
+  const fresh=id=>({img:id,zoom:1,ox:0,oy:0});
+  if(target&&target.id&&byId(target.id)&&ids.length===1){
+    const b=byId(target.id),h=getPath(b,target.sub||'');Object.assign(h,fresh(ids[0]));if(b.type==='header'&&b.style!=='monogram'&&b.logo==='none')b.logo='above';sel={id:b.id,sub:b.type==='people'?(target.sub||''):''};renderAll();commit();toast('Photo framed. Drag it to reposition.');return;
+  }
+  let at=target&&target.index!=null?target.index:(()=>{const i=doc.blocks.findIndex(x=>x.id===sel.id);return i<0?doc.blocks.length:i+1;})();
+  const groups=[];
+  if(ids.length===1)groups.push(ids);else if(ids.length<=4)groups.push(ids);else for(let i=0;i<ids.length;i+=3)groups.push(ids.slice(i,i+3));
+  let last;
+  groups.forEach(g=>{let b;
+    if(g.length===1){b=make('photo');Object.assign(b,fresh(g[0]));}
+    else{b=make('people');b.items=g.map(id=>Object.assign(P0(),fresh(id),{name:'Name',role:'Role'}));}
+    doc.blocks.splice(at++,0,b);last=b;});
+  sel={id:last.id,sub:''};renderAll();commit();
+  toast(ids.length===1?'Photo framed. Drag it to reposition.':ids.length+' photos framed in a row.');
+}
+const fileInput=$('#file');let fileTarget=null;
+fileInput.addEventListener('change',()=>{if(fileInput.files.length)takeFiles(fileInput.files,fileTarget);fileInput.value='';});
+function pickFile(target){fileTarget=target;fileInput.multiple=!target;fileInput.click();}
+
+/* ---------- canvas events ---------- */
+canvas.addEventListener('click',e=>{
+  if(e.target.closest('a'))e.preventDefault();
+  const tool=e.target.closest('.tools button[data-act]');
+  if(tool){act(tool.closest('.blk').dataset.id,tool.dataset.act);return;}
+  const blk=e.target.closest('.blk');
+  if(!blk){if(sel.id)select(null);return;}
+  const im=e.target.closest('img[data-img]');
+  const sub=im?im.dataset.img:(sel.id===blk.dataset.id?sel.sub:'');
+  if(sel.id!==blk.dataset.id||sel.sub!==sub)select(blk.dataset.id,sub);
+  if(e.target.closest('.sign-ph'))openSign(blk.dataset.id);
+});
+canvas.addEventListener('dblclick',e=>{const sg=e.target.closest('img[data-sign]');if(sg){openSign(sg.closest('.blk').dataset.id);return;}const im=e.target.closest('img[data-img]');if(im)pickFile({id:im.closest('.blk').dataset.id,sub:im.dataset.img});});
+canvas.addEventListener('focusin',e=>{const blk=e.target.closest&&e.target.closest('.blk');if(blk&&sel.id!==blk.dataset.id)select(blk.dataset.id,'');});
+canvas.addEventListener('input',e=>{
+  const el=e.target.closest('[data-f]');if(!el)return;const b=byId(el.closest('.blk').dataset.id);if(!b)return;
+  setPath(b,el.dataset.f,el.dataset.rich?clean(el):el.textContent.replace(/\n/g,' '));soon();
+  if(b.type==='header'&&b.style==='monogram'&&!b.img){const im=$('img[data-img]',el.closest('.blk')),T=theme();if(im)im.src=bake(b,picOpts(b,T),T);}
+});
+canvas.addEventListener('keydown',e=>{
+  const el=e.target.closest('[data-f]');if(!el||e.key!=='Enter')return;
+  e.preventDefault();if(el.dataset.rich)document.execCommand('insertLineBreak');else el.blur();
+});
+document.addEventListener('selectionchange',()=>{const s=getSelection();if(!s.rangeCount)return;const n=s.anchorNode,el=n&&(n.nodeType===1?n:n.parentElement);
+  if(el&&el.closest&&el.closest('#canvas [data-rich]'))savedRange=s.getRangeAt(0).cloneRange();});
+
+/* drag a framed photo to reposition it inside its circle */
+/* Drag a photo inside its frame. The pan is stored as ox/oy in -1..1, which
+   is resolution independent: the same value crops correctly whatever size the
+   frame is rendered at. Re-baking is done live (uncached) during the drag. */
+let pd=null;
+canvas.addEventListener('pointerdown',e=>{
+  const im=e.target.closest('img[data-img]');if(!im||e.button>0)return;
+  const blk=im.closest('.blk'),b=byId(blk.dataset.id);if(!b)return;const h=getPath(b,im.dataset.img);
+  if(!h.img||!images[h.img])return;
+  if(e.pointerType==='touch'&&sel.id!==b.id)return;
+  pd={im,b,h,o:imgOpts.get(b.id+'/'+im.dataset.img),x:e.clientX,y:e.clientY,ox:h.ox||0,oy:h.oy||0,moved:false,scale:im.getBoundingClientRect().width/im.width||1};
+  try{im.setPointerCapture(e.pointerId);}catch(_){}
+});
+canvas.addEventListener('pointermove',e=>{
+  if(!pd)return;const dx=(e.clientX-pd.x)/pd.scale,dy=(e.clientY-pd.y)/pd.scale;
+  if(!pd.moved&&Math.hypot(dx,dy)<3)return;pd.moved=true;pd.im.style.cursor='grabbing';
+  const el=images[pd.h.img].el,o=pd.o,k=Math.max(o.w/el.naturalWidth,o.h/el.naturalHeight)*(pd.h.zoom||1),ovx=(el.naturalWidth*k-o.w)/2,ovy=(el.naturalHeight*k-o.h)/2;
+  if(ovx>.5)pd.h.ox=clamp(pd.ox+dx/ovx,-1,1);if(ovy>.5)pd.h.oy=clamp(pd.oy+dy/ovy,-1,1);
+  pd.im.src=bake(pd.h,o,theme(),true);
+});
+const endPd=()=>{if(!pd)return;const m=pd.moved;pd.im.style.cursor='';pd=null;if(m){renderCanvas();commit();}};
+canvas.addEventListener('pointerup',endPd);canvas.addEventListener('pointercancel',endPd);
+
+/* ---------- drag and drop: blocks, palette items, and files ---------- */
+const stage=$('#stage'),MIME='application/x-roundel';
+const hasType=(e,t)=>e.dataTransfer&&[...e.dataTransfer.types].includes(t);
+/* Drop targeting. dropIndex() finds the insertion point from the pointer's Y
+   position against block midpoints; showLine() paints the red insertion rule.
+   Three kinds of payload land here: a new block from the palette, an existing
+   block being reordered, and image files from the desktop. */
+function dropIndex(y){const els=$$('.blk',canvas);for(let i=0;i<els.length;i++){const r=els[i].getBoundingClientRect();if(y<r.top+r.height/2)return i;}return els.length;}
+function showLine(i){const line=$('#dropline'),els=$$('.blk',canvas);if(!line)return;
+  const top=!els.length?18:i<els.length?els[i].offsetTop:els[els.length-1].offsetTop+els[els.length-1].offsetHeight;
+  line.style.top=top+'px';line.style.display='block';}
+function clearDrag(){const l=$('#dropline');if(l)l.style.display='none';$$('img.over',canvas).forEach(i=>i.classList.remove('over'));document.body.classList.remove('filedrag');}
+canvas.addEventListener('dragstart',e=>{const g=e.target.closest('.grip');if(!g){e.preventDefault();return;}const blk=g.closest('.blk');
+  e.dataTransfer.setData(MIME,'move:'+blk.dataset.id);e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setDragImage(blk,30,20);}catch(_){}});
+$('#palette').addEventListener('dragstart',e=>{const b=e.target.closest('button[data-type]');if(!b)return;e.dataTransfer.setData(MIME,'new:'+b.dataset.type);e.dataTransfer.effectAllowed='copy';});
+window.addEventListener('dragover',e=>{
+  const files=hasType(e,'Files'),ours=hasType(e,MIME);if(!files&&!ours)return;
+  e.preventDefault();if(files)document.body.classList.add('filedrag');
+  $$('img.over',canvas).forEach(i=>i.classList.remove('over'));
+  const im=files&&e.target.closest&&e.target.closest('#canvas img[data-img]');
+  if(im){im.classList.add('over');const l=$('#dropline');if(l)l.style.display='none';return;}
+  if(stage.contains(e.target))showLine(dropIndex(e.clientY));
+});
+window.addEventListener('dragleave',e=>{if(!e.relatedTarget)clearDrag();});
+window.addEventListener('dragend',clearDrag);
+window.addEventListener('drop',e=>{
+  const files=hasType(e,'Files'),ours=hasType(e,MIME);if(!files&&!ours)return;
+  e.preventDefault();const inStage=stage.contains(e.target),at=inStage?dropIndex(e.clientY):doc.blocks.length;
+  const im=e.target.closest&&e.target.closest('#canvas img[data-img]');clearDrag();
+  if(files){const fl=e.dataTransfer.files;
+    if(im&&[...fl].filter(f=>/^image\//.test(f.type)).length===1)takeFiles(fl,{id:im.closest('.blk').dataset.id,sub:im.dataset.img});else takeFiles(fl,{index:at});return;}
+  if(!inStage)return;
+  const d=e.dataTransfer.getData(MIME);
+  if(d.startsWith('new:'))insert(make(d.slice(4)),at);
+  else if(d.startsWith('move:')){const id=d.slice(5),i=doc.blocks.findIndex(b=>b.id===id);if(i<0)return;const[b]=doc.blocks.splice(i,1);doc.blocks.splice(at>i?at-1:at,0,b);sel={id,sub:''};renderAll();commit();}
+});
+document.addEventListener('paste',e=>{
+  const cd=e.clipboardData;if(!cd)return;
+  const imgs=[...cd.files].filter(f=>/^image\//.test(f.type));
+  if(imgs.length){e.preventDefault();const b=selBlock();
+    const tgt=b&&imgs.length===1&&(('img' in b&&(b.type!=='header'||b.style==='monogram'||b.logo!=='none'))||(b.type==='people'&&sel.sub))?{id:b.id,sub:b.type==='people'?sel.sub:''}:null;takeFiles(imgs,tgt);return;}
+  if(e.target.closest&&e.target.closest('#canvas [data-f]')){e.preventDefault();document.execCommand('insertText',false,cd.getData('text/plain').replace(/\r/g,''));}
+});
+
+/* ---------- inspector ---------- */
+const insp=$('#inspector');
+function segF(k,label,opts,val){return '<div class="field"><span class="lab">'+label+'</span><div class="seg'+(opts.length>4?' grid3':'')+'" role="group" aria-label="'+label+'">'+opts.map(o=>'<button data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(String(val)===String(o[0]))+'">'+o[1]+'</button>').join('')+'</div></div>';}
+const ALIGN=[['left','Left'],['center','Center'],['right','Right']],FRAMES=[['plain','Plain'],['ring','Ring'],['double','Double'],['halo','Halo']];
+/* The right panel. It is regenerated from the selected block each time rather
+   than kept in sync, and every control carries data-k="fieldPath" so one input
+   handler writes the value back. segF() builds a segmented control. */
+function renderInspector(){
+  const b=selBlock();
+  if(!b){insp.innerHTML='<h2>Nothing selected</h2><p class="hint">Click a block in the email to edit it. Type directly on the canvas to change wording.</p>'+
+    '<h2>Photos</h2><p class="hint">Drop image files anywhere, or paste a copied image with Ctrl+V or ⌘V. One photo becomes a framed circle, and two to four dropped together become a row.</p>'+
+    '<h2>Shortcuts</h2><p class="hint">Undo: Ctrl+Z<br>Redo: Ctrl+Shift+Z<br>Duplicate block: Ctrl+D<br>Move block: Alt+↑ or Alt+↓<br>Delete block: Delete<br>On a Mac, use ⌘ in place of Ctrl.</p>';return;}
+  let h='<h2>'+LABEL[b.type]+'</h2>';
+  const pre=b.type==='people'?(sel.sub?sel.sub+'.':null):'';
+  const photoUI=()=>{if(pre===null)return '<p class="hint">Click a photo in the row to adjust or replace it.</p>';const p=getPath(b,sel.sub||'');
+    return (b.type==='people'?'<p class="hint">Photo '+(+sel.sub.split('.')[1]+1)+' of '+b.items.length+'</p>':'')+
+      '<div class="field row"><button class="btn" data-do="replace">'+(p.img?'Replace photo':'Choose a photo')+'</button>'+(p.img?'<button class="btn" data-do="recenter">Recenter</button>':'')+'</div>'+
+      '<div class="field"><label for="f-zoom">Zoom</label><input id="f-zoom" type="range" min="1" max="3" step="0.01" data-k="'+pre+'zoom" value="'+(p.zoom||1)+'"'+(p.img?'':' disabled')+'></div>'+
+      '<div class="field"><label for="f-alt">Description for screen readers</label><input id="f-alt" type="text" data-k="'+pre+'alt" value="'+esc(p.alt||'')+'" placeholder="Who or what is pictured"></div>'+
+      (p.img?'<p class="hint">Drag the photo on the canvas to reposition it.</p>':'');};
+  const rich='<div class="field"><span class="lab">Selected words</span><div class="row rt"><button class="btn" data-cmd="bold" aria-label="Bold">B</button><button class="btn" data-cmd="italic" aria-label="Italic" style="font-style:italic">I</button><button class="btn" data-cmd="underline" aria-label="Underline" style="text-decoration:underline">U</button><button class="btn" data-cmd="unlink" style="font-weight:500">Remove link</button></div>'+
+    '<div class="row" style="margin-top:6px"><input type="url" id="linkUrl" placeholder="https://" aria-label="Link address" style="flex:1;min-width:0"><button class="btn" data-do="link">Add link</button></div></div>';
+  switch(b.type){
+    case 'header':h+=segF('style','Look',[['band','Color band'],['tint','Soft band'],['plain','Underline'],['masthead','Masthead'],['split','Split'],['monogram','Badge']],b.style)+
+      (b.style==='masthead'||b.style==='split'?'':segF('align','Align',ALIGN,b.align))+
+      (b.style==='monogram'?'<h2>Badge</h2><p class="hint">The badge shows your initials until you add a logo or photo.</p>'+photoUI()+segF('frame','Frame',FRAMES,b.frame||'plain')
+        :'<h2>Logo or photo</h2>'+segF('logo','Place it',[['none','None'],['above','Above the name'],['left','Beside the name']],b.logo)+
+         (b.logo==='none'?'<p class="hint">Add a logo, crest or photo above or beside the name.</p>'
+          :photoUI()+segF('logoShape','Shape',[['free','Keep its shape'],['circle','Circle']],b.logoShape)+
+            (b.logoShape==='circle'?segF('frame','Frame',FRAMES,b.frame||'plain'):'')+
+            segF('logoSize','Size',[['s','S'],['m','M'],['l','L']],b.logoSize)+
+            '<p class="hint">A PNG logo keeps its transparent background, so it sits on a colored band cleanly.</p>'))+
+      (b.style==='split'?'<p class="hint">The tagline sits on the right. Use it for a date or an issue number.</p>':'');break;
+    case 'signature':{const has=signed(b);
+      h+='<div class="field row"><button class="btn primary" data-do="sign">'+(has?'Change signature':'Sign')+'</button>'+(has?'<button class="btn" data-do="unsign">Remove signature</button>':'')+'</div>'+
+      segF('ink','Ink',[['text','Text'],['accent','Main'],['blue','Blue'],['black','Black']],b.ink)+
+      (b.typed?'':'<div class="field"><label for="f-w">Pen thickness</label><input id="f-w" type="range" min="0.6" max="1.8" step="0.1" data-k="weight" value="'+b.weight+'"></div>')+
+      segF('size','Size',[['s','S'],['m','M'],['l','L']],b.size)+segF('align','Align',ALIGN,b.align)+
+      '<div class="field"><label class="check"><input type="checkbox" data-k="rule"'+(b.rule?' checked':'')+'> Line under the signature</label></div>';break;}
+    case 'heading':h+=segF('size','Size',[['xl','Large'],['l','Medium'],['m','Small']],b.size)+segF('align','Align',ALIGN,b.align);break;
+    case 'text':h+=rich+segF('size','Size',[['m','Regular'],['l','Large']],b.size)+segF('align','Align',ALIGN,b.align);break;
+    case 'photo':h+=photoUI()+segF('frame','Frame',FRAMES,b.frame)+segF('size','Size',[['s','S'],['m','M'],['l','L'],['xl','XL']],b.size)+segF('align','Align',ALIGN,b.align);break;
+    case 'people':h+=photoUI()+segF('frame','Frame',FRAMES,b.frame)+'<div class="field row">'+(b.items.length<4?'<button class="btn" data-do="addPerson">Add a person</button>':'')+(b.items.length>2&&sel.sub?'<button class="btn" data-do="rmPerson">Remove this person</button>':'')+'</div>';break;
+    case 'profile':h+=photoUI()+segF('frame','Frame',FRAMES,b.frame)+segF('side','Photo side',[['left','Left'],['right','Right']],b.side)+rich;break;
+    case 'banner':h+=photoUI()+segF('ratio','Shape',[['1.78','16:9'],['2','2:1'],['3','3:1']],b.ratio)+
+      '<div class="field"><label class="check"><input type="checkbox" data-k="bleed"'+(b.bleed?' checked':'')+'> Run edge to edge</label></div>'+
+      '<div class="field"><label class="check"><input type="checkbox" data-k="rounded"'+(b.rounded?' checked':'')+(b.bleed?' disabled':'')+'> Round the corners</label></div>';break;
+    case 'button':h+='<div class="field"><label for="f-url">Link address</label><input id="f-url" type="url" data-k="url" value="'+esc(b.url)+'" placeholder="https://"></div>'+
+      segF('style','Look',[['solid','Filled'],['outline','Outline']],b.style)+segF('align','Align',ALIGN,b.align)+
+      '<div class="field"><label class="check"><input type="checkbox" data-k="full"'+(b.full?' checked':'')+'> Full width</label></div>';break;
+    case 'callout':h+=rich;break;
+    case 'divider':h+=segF('style','Look',[['line','Line'],['short','Short bar'],['dots','Dots']],b.style);break;
+    case 'spacer':h+='<div class="field"><label for="f-h">Height</label><input id="f-h" type="range" min="8" max="80" step="4" data-k="h" value="'+b.h+'"></div>';break;
+    case 'footer':h+=rich+segF('align','Align',ALIGN,b.align);break;
+    case 'quote':h+='<p class="hint">Type on the canvas to edit the quote and who said it.</p>';break;
+  }
+  insp.innerHTML=h;
+}
+insp.addEventListener('mousedown',e=>{if(e.target.closest('[data-cmd]'))e.preventDefault();});
+/* Rich-text controls live outside the editable region, so the text selection
+   is captured on selectionchange and restored before execCommand runs. */
+function restoreRange(){if(!savedRange||!canvas.contains(savedRange.commonAncestorContainer))return null;const s=getSelection();s.removeAllRanges();s.addRange(savedRange);
+  const n=savedRange.commonAncestorContainer;return (n.nodeType===1?n:n.parentElement).closest('[data-rich]');}
+function syncRich(el){if(!el)return;const b=byId(el.closest('.blk').dataset.id);if(b){setPath(b,el.dataset.f,clean(el));soon();}}
+insp.addEventListener('click',e=>{
+  const b=selBlock();if(!b)return;
+  const cmd=e.target.closest('[data-cmd]');
+  if(cmd){const el=restoreRange();if(!el){toast('Select some words in the email first.');return;}document.execCommand(cmd.dataset.cmd);syncRich(el);return;}
+  const seg=e.target.closest('button[data-k]');
+  if(seg){setPath(b,seg.dataset.k,seg.dataset.v);renderCanvas();renderInspector();commit();return;}
+  const d=e.target.closest('[data-do]');if(!d)return;
+  const a=d.dataset.do;
+  if(a==='replace')pickFile({id:b.id,sub:sel.sub});
+  else if(a==='sign')openSign(b.id);
+  else if(a==='unsign'){b.strokes=[];b.typed='';b.sv='';renderAll();commit();}
+  else if(a==='recenter'){const p=getPath(b,sel.sub||'');p.ox=0;p.oy=0;p.zoom=1;renderCanvas();renderInspector();commit();}
+  else if(a==='addPerson'){b.items.push(Object.assign(P0(),{name:'Name',role:'Role'}));sel.sub='items.'+(b.items.length-1);renderAll();commit();}
+  else if(a==='rmPerson'){b.items.splice(+sel.sub.split('.')[1],1);sel.sub='';renderAll();commit();}
+  else if(a==='link'){let url=$('#linkUrl').value.trim();if(!url){toast('Type a link address first.');return;}if(!/^(https?:|mailto:)/i.test(url))url='https://'+url;
+    const el=restoreRange();if(!el||getSelection().isCollapsed){toast('Select the words to link in the email first.');return;}
+    document.execCommand('createLink',false,url);syncRich(el);$('#linkUrl').value='';toast('Link added.');}
+});
+insp.addEventListener('input',e=>{
+  const el=e.target.closest('input[data-k]');const b=selBlock();if(!el||!b)return;
+  const v=el.type==='range'?parseFloat(el.value):el.type==='checkbox'?el.checked:el.value;
+  setPath(b,el.dataset.k,v);renderCanvas();soon();if(el.type==='checkbox')renderInspector();
+});
+
+/* ---------- left panel ---------- */
+$('#palette').innerHTML=Object.keys(LABEL).map(t=>'<button data-type="'+t+'" draggable="true">'+ico(t)+LABEL[t]+'</button>').join('');
+$('#palette').addEventListener('click',e=>{const b=e.target.closest('button[data-type]');if(!b)return;insert(make(b.dataset.type));if(matchMedia('(max-width:920px)').matches)setPane('canvas');});
+/* ---------- layouts: built in, saved, and reset ----------
+   `mine` holds the user's saved layouts, each a frozen copy of a document plus
+   the photos it uses, persisted in IndexedDB beside the draft. `appliedFrom`
+   records which layout the current draft started from, so "Reset to the
+   original" can rebuild it without the user hunting for it in the list. */
+let mine=[],appliedFrom=null;
+const DOCKEYS=['subject','preheader','theme','accent','accent2','bg','corners','buttons','density','blocks'];
+function layoutSnapshot(){
+  const d={};DOCKEYS.forEach(k=>d[k]=doc[k]);
+  const im={};usedImages().forEach(id=>{if(images[id])im[id]=images[id].src;});
+  return{doc:JSON.parse(JSON.stringify(d)),images:im};
+}
+async function applySnapshot(snap){
+  for(const id in (snap.images||{})){if(images[id])continue;
+    try{const el=new Image();el.src=snap.images[id];await el.decode();images[id]={src:snap.images[id],el};}catch(e){}}
+  const d=JSON.parse(JSON.stringify(snap.doc));DOCKEYS.forEach(k=>{if(k in d)doc[k]=d[k];});
+  cache.clear();sel={id:null,sub:''};renderAll();commit();ensureSigFonts();
+}
+function renderStarts(){
+  const groups={};Object.keys(STARTS).forEach(k=>{const gr=STARTS[k].group||'General';(groups[gr]=groups[gr]||[]).push(k);});
+  let h='';
+  if(mine.length)h+='<h3>Your layouts</h3>'+mine.map(m=>'<div class="item"><button data-mine="'+m.id+'"><b>'+esc(m.name)+'</b><span>Saved '+esc(m.when)+'</span></button>'+
+    '<button class="del" data-del="'+m.id+'" aria-label="Delete the layout '+esc(m.name)+'" title="Delete this layout">&times;</button></div>').join('');
+  h+=['General','For school'].concat(Object.keys(groups).filter(g=>g!=='General'&&g!=='For school')).filter(g=>groups[g]).map(g=>
+    '<h3>'+g+'</h3>'+groups[g].map(k=>'<button data-start="'+k+'"><b>'+STARTS[k].name+'</b><span>'+STARTS[k].desc+'</span></button>').join('')).join('');
+  $('#starts').innerHTML=h;
+  $('#resetWrap').hidden=!appliedFrom;
+}
+const saveLayouts=()=>{if(idb.db)idb.set('layouts',mine);};
+function applyStart(k){
+  const s=STARTS[k].build();Object.assign(doc,s);appliedFrom={kind:'start',key:k};
+  sel={id:null,sub:''};renderAll();commit();renderStarts();
+}
+$('#starts').addEventListener('click',async e=>{
+  const del=e.target.closest('[data-del]');
+  if(del){const m=mine.find(x=>x.id===del.dataset.del);if(!m)return;
+    mine=mine.filter(x=>x.id!==del.dataset.del);if(appliedFrom&&appliedFrom.id===m.id)appliedFrom=null;
+    saveLayouts();renderStarts();toast('Deleted the layout “'+m.name+'”.');return;}
+  const mn=e.target.closest('[data-mine]');
+  if(mn){const m=mine.find(x=>x.id===mn.dataset.mine);if(!m)return;
+    await applySnapshot(m);appliedFrom={kind:'mine',id:m.id,name:m.name};renderStarts();
+    toast('“'+m.name+'” applied. Undo brings your previous draft back.');
+    if(matchMedia('(max-width:920px)').matches)setPane('canvas');return;}
+  const b=e.target.closest('[data-start]');if(!b)return;
+  applyStart(b.dataset.start);toast('Layout applied. Undo brings your previous draft back.');
+  if(matchMedia('(max-width:920px)').matches)setPane('canvas');
+});
+$('#saveLayout').addEventListener('click',()=>{
+  const el=$('#layoutName'),name=el.value.trim();
+  if(!name){toast('Name the layout first, so you can find it later.');el.focus();return;}
+  if(!doc.blocks.length){toast('The email is empty. There is nothing to save yet.');return;}
+  const snap=layoutSnapshot(),when=new Date().toLocaleDateString(undefined,{month:'short',day:'numeric'}),old=mine.find(m=>m.name.toLowerCase()===name.toLowerCase());
+  if(old){Object.assign(old,snap,{when});appliedFrom={kind:'mine',id:old.id,name};toast('Replaced the layout “'+name+'”.');}
+  else{const m=Object.assign({id:uid('l'),name,when},snap);mine.unshift(m);appliedFrom={kind:'mine',id:m.id,name};toast('Saved as “'+name+'”. It’s at the top of the list.');}
+  el.value='';saveLayouts();renderStarts();
+});
+$('#layoutName').addEventListener('keydown',e=>{if(e.key==='Enter')$('#saveLayout').click();});
+$('#resetLayout').addEventListener('click',async()=>{
+  if(!appliedFrom)return;
+  if(appliedFrom.kind==='start'){applyStart(appliedFrom.key);toast('Back to the original “'+STARTS[appliedFrom.key].name+'” layout.');return;}
+  const m=mine.find(x=>x.id===appliedFrom.id);
+  if(!m){appliedFrom=null;renderStarts();toast('That saved layout is gone, so there is nothing to go back to.');return;}
+  await applySnapshot(m);toast('Back to your saved “'+m.name+'”.');
+});
+$$('.tabs button').forEach(t=>t.addEventListener('click',()=>{$$('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===t));$('#tab-add').hidden=t.dataset.tab!=='add';$('#tab-style').hidden=t.dataset.tab!=='style';}));
+function renderStyle(){
+  const T=theme();
+  const well=(k,label,desc,val,set)=>'<div class="well"><input type="color" data-c="'+k+'" value="'+val+'" aria-label="'+label+'"><div><b>'+label+'</b><span>'+desc+'</span></div>'+(set?'<button class="btn" data-reset="'+k+'">Reset</button>':'')+'</div>';
+  $('#tab-style').innerHTML='<h2>Color presets</h2><div class="themes">'+Object.keys(THEMES).map(k=>{const t=THEMES[k];
+    return '<button data-theme-pick="'+k+'" aria-pressed="'+(doc.theme===k)+'"><span class="sw" style="background:'+t.bg+'"><i style="background:'+t.card+'"></i><u style="border-color:'+t.accent+';background:'+(t.accent2||mix(t.accent,t.card,.7))+'"></u></span>'+t.name+'</button>';}).join('')+'</div>'+
+    '<p class="hint">Presets use fonts every mail app already has, so Gmail shows what you see here.</p>'+
+    '<h2>Your colors</h2>'+well('accent','Main color','Buttons, links, header',T.accent,!!doc.accent)+well('accent2','Second color','Frames, callouts, quote bars',T.accent2,!!doc.accent2)+well('bg','Background','Around the email',T.bg,!!doc.bg)+
+    '<h2>Shape and spacing</h2>'+
+    segFd('corners','Page corners',[['round','Rounded'],['square','Square']],doc.corners)+
+    segFd('buttons','Button shape',[['pill','Pill'],['round','Rounded'],['square','Square']],doc.buttons)+
+    segFd('density','Spacing',[['roomy','Roomy'],['cozy','Compact']],doc.density);
+}
+function segFd(k,label,opts,val){return '<div class="field"><span class="lab">'+label+'</span><div class="seg" role="group" aria-label="'+label+'">'+opts.map(o=>'<button data-d="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(val===o[0])+'">'+o[1]+'</button>').join('')+'</div></div>';}
+$('#tab-style').addEventListener('click',e=>{
+  const t=e.target.closest('[data-theme-pick]');if(t){doc.theme=t.dataset.themePick;doc.accent=doc.accent2=doc.bg=null;renderAll();commit();return;}
+  const d=e.target.closest('[data-d]');if(d){doc[d.dataset.d]=d.dataset.v;renderAll();commit();return;}
+  const r=e.target.closest('[data-reset]');if(r){doc[r.dataset.reset]=null;renderAll();commit();return;}
+});
+$('#tab-style').addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.c;if(!k)return;doc[k]=e.target.value;renderCanvas();soon();});
+$('#tab-style').addEventListener('change',e=>{if(e.target.dataset&&e.target.dataset.c){renderStyle();commit();}});
+
+/* ---------- top bar ---------- */
+$('#undo').onclick=()=>travel(-1);$('#redo').onclick=()=>travel(1);
+$$('[data-device]').forEach(b=>b.addEventListener('click',()=>{if(b.tagName!=='BUTTON')return;document.body.dataset.device=b.dataset.device;$$('button[data-device]').forEach(x=>x.setAttribute('aria-pressed',x===b));}));
+function setPane(p){document.body.dataset.pane=p;$$('.mtabs button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.pane===p));}
+$$('.mtabs button').forEach(b=>b.addEventListener('click',()=>setPane(b.dataset.pane)));
+['subject','preheader'].forEach(k=>$('#'+k).addEventListener('input',e=>{doc[k]=e.target.value;soon();}));
+
+document.addEventListener('keydown',e=>{
+  const mod=e.ctrlKey||e.metaKey,t=e.target,inField=t.tagName==='INPUT'||t.tagName==='TEXTAREA',editing=t.isContentEditable;
+  if($('dialog[open]'))return;
+  if(mod&&e.key.toLowerCase()==='z'&&!inField){e.preventDefault();travel(e.shiftKey?1:-1);return;}
+  if(mod&&e.key.toLowerCase()==='y'&&!inField){e.preventDefault();travel(1);return;}
+  if(inField||!sel.id)return;
+  if(mod&&e.key.toLowerCase()==='d'){e.preventDefault();act(sel.id,'dup');return;}
+  if(e.altKey&&(e.key==='ArrowUp'||e.key==='ArrowDown')){e.preventDefault();act(sel.id,e.key==='ArrowUp'?'up':'down');return;}
+  if(editing)return;
+  if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();act(sel.id,'del');}
+  else if(e.key==='Escape')select(null);
+});
+
+/* ---------- export ---------- */
+/* ---------- export ----------
+   buildEmail() wraps the blocks in the outer table structure Gmail expects.
+   fullDoc() adds a document shell plus the hidden preheader div, the text that
+   appears after the subject line in an inbox list. plainText() is the fallback
+   copy for clients that refuse HTML. */
+function buildEmail(){
+  const T=theme(),B=doc.blocks,sp='<tr><td height="18" style="height:18px;font-size:0;line-height:0;">&nbsp;</td></tr>';
+  let rows=B.length&&!edgeless(B[0])?sp:'';
+  B.forEach((b,i)=>{const r=rb(b,T,false,{first:i===0,last:i===B.length-1});
+    rows+='<tr><td'+(r.bg?' bgcolor="'+r.bg+'"':'')+' style="padding:'+r.pad+';'+(r.bg?'background-color:'+r.bg+';':'')+(r.radius?'border-radius:'+r.radius+';':'')+'">'+r.html+'</td></tr>';});
+  rows+=sp;
+  return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="'+T.bg+'" style="background-color:'+T.bg+';"><tr><td align="center" style="padding:24px 12px;">'+
+    '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="'+T.card+'" style="width:600px;max-width:100%;background-color:'+T.card+';border-radius:'+T.cardR+'px;">'+rows+'</table></td></tr></table>';
+}
+function fullDoc(){
+  const T=theme();
+  return '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>'+esc(doc.subject||'Email')+'</title>\n</head>\n<body style="margin:0;padding:0;background-color:'+T.bg+';">\n'+
+    (doc.preheader?'<div style="display:none;max-height:0;overflow:hidden;opacity:0;font-size:1px;line-height:1px;color:'+T.bg+';">'+esc(doc.preheader)+'</div>\n':'')+buildEmail()+'\n</body>\n</html>';
+}
+function plainText(){
+  return doc.blocks.map(b=>{switch(b.type){
+    case 'header':return [b.brand,b.tagline].filter(Boolean).join('\n');
+    case 'heading':return b.text;
+    case 'text':case 'footer':return strip(b.html);
+    case 'photo':return b.caption||'';
+    case 'people':return b.items.map(i=>[i.name,i.role].filter(Boolean).join(', ')).join('\n');
+    case 'profile':return [b.name,b.role,strip(b.html)].filter(Boolean).join('\n');
+    case 'signature':return [b.name,b.role].filter(Boolean).join('\n');
+    case 'button':return b.label+(b.url?': '+b.url:'');
+    case 'quote':return '“'+b.text+'”'+(b.cite?'\n'+b.cite:'');
+    case 'callout':return [b.title,strip(b.html)].filter(Boolean).join('\n');
+    case 'divider':return '----------';
+    default:return '';}}).filter(Boolean).join('\n\n');
+}
+function eachPhoto(fn){doc.blocks.forEach(b=>{if('img' in b&&(b.type!=='header'||(b.style!=='monogram'&&b.logo!=='none')))fn(b,b);(b.items||[]).forEach(i=>fn(i,b));});}
+/* The pre-send checklist: the mistakes that are expensive after you hit send —
+   no subject, placeholder photos, missing alt text, unsigned signatures and
+   buttons with no link. sizes() reports against Gmail's 102 KB clipping
+   threshold, which is measured on the markup, not on the attached photos. */
+function checks(){
+  const out=[];let ph=0,noAlt=0,n=0;
+  eachPhoto(p=>{n++;if(!p.img)ph++;else if(!(p.alt||p.name||p.caption))noAlt++;});
+  const btn=doc.blocks.filter(b=>b.type==='button'&&!/^(https?:|mailto:)/i.test(b.url||'')).length;
+  out.push(doc.subject.trim()?{ok:1,t:'Subject line is set.'}:{ok:0,t:'Add a subject line above the email.'});
+  if(!doc.blocks.length)out.push({ok:0,t:'The email is empty.'});
+  if(n)out.push(ph?{ok:0,t:(ph===1?'1 photo is still a placeholder':ph+' photos are still placeholders')+'. Drop real photos on them, or delete the block.'}:{ok:1,t:'Every photo frame has a real photo.'});
+  if(noAlt)out.push({ok:0,t:noAlt+(noAlt===1?' photo has':' photos have')+' no description for screen readers.'});
+  const uns=doc.blocks.filter(b=>b.type==='signature'&&!signed(b)).length;
+  if(uns)out.push({ok:0,t:uns===1?'A signature block is not signed yet.':uns+' signature blocks are not signed yet.'});
+  if(doc.blocks.some(b=>b.type==='button'))out.push(btn?{ok:0,t:btn+(btn===1?' button has':' buttons have')+' no link address yet.'}:{ok:1,t:'Every button has a link.'});
+  return out;
+}
+function sizes(){const h=buildEmail(),m=h.replace(/src="data:[^"]+"/g,'src=""');return{markup:m.length/1024,photos:(h.length-m.length)*.75/1048576};}
+
+/* Clipboard. The async Clipboard API is tried first; where it is blocked, a
+   hidden textarea plus a copy-event listener is the fallback. If both fail the
+   export dialog shows the rendered email and selects it so the user can press
+   Ctrl+C themselves. */
+async function copyRich(html,text){
+  try{if(navigator.clipboard&&window.ClipboardItem){await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([text],{type:'text/plain'})})]);return true;}}catch(e){}
+  let ok=false;const h=e=>{e.clipboardData.setData('text/html',html);e.clipboardData.setData('text/plain',text);e.preventDefault();e.stopImmediatePropagation();ok=true;};
+  const host=$('dialog[open]')||document.body,t=document.createElement('textarea');t.value=' ';t.style.cssText='position:fixed;opacity:0;top:0;left:0;width:1px;height:1px';host.appendChild(t);t.select();
+  document.addEventListener('copy',h,true);try{document.execCommand('copy');}catch(e){}document.removeEventListener('copy',h,true);t.remove();return ok;
+}
+async function copyText(text){
+  try{await navigator.clipboard.writeText(text);return true;}catch(e){}
+  const host=$('dialog[open]')||document.body,t=document.createElement('textarea');t.value=text;t.style.cssText='position:fixed;opacity:0;top:0;left:0';host.appendChild(t);t.select();let ok=false;try{ok=document.execCommand('copy');}catch(e){}t.remove();return ok;
+}
+async function copyForGmail(){
+  if(typingTimer)commit();
+  if(!doc.blocks.length){toast('The email is empty. Add a block first.');return;}
+  const ok=await copyRich(buildEmail(),plainText());
+  if(ok){toast('Copied for Gmail. Paste it into a new message.');return;}
+  openExport();const m=$('#manual');m.style.display='block';m.innerHTML=buildEmail();
+  const r=document.createRange();r.selectNodeContents(m);const s=getSelection();s.removeAllRanges();s.addRange(r);
+  toast('This browser blocked automatic copying. The email is selected below: press Ctrl+C or ⌘C.');
+}
+$('#copyGmail').onclick=copyForGmail;
+
+let downloads=null;
+if(window.claude&&window.claude.use)window.claude.use('downloads').then(d=>{downloads=d;}).catch(()=>{});
+function openExport(){
+  if(typingTimer)commit();
+  const c=checks(),z=sizes(),pct=Math.min(100,z.markup/102*100),dlg=$('#exportDlg');
+  $('#manual').style.display='none';$('#manual').innerHTML='';
+  $('#exBody').innerHTML='<ul class="checks">'+c.map(x=>'<li class="'+(x.ok?'':'w')+'">'+x.t+'</li>').join('')+'</ul>'+
+    '<h3>Size</h3><div class="meter" aria-hidden="true"><i class="'+(pct>85?'w':'')+'" style="width:'+pct.toFixed(0)+'%"></i></div>'+
+    '<p class="hint" style="margin:0">Message code is '+z.markup.toFixed(0)+' KB. Gmail trims messages over 102 KB behind a “View entire message” link. Photos add about '+(z.photos<1?Math.round(z.photos*1024)+' KB':z.photos.toFixed(1)+' MB')+' and count toward Gmail’s 25 MB limit instead.</p>'+
+    '<h3>Send it from Gmail</h3><ol class="steps"><li>Select “Copy for Gmail”.</li><li>Open a new message in Gmail and click into the body.</li><li>Paste with Ctrl+V or ⌘V. Photos travel inside the message.</li><li>Send yourself a test before sending to everyone.</li></ol>'+
+    '<div class="row" style="margin-top:14px"><button class="btn primary" data-x="gmail">Copy for Gmail</button><a class="btn" target="_blank" rel="noopener" href="https://mail.google.com/mail/?view=cm&fs=1&su='+encodeURIComponent(doc.subject)+'">Open a new Gmail message</a></div>'+
+    '<h3>Other ways out</h3><div class="row"><button class="btn" data-x="code">Copy HTML code</button>'+(downloads?'<button class="btn" data-x="file">Download .html</button>':'')+'<button class="btn" data-x="text">Copy plain text</button></div>'+
+    '<p class="hint">The HTML code keeps photos embedded in the file. Newsletter services such as Mailchimp need photos hosted online instead, so upload them there.</p>'+
+    '<div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn" data-x="close">Close</button></div>';
+  if(!dlg.open)dlg.showModal();
+}
+$('#openExport').onclick=openExport;
+$('#exportDlg').addEventListener('click',async e=>{
+  if(e.target===e.currentTarget){e.currentTarget.close();return;}
+  const b=e.target.closest('[data-x]');if(!b)return;const x=b.dataset.x;
+  if(x==='close')$('#exportDlg').close();
+  else if(x==='gmail')copyForGmail();
+  else if(x==='code')toast(await copyText(fullDoc())?'HTML code copied.':'This browser blocked copying. Use Download instead.');
+  else if(x==='text')toast(await copyText(plainText())?'Plain text copied.':'This browser blocked copying.');
+  else if(x==='file'&&downloads){const name=(doc.subject.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'email')+'.html';
+    try{await downloads.save({filename:name,data:fullDoc()});toast('Downloaded '+name+'.');}catch(err){if(!err||err.code!=='declined')toast('The download did not go through. Copy the HTML code instead.');}}
+});
+
+/* ---------- misc ---------- */
+let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),3600);}
+function renderAll(){renderCanvas();renderInspector();renderStyle();$('#subject').value=doc.subject;$('#preheader').value=doc.preheader;syncTop();}
+
+/* Boot: load a sample newsletter, then overlay a saved draft if one exists,
+   then seed the undo history so the first undo cannot empty the editor. */
+(async function init(){
+  initPad();
+  Object.assign(doc,STARTS.newsletter.build());
+  appliedFrom={kind:'start',key:'newsletter'};
+  renderAll();renderStarts();
+  if(await idb.open()){
+    const L=await idb.get('layouts');if(Array.isArray(L)){mine=L;renderStarts();}
+    const d=await idb.get('draft');
+    if(d&&d.doc&&Array.isArray(d.doc.blocks)){
+      for(const id in (d.images||{})){try{const el=new Image();el.src=d.images[id];await el.decode();images[id]={src:d.images[id],el};}catch(e){}}
+      doc=Object.assign(doc,d.doc);appliedFrom=null;cache.clear();renderAll();renderStarts();
+    }
+  }
+  hist=[JSON.stringify(doc)];hi=0;syncTop();ensureSigFonts();
+})();
+})();
+</script>
+</body>
+</html>

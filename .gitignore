@@ -1,0 +1,14 @@
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local scratch
+node_modules/
+dist/
+*.log
+scratch/
