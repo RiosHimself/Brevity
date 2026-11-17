@@ -527,7 +527,7 @@ function make(type){
     photo:Object.assign(P0(),{frame:'ring',size:'l',align:'center',caption:''}),
     people:{frame:'plain',items:[1,2,3].map(()=>Object.assign(P0(),{name:'Name',role:'Role'}))},
     profile:Object.assign(P0(),{frame:'plain',side:'left',name:'Your name',role:'Your role',html:'A sentence or two about you, or a sign-off.'}),
-    signature:{strokes:[],typed:'',font:'dancing',sv:'',ink:'text',weight:1,size:'m',align:'left',rule:false,name:'Your name',role:''},
+    signature:{strokes:[],typed:'',font:'dancing',sv:'',ink:'text',weight:1,size:'m',align:'left',rule:false,name:'Your name',role:'',photo:false,frame:'plain',pic:P0()},
     banner:Object.assign(P0(),{ratio:'2',bleed:false,rounded:true}),
     button:{label:'Read more',url:'',style:'solid',align:'center',full:false},
     quote:{text:'A short line worth pulling out of the message.',cite:''},
@@ -814,6 +814,7 @@ function picOpts(b,T){
   if(b.type==='photo')return{shape:'circle',w:{s:96,m:140,l:200,xl:280}[b.size]||200,h:{s:96,m:140,l:200,xl:280}[b.size]||200,frame:b.frame};
   if(b.type==='people'){const n={2:140,3:120,4:96}[b.items.length]||96;return{shape:'circle',w:n,h:n,frame:b.frame};}
   if(b.type==='profile')return{shape:'circle',w:96,h:96,frame:b.frame};
+  if(b.type==='signature')return{shape:'circle',w:80,h:80,frame:b.frame||'plain'};
   if(b.type==='columns'){const w=Math.floor((600-T.pad*2)/2)-12;return{shape:'rect',w,h:Math.round(w*.75),radius:T.cardR?10:0,fluid:true};}
   const w=b.bleed?600:600-T.pad*2;return{shape:'rect',w,h:Math.round(w/parseFloat(b.ratio||2)),radius:(!b.bleed&&b.rounded&&T.cardR)?14:0,fluid:true};  // square page corners square every box
 }
@@ -822,7 +823,7 @@ function picOpts(b,T){
 function pic(b,path,T,ed){
   const h=getPath(b,path),o=picOpts(b,T),src=bake(h,o,T);
   if(ed)imgOpts.set(b.id+'/'+path,o);
-  const alt=esc(h.alt||h.name||h.caption||(b.type==='header'?b.brand:'')||'');
+  const alt=esc(h.alt||h.name||h.caption||(b.type==='header'?b.brand:b.type==='signature'?b.name:'')||'');
   return '<img src="'+src+'" width="'+o.w+'" height="'+o.h+'" alt="'+alt+'"'+(ed?' data-img="'+path+'" draggable="false" class="'+(o.shape==='rect'?'rect':'')+'"':'')+
     ' style="display:'+(o.fluid?'block':'inline-block')+';border:0;outline:none;width:'+(o.fluid?'100%':o.w+'px')+';max-width:'+(o.fluid?o.w+'px':'100%')+';height:auto;">';
 }
@@ -1082,11 +1083,21 @@ function rb(b,T,ed,pos){
         :'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td height="1" bgcolor="'+T.line+'" style="height:1px;background-color:'+T.line+';font-size:0;line-height:0;">&nbsp;</td></tr></table>';break;
     case 'spacer':pad='0';html='<div'+(ed?' class="spacer-ed"':'')+' style="height:'+b.h+'px;line-height:'+b.h+'px;font-size:0;">&nbsp;</div>';break;
     case 'signature':{const sg=sigBake(b,T);
+      /* With a profile picture: beside the signature when it is aligned left
+         or right (the photo on that side), above it when centred. A table,
+         not floats, so every mail client keeps them side by side. */
+      const withPic=b.photo&&b.pic,side=b.align==='right'?'right':'left';
       html=(sg?'<div style="text-align:'+b.align+';font-size:0;line-height:0;"><img src="'+sg.src+'" width="'+sg.w+'" height="'+sg.h+'" alt="'+esc(b.name?'Signature of '+b.name:'Signature')+'"'+(ed?' data-sign="1" draggable="false" title="Double-click to change the signature"':'')+' style="display:inline-block;border:0;outline:none;width:'+sg.w+'px;max-width:100%;height:auto;"></div>'
           :ed?'<div data-sign="1" class="sign-ph" style="color:'+T.muted+';text-align:'+b.align+';"><span>Click here to sign</span></div>':'')+
         (b.rule?'<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="'+b.align+'" style="margin:'+({left:'6px auto 0 0',center:'6px auto 0',right:'6px 0 0 auto'}[b.align])+';"><tr><td width="220" height="1" bgcolor="'+T.muted+'" style="width:220px;height:1px;background-color:'+T.muted+';font-size:0;line-height:0;">&nbsp;</td></tr></table>':'')+
         (has(b.name)?'<div'+A('name',0,'Your name')+' style="'+f(T.hf,16,22,T.text,'font-weight:bold;text-align:'+b.align+';padding-top:8px;clear:both;')+'">'+esc(b.name)+'</div>':'')+
-        (has(b.role)?'<div'+A('role',0,'Add a title')+' style="'+f(T.bf,13,19,T.muted,'text-align:'+b.align+';')+'">'+esc(b.role)+'</div>':'');break;}
+        (has(b.role)?'<div'+A('role',0,'Add a title')+' style="'+f(T.bf,13,19,T.muted,'text-align:'+b.align+';')+'">'+esc(b.role)+'</div>':'');
+      if(withPic){const ph='<div style="font-size:0;line-height:0;">'+pic(b,'pic',T,ed)+'</div>';
+        html=b.align==='center'?'<div style="text-align:center;font-size:0;line-height:0;padding-bottom:10px;">'+pic(b,'pic',T,ed)+'</div>'+html
+          :'<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="'+side+'"><tr>'+
+            (side==='left'?'<td width="80" valign="middle" style="width:80px;">'+ph+'</td><td width="16" style="width:16px;font-size:0;">&nbsp;</td><td valign="middle">'+html+'</td>'
+                          :'<td valign="middle">'+html+'</td><td width="16" style="width:16px;font-size:0;">&nbsp;</td><td width="80" valign="middle" style="width:80px;">'+ph+'</td>')+'</tr></table>';}
+      break;}
     case 'event':{const ev=evInfo(b),rr=T.cardR?10:0,lk=(u,t)=>'<a href="'+esc(u)+'" target="_blank" style="color:'+T.accent+';text-decoration:underline;">'+t+'</a>';
       const badge='<td width="64" valign="top" style="width:64px;"><table role="presentation" width="64" cellpadding="0" cellspacing="0" border="0" bgcolor="'+T.accent+'" style="width:64px;background-color:'+T.accent+';border-radius:'+rr+'px;"><tr><td align="center" style="padding:9px 0 10px;text-align:center;">'+
         '<div style="'+f(T.bf,11,14,T.on,'font-weight:bold;letter-spacing:1px;text-transform:uppercase;text-align:center;')+'">'+esc(ev.mon)+'</div><div style="'+f(T.hf,26,30,T.on,'font-weight:bold;text-align:center;')+'">'+esc(ev.day)+'</div></td></tr></table></td>';
@@ -1405,7 +1416,7 @@ document.addEventListener('paste',e=>{
   const cd=e.clipboardData;if(!cd)return;
   const imgs=[...cd.files].filter(f=>/^image\//.test(f.type));
   if(imgs.length){e.preventDefault();const b=selBlock();
-    const tgt=b&&imgs.length===1&&(('img' in b&&(b.type!=='header'||b.style==='monogram'||b.logo!=='none'))||(b.type==='people'&&sel.sub)||(b.type==='columns'&&b.layout!=='text'))?{id:b.id,sub:b.type==='people'?sel.sub:b.type==='columns'?'pic':''}:null;takeFiles(imgs,tgt);return;}
+    const tgt=b&&imgs.length===1&&(('img' in b&&(b.type!=='header'||b.style==='monogram'||b.logo!=='none'))||(b.type==='people'&&sel.sub)||(b.type==='columns'&&b.layout!=='text')||(b.type==='signature'&&b.photo))?{id:b.id,sub:b.type==='people'?sel.sub:(b.type==='columns'||b.type==='signature')?'pic':''}:null;takeFiles(imgs,tgt);return;}
   const fe=e.target.closest&&e.target.closest('#canvas [data-f]');
   // Cells copied from a spreadsheet arrive as tab-separated lines: fill the table from the cell being pasted into.
   const tm=fe&&/^rows\.(\d+)\.(\d+)$/.exec(fe.dataset.f),txt=cd.getData('text/plain').replace(/\r/g,'').replace(/\n$/,'');
@@ -1421,7 +1432,7 @@ document.addEventListener('paste',e=>{
 const insp=$('#inspector');
 function segF(k,label,opts,val){return '<div class="field"><span class="lab">'+label+'</span><div class="seg'+(opts.length>4?' grid3':'')+'" role="group" aria-label="'+label+'">'+opts.map(o=>'<button data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(String(val)===String(o[0]))+'">'+o[1]+'</button>').join('')+'</div></div>';}
 // Which photo the inspector is editing: a person in a row, the two-column photo, or the block's own.
-function photoPath(b){return b.type==='people'?(sel.sub||null):b.type==='columns'?'pic':'';}
+function photoPath(b){return b.type==='people'?(sel.sub||null):(b.type==='columns'||b.type==='signature')?'pic':'';}
 const ALIGN=[['left','Left'],['center','Center'],['right','Right']],FRAMES=[['plain','Plain'],['ring','Ring'],['double','Double'],['halo','Halo']];
 /* The right panel. It is regenerated from the selected block each time rather
    than kept in sync, and every control carries data-k="fieldPath" so one input
@@ -1470,7 +1481,9 @@ function renderInspector(){
       segF('ink','Ink',[['text','Text'],['accent','Main'],['blue','Blue'],['black','Black']],b.ink)+
       (b.typed?'':'<div class="field"><label for="f-w">Pen thickness</label><input id="f-w" type="range" min="0.6" max="1.8" step="0.1" data-k="weight" value="'+b.weight+'"></div>')+
       segF('size','Size',[['s','S'],['m','M'],['l','L']],b.size)+segF('align','Align',ALIGN,b.align)+
-      '<div class="field"><label class="check"><input type="checkbox" data-k="rule"'+(b.rule?' checked':'')+'> Line under the signature</label></div>';break;}
+      '<div class="field"><label class="check"><input type="checkbox" data-k="rule"'+(b.rule?' checked':'')+'> Line under the signature</label></div>'+
+      '<div class="field"><label class="check"><input type="checkbox" data-k="photo"'+(b.photo?' checked':'')+'> Include a profile picture</label></div>'+
+      (b.photo?'<h2>Profile picture</h2>'+photoUI()+segF('frame','Frame',FRAMES,b.frame||'plain')+'<p class="hint">Beside the signature when it is aligned left or right, above it when centred.</p>':'');break;}
     case 'heading':h+=segF('size','Size',[['xl','Large'],['l','Medium'],['m','Small']],b.size)+segF('align','Align',ALIGN,b.align);break;
     case 'text':h+=rich+segF('size','Size',[['m','Regular'],['l','Large']],b.size)+segF('align','Align',ALIGN,b.align);break;
     case 'photo':h+=photoUI()+segF('frame','Frame',FRAMES,b.frame)+segF('size','Size',[['s','S'],['m','M'],['l','L'],['xl','XL']],b.size)+segF('align','Align',ALIGN,b.align);break;
@@ -1610,6 +1623,7 @@ insp.addEventListener('click',e=>{
 insp.addEventListener('input',e=>{
   const el=e.target.closest('input[data-k],select[data-k]');const b=selBlock();if(!el||!b)return;
   const v=el.type==='range'?parseFloat(el.value):el.type==='checkbox'?el.checked:el.value;
+  if(el.dataset.k==='photo'&&v&&!b.pic)b.pic=P0();  // signatures saved before this option have no photo slot yet
   setPath(b,el.dataset.k,v);renderCanvas();soon();if(el.type==='checkbox'||el.tagName==='SELECT')renderInspector();
 });
 
@@ -1928,14 +1942,14 @@ function plainText(){
     case 'links':return (b.items||[]).map(x=>{const u=linkHref(x)&&(/^(email|phone)$/.test(x.kind)?String(x.url).trim().replace(/^(mailto|tel):/i,''):linkHref(x));return u?(x.label||LINK_KINDS[x.kind][0])+': '+u:'';}).filter(Boolean).join('\n');
     default:return '';}}).filter(Boolean).join('\n\n');
 }
-function eachPhoto(fn){doc.blocks.forEach(b=>{if('img' in b&&(b.type!=='header'||(b.style!=='monogram'&&b.logo!=='none')))fn(b,b);if(b.type==='people')b.items.forEach(i=>fn(i,b));if(b.type==='columns'&&b.layout!=='text')fn(b.pic,b);});}
+function eachPhoto(fn){doc.blocks.forEach(b=>{if('img' in b&&(b.type!=='header'||(b.style!=='monogram'&&b.logo!=='none')))fn(b,b);if(b.type==='people')b.items.forEach(i=>fn(i,b));if(b.type==='columns'&&b.layout!=='text')fn(b.pic,b);if(b.type==='signature'&&b.photo&&b.pic)fn(b.pic,b);});}
 /* The pre-send checklist: the mistakes that are expensive after you hit send —
    no subject, placeholder photos, missing alt text, unsigned signatures and
    buttons with no link. sizes() reports against Gmail's 102 KB clipping
    threshold, which is measured on the markup, not on the attached photos. */
 function checks(){
   const out=[];let ph=0,noAlt=0,n=0;
-  eachPhoto(p=>{n++;if(!p.img)ph++;else if(!(p.alt||p.name||p.caption))noAlt++;});
+  eachPhoto((p,b)=>{n++;if(!p.img)ph++;else if(!(p.alt||p.name||p.caption||(b&&b.type==='signature'&&b.name)))noAlt++;});
   const btn=doc.blocks.filter(b=>b.type==='button'&&!/^(https?:|mailto:)/i.test(b.url||'')).length;
   out.push(doc.subject.trim()?{ok:1,t:'Subject line is set.'}:{ok:0,t:'Add a subject line above the email.'});
   if(!doc.blocks.length)out.push({ok:0,t:'The email is empty.'});

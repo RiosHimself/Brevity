@@ -11,6 +11,7 @@ All notable changes to this project are recorded here. Dates are the day the cha
 - Installed on a computer, Brevity opens `.brevity` files
 - List levels: Tab and Shift+Tab inside a list item, or the two arrow buttons, move it in or out, up to three levels, with bullets and numbering that change by level (1, a, i)
 - Heading and Subheading lines inside text, callout, footer, event and column text, set from the new Line row in the toolbar
+- Signature blocks can include a round profile picture, beside the signature when aligned left or right and above it when centred, with the usual frames, zoom and drag to reposition
 
 ### Fixed
 - Edits made in the second or so before closing or reloading the page could be lost. Brevity now saves as soon as the page is hidden or closed

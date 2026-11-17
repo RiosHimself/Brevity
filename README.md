@@ -43,6 +43,7 @@ Brevity works inside those limits instead of around them:
 **Signatures**
 - Draw with a mouse, finger or stylus. Strokes are smoothed as you write and settled when you lift the pen; the line thins as you move faster, and stylus pressure is used where available
 - Or type your name in one of four handwriting styles
+- Add a round profile picture beside or above the signature
 - Either way the result is rasterized, so the recipient needs no fonts
 
 **Style**
