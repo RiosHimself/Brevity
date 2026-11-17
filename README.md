@@ -93,6 +93,7 @@ Nothing leaves the browser. There is no server, no analytics and no network requ
 - **Photos are embedded as data URIs,** which keeps the email self-contained but counts against Gmail's 25 MB message limit. A newsletter service such as Mailchimp wants photos hosted online instead.
 - **Outlook on Windows** uses the Word rendering engine and will square off some rounded corners. Circular photos survive because they are baked images.
 - **No mail merge, no sending.** Brevity composes; your mail client sends.
+- **Flags on Windows.** Windows has no flag emoji, so Windows readers see two letters for a flag sent as text. Turn on **Send emoji as pictures** in Check and export to send real flags. A flag in the subject line stays text.
 - **Dark mode in mail clients** may recolour parts of the message. Test if your recipients are likely to read in dark mode.
 - **Drafts, saved layouts and sections are per browser.** They do not sync between devices; save a `.brevity` file to move an email.
 - **Add to calendar** covers Google Calendar and Outlook. Apple Calendar needs an `.ics` file, which an email body cannot carry; Apple Mail offers to add dates it finds in the text.
@@ -123,3 +124,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). The short version: keep it one file with
 ## Licence
 
 MIT. See [LICENSE](LICENSE).
+
+Country flag artwork on Windows comes from [Twemoji](https://github.com/twitter/twemoji) by Twitter, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), via the "Twemoji Country Flags" font from TalkJS's [country-flag-emoji-polyfill](https://github.com/talkjs/country-flag-emoji-polyfill) (MIT). The font is embedded unchanged in `index.html` and is only used where the computer cannot draw flags itself.

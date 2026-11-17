@@ -2,6 +2,11 @@
 
 All notable changes to this project are recorded here. Dates are the day the change landed.
 
+## [Unreleased]
+
+### Fixed
+- Country flags showed as two letters on Windows, which has no flag emoji. Where a computer cannot draw flags, Brevity now uses a bundled flag font in the picker, the canvas and the subject line, and emoji sent as pictures carry real flags to every reader
+
 ## [1.1.0] — 2026-11-17
 
 ### Added
